@@ -21,7 +21,7 @@ Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descri
 Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit het logo `han-sport-en-bewegen`; daaronder sfeerfoto `wandeling-schemer-staand`. Geen "wachtwoord vergeten" (de docent reset).
 
 ### Onze meerdaagse (startscherm) – OVZ-01, OVZ-02
-1. Kop met sfeerbeeld, naam en verhaal van het meerdaagsethema (anders: foto `vallei-viaduct` en tekst "Kies jullie meerdaagsethema").
+1. Kop met sfeerbeeld, naam en verhaal van het meerdaagsethema (anders: foto `vallei-viaduct` en de melding "Meerdaagsethema nog niet gekozen" met uitleg; stuurgroep en docent krijgen een knop "Thema kiezen").
 2. Aftellen tot 28 juni 2027.
 3. Zes belevenissen als kaarten: titel, publieke samenvatting, statuslabel.
 4. Alleen projectgroep: blok "Jullie AVF" met voortgang per sectie en open verbeterverzoeken.

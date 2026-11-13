@@ -60,7 +60,21 @@ export default async function OnzeMeerdaagse() {
       <section className="relative overflow-hidden rounded-han bg-kop text-white">
         {sfeer && <img src={sfeer} alt="" className="absolute inset-0 size-full object-cover opacity-60" />}
         <div className="relative flex min-h-56 flex-col justify-end gap-2 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <h1 className="text-3xl !text-white">{heeftThema ? thema!.naam : "Kies jullie meerdaagsethema"}</h1>
+          <h1 className="text-3xl !text-white">{heeftThema ? thema!.naam : "Meerdaagsethema nog niet gekozen"}</h1>
+          {!heeftThema && (
+            <p className="text-white">
+              Jullie meerdaagsethema is nog niet gekozen en nog niet ingevuld. De stuurgroep (Beleving & Thema) kiest het thema.
+              Zodra dat is gebeurd, zie je hier de naam, het verhaal en het sfeerbeeld.
+            </p>
+          )}
+          {!heeftThema && (profiel.soort === "stuurgroep" || profiel.soort === "docent") && (
+            <Link
+              href="/stuurgroep/beleving-thema"
+              className="mt-1 flex min-h-aanraak items-center justify-center rounded-han bg-white px-4 font-bold text-kop"
+            >
+              Thema kiezen
+            </Link>
+          )}
           {heeftThema && thema!.verhaal && <p className="text-white">{thema!.verhaal}</p>}
           {heeftThema && thema!.slogan && <p className="font-medium text-white">{thema!.slogan}</p>}
         </div>

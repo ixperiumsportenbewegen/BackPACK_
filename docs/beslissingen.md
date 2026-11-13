@@ -31,3 +31,4 @@
 | 2026-11-13 | Webadres voorlopig https://back-pack-one.vercel.app (Vercel, team iXperium Sport en Bewegen) | Open punt 6: tijdelijke keuze `<projectnaam>.vercel.app` |
 | 2026-11-13 | De naam wordt overal geschreven als BackPACK_ (PACK in hoofdletters, met underscore), ook in lopende tekst en in het manifest | Besluit Bart; vervangt de schrijfwijze Backpack_ |
 | 2026-11-13 | Meerdaagsethema per cluster: de stuurgroep bedenkt het thema zelf en voegt het plaatje toe (eigen upload of een outdoorfoto uit assets/fotos); één accentkleur uit rood, oranje, groen of blauw; PRD-zin over "drie kleuren" vervalt | Besluit Bart; bouwvolgorde en huisstijl gaan voor het PRD |
+| 2026-11-13 | Beginwaarden: geen enkel cluster heeft een thema; het startscherm toont "Meerdaagsethema nog niet gekozen" met uitleg (VD heette eerder Oerspelen in de testdata) | Besluit Bart; de stuurgroep kiest het thema zelf |

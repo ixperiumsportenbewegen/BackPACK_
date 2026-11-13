@@ -47,14 +47,11 @@
     {
       "code": "VD",
       "naam": "Cluster VD",
-      "budget_totaal": 250.0,
+      "budget_totaal": 250,
       "teams_link": "https://teams.microsoft.com/",
       "forms_link": "https://forms.office.com/",
       "meerdaagsethema": {
-        "naam": "Oerspelen",
-        "verhaal": "Drie dagen terug naar de oertijd: stammen strijden in de Ardennen om de eer van de vallei.",
-        "slogan": "Eén vallei, zes stammen",
-        "accentkleur": "#F5A846"
+        "naam": null
       },
       "stuurgroeprollen": [
         {
@@ -178,7 +175,7 @@
     {
       "code": "VC",
       "naam": "Cluster VC",
-      "budget_totaal": 250.0,
+      "budget_totaal": 250,
       "teams_link": "https://teams.microsoft.com/",
       "forms_link": "https://forms.office.com/",
       "meerdaagsethema": {
@@ -306,7 +303,7 @@
     {
       "code": "TEST",
       "naam": "Oefencluster",
-      "budget_totaal": 250.0,
+      "budget_totaal": 250,
       "teams_link": "",
       "forms_link": "",
       "meerdaagsethema": {

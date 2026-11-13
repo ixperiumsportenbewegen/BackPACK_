@@ -12,10 +12,10 @@ test.describe.configure({ mode: "serial" });
 
 const wachtwoorden: Record<string, string> = JSON.parse(readFileSync("seed/wachtwoorden.local.json", "utf8"));
 const ORIGINEEL = {
-  naam: "Oerspelen",
-  verhaal: "Drie dagen terug naar de oertijd: stammen strijden in de Ardennen om de eer van de vallei.",
-  slogan: "Eén vallei, zes stammen",
-  accentkleur: "#F5A846",
+  naam: null,
+  verhaal: null,
+  slogan: null,
+  accentkleur: null,
   sfeerbeeld_pad: null,
   logo_pad: null,
   bijgewerkt_door_naam: null,
@@ -72,7 +72,7 @@ test("de stuurgroep stelt het thema in; VD ziet het direct, VC niet", async ({ b
   // VC ziet niets veranderen
   const vc = await nieuweSessie(browser, "vc-groep-1");
   await expect(vc.page.getByRole("banner").getByText("Ardennen Avontuur")).toHaveCount(0);
-  await expect(vc.page.getByRole("heading", { name: "Kies jullie meerdaagsethema" })).toBeVisible();
+  await expect(vc.page.getByRole("heading", { name: "Meerdaagsethema nog niet gekozen" })).toBeVisible();
 
   // Een projectgroep komt niet op de werkpagina
   await groep.page.goto("/stuurgroep/beleving-thema");

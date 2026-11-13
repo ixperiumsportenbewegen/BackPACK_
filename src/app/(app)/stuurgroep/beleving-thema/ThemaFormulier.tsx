@@ -174,7 +174,7 @@ export function ThemaFormulier({
         <div className="relative bg-kop">
           {sfeerUrl && <img src={sfeerUrl} alt="" className="h-36 w-full object-cover opacity-70" />}
           <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-3 text-white">
-            <p className="font-heading text-xl font-bold">{concept.naam?.trim() || "Kies jullie meerdaagsethema"}</p>
+            <p className="font-heading text-xl font-bold">{concept.naam?.trim() || "Meerdaagsethema nog niet gekozen"}</p>
             {concept.slogan?.trim() && <p className="text-sm font-medium">{concept.slogan}</p>}
           </div>
         </div>

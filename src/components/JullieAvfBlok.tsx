@@ -1,15 +1,17 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { AvfStatusLabel } from "@/components/BelevenisKaart";
+import { ChevronRight, MessageSquareWarning } from "lucide-react";
+import { AvfStatusLabel, OpnieuwLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
 import { SECTIES } from "@/config/avf-velden";
 import type { AvfGegevens } from "@/lib/avfData";
+import { laadVerzoeken } from "@/lib/beoordeling";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { formatTijdvak } from "@/lib/tijd";
 
-/** Het blok "Jullie AVF": status, voortgang per sectie, open verbeterverzoeken volgen in opdracht 4. */
-export function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop?: "h2" | "h3" }) {
+/** Het blok "Jullie AVF": status, voortgang per sectie en open verbeterverzoeken. */
+export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop?: "h2" | "h3" }) {
   const Kop = kop;
+  const open = (await laadVerzoeken(avf.id)).filter((v) => v.status === "open").length;
   const voortgang = voortgangPerSectie(avf.inhoud);
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
@@ -20,8 +22,14 @@ export function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop?: "h2
       <p className="mt-1 text-lg font-bold text-kop">{avf.inhoud.titel?.trim() || "Nog geen titel"}</p>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <AvfStatusLabel status={avf.status} />
+        {avf.opnieuwTeControleren && <OpnieuwLabel />}
         <span className="font-medium text-kop">{leeg ? "Jullie BackPACK_ is nog leeg. Begin met sectie A." : `${compleet} van ${totaal} vakken ingepakt`}</span>
       </div>
+      {open > 0 && (
+        <p role="status" className="mt-2 flex items-center gap-2 font-bold text-kop">
+          <MessageSquareWarning aria-hidden className="size-5 shrink-0" /> {open === 1 ? "1 open verbeterverzoek" : `${open} open verbeterverzoeken`} van de stuurgroep
+        </p>
+      )}
       <p className="mt-1 text-sm text-zacht">{avf.tijdvak ? formatTijdvak(avf.tijdvak) : "Nog niet ingepland"}</p>
       <ul className="mt-3 grid grid-cols-2 gap-2">
         {SECTIES.map((s) => {

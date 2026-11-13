@@ -4,7 +4,9 @@ import { ChevronLeft } from "lucide-react";
 import { AvfEditor } from "@/components/avf/AvfEditor";
 import { OnderdeelEditor } from "@/components/avf/OnderdeelEditor";
 import { StapNavigatie } from "@/components/avf/StapNavigatie";
+import { VerzoekenLijst } from "@/components/avf/Verzoeken";
 import { laadEigenAvf } from "@/lib/avfData";
+import { laadVerzoeken } from "@/lib/beoordeling";
 import { getProfiel } from "@/lib/profiel";
 
 export const metadata = { title: "Onderdeel · BackPACK_" };
@@ -23,6 +25,7 @@ export default async function OnderdeelPagina({ params }: { params: Promise<{ id
   const nr = inFase.findIndex((o) => o.id === onderdeel.id);
   const buur = (o: (typeof inFase)[number] | undefined) =>
     o ? { href: `/avf/onderdeel/${o.id}`, label: `${inFase.indexOf(o) + 1}. ${o.naam?.trim() || "Onderdeel zonder naam"}` } : null;
+  const verzoeken = (await laadVerzoeken(avf.id)).filter((v) => v.onderdeelId === onderdeel.id);
   const terugNaarFase = { href: `/avf/D?fase=${onderdeel.fase}`, label: `Terug naar de ${FASE_LABEL[onderdeel.fase].toLowerCase()} met alle onderdelen` };
 
   return (
@@ -31,6 +34,7 @@ export default async function OnderdeelPagina({ params }: { params: Promise<{ id
         <ChevronLeft aria-hidden className="size-5" /> Sectie D · {FASE_LABEL[onderdeel.fase]}
       </Link>
       <h1 className="text-3xl">{onderdeel.naam?.trim() || "Onderdeel zonder naam"}</h1>
+      <VerzoekenLijst verzoeken={verzoeken} kop="Verbeterverzoeken voor dit onderdeel" />
       <AvfEditor vergrendeld={avf.status === "ingediend"}>
         <OnderdeelEditor key={onderdeel.id} onderdeel={onderdeel} avfId={avf.id} clusterId={avf.clusterId} />
       </AvfEditor>

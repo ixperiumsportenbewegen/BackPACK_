@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, FileText } from "lucide-react";
-import { BelevenisKaart } from "@/components/BelevenisKaart";
+import { BelevenisKaart, OpnieuwLabel } from "@/components/BelevenisKaart";
+import { laadStanden } from "@/lib/beoordeling";
 import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { PaginaKop } from "@/components/PaginaKop";
 import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
@@ -15,6 +16,7 @@ export default async function Belevenissen() {
   const eigenAvf = profiel.soort === "projectgroep" ? await laadEigenAvf() : null;
   const anderen = kaarten.filter((k) => k.projectgroepNummer !== eigenNummer);
   const leesbaar = profiel.soort === "stuurgroep" || profiel.soort === "docent";
+  const standen = leesbaar && profiel.cluster ? await laadStanden(profiel.cluster.id) : {};
 
   return (
     <div className="flex flex-col gap-4">
@@ -37,6 +39,13 @@ export default async function Belevenissen() {
           {anderen.map((k) => (
             <li key={k.id}>
               <BelevenisKaart k={k} />
+              {leesbaar && standen[k.id] && (standen[k.id].opnieuwTeControleren || standen[k.id].open > 0 || standen[k.id].aangepast > 0) && (
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm font-medium text-kop">
+                  {standen[k.id].opnieuwTeControleren && <OpnieuwLabel />}
+                  {standen[k.id].open > 0 && <span>{standen[k.id].open} open {standen[k.id].open === 1 ? "verbeterverzoek" : "verbeterverzoeken"}</span>}
+                  {standen[k.id].aangepast > 0 && <span>{standen[k.id].aangepast} aangepast door de groep</span>}
+                </p>
+              )}
               {leesbaar && (
                 <Link href={`/belevenissen/${k.id}`} className="mt-1 flex min-h-aanraak items-center gap-2 font-bold text-kop underline">
                   <FileText aria-hidden className="size-5" /> Het hele AVF lezen

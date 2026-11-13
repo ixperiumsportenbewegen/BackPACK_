@@ -4,6 +4,7 @@ import { PROJECTGROEPROLLEN } from "@/config/projectgroeprollen";
 import type { AvfGegevens } from "@/lib/avfData";
 import { isGevuld, type Json } from "@/lib/avfVoortgang";
 import { formatTijdvak } from "@/lib/tijd";
+import { VerzoekSectie, type VerzoekContext } from "@/components/avf/VerzoekSectie";
 
 const FASEN = [{ code: "kop", naam: "Kop" }, { code: "romp", naam: "Romp" }, { code: "staart", naam: "Staart" }] as const;
 const tekst = (w: unknown) => (isGevuld(w) ? String(w) : "");
@@ -17,14 +18,15 @@ function Rij({ label, waarde }: { label: string; waarde: React.ReactNode }) {
   );
 }
 
-function Blok({ code, children }: { code: string; children: React.ReactNode }) {
+function Blok({ code, children, onder }: { code: string; children: React.ReactNode; onder?: React.ReactNode }) {
   const s = SECTIES.find((x) => x.code === code)!;
   return (
-    <section className="break-inside-avoid-page">
+    <section id={`sectie-${code}`} className="break-inside-avoid-page scroll-mt-24">
       <h2 className="border-b-2 border-kop pb-1 text-2xl">
         <span className="text-merk">{code}</span> · {s.naam}
       </h2>
       <div className="mt-3 flex flex-col gap-3">{children}</div>
+      {onder}
     </section>
   );
 }
@@ -40,7 +42,8 @@ function Afbeelding({ pad, bijschrift }: { pad: string | null; bijschrift: strin
 }
 
 /** Het volledige AVF als leesbare pagina die goed afdrukt (opslaan als PDF via de browser). */
-export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
+export function AvfLeesweergave({ avf, verzoeken }: { avf: AvfGegevens; verzoeken?: VerzoekContext }) {
+  const onder = (sectie: "A" | "B" | "C" | "D" | "E" | "G" | "H") => (verzoeken ? <VerzoekSectie ctx={verzoeken} sectie={sectie} /> : null);
   const i = avf.inhoud;
   const bs = i.beginsituatie as Json;
   const dl = i.doelen as Json;
@@ -54,7 +57,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <Blok code="A">
+      <Blok code="A" onder={onder("A")}>
         <dl className="grid gap-3 sm:grid-cols-2">
           <Rij label="Titel" waarde={tekst(i.titel)} />
           <Rij label="Verschijningsvorm" waarde={tekst(i.verschijningsvorm)} />
@@ -68,7 +71,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         </dl>
       </Blok>
 
-      <Blok code="B">
+      <Blok code="B" onder={onder("B")}>
         <dl className="flex flex-col gap-3">
           <Rij label="Algemene omschrijving van de groep" waarde={tekst(bs.algemeen)} />
           <Rij label="Motorische beginsituatie" waarde={tekst(bs.motorisch)} />
@@ -77,7 +80,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         </dl>
       </Blok>
 
-      <Blok code="C">
+      <Blok code="C" onder={onder("C")}>
         <dl className="flex flex-col gap-3">
           <Rij label="Motorisch doel" waarde={tekst(dl.motorisch)} />
           <Rij label="Cognitief doel" waarde={tekst(dl.cognitief)} />
@@ -93,7 +96,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         </dl>
       </Blok>
 
-      <Blok code="D">
+      <Blok code="D" onder={onder("D")}>
         {FASEN.map((fase) => {
           const f = avf.fasen.find((x) => x.fase === fase.code)!;
           const onderdelen = avf.onderdelen.filter((o) => o.fase === fase.code);
@@ -130,6 +133,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
                       <Rij label="USV: veilig" waarde={[tekst(o.fysieke_veiligheid), veld("usv_veilig_aanvulling") && `Aanvulling: ${veld("usv_veilig_aanvulling")}`].filter(Boolean).join("\n")} />
                     </dl>
                     <div className="mt-2"><Afbeelding pad={o.afbeelding_pad} bijschrift={o.afbeelding_bijschrift} /></div>
+                    {verzoeken && <VerzoekSectie ctx={verzoeken} sectie="D" onderdeelId={o.id} />}
                   </article>
                 );
               })}
@@ -138,7 +142,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         })}
       </Blok>
 
-      <Blok code="E">
+      <Blok code="E" onder={onder("E")}>
         <dl className="flex flex-col gap-3">
           <Rij
             label="Risico's"
@@ -174,7 +178,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         </dl>
       </Blok>
 
-      <Blok code="G">
+      <Blok code="G" onder={onder("G")}>
         <dl className="flex flex-col gap-3">
           <Rij label="Bijdrage aan het meerdaagsethema" waarde={tekst(g.bijdrage_thema)} />
           <Rij label="Samenhang met het programma" waarde={tekst(g.samenhang)} />
@@ -191,7 +195,7 @@ export function AvfLeesweergave({ avf }: { avf: AvfGegevens }) {
         </dl>
       </Blok>
 
-      <Blok code="H">
+      <Blok code="H" onder={onder("H")}>
         <dl className="flex flex-col gap-3">
           <Rij label="Voor" waarde={tekst(h.voor)} />
           <Rij label="Tijdens" waarde={tekst(h.tijdens)} />

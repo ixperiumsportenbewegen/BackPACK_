@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, FileText, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, MapPin, Send } from "lucide-react";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
+import { VerzoekLabel } from "@/components/avf/Verzoeken";
 import { PaginaKop } from "@/components/PaginaKop";
 import { SECTIES, eigenarenVanSectie } from "@/config/avf-velden";
 import { rolNaam } from "@/components/avf/Sectie";
 import { laadEigenAvf } from "@/lib/avfData";
+import { laadVerzoeken } from "@/lib/beoordeling";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { getProfiel } from "@/lib/profiel";
 import { formatMoment, formatTijdvak } from "@/lib/tijd";
@@ -20,6 +22,7 @@ export default async function AvfOverzicht() {
   if (!avf) redirect("/");
 
   const voortgang = voortgangPerSectie(avf.inhoud);
+  const verzoeken = (await laadVerzoeken(avf.id)).filter((v) => v.status !== "afgehandeld");
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
 
@@ -50,11 +53,18 @@ export default async function AvfOverzicht() {
           </p>
           <p className="mt-1 text-sm text-zacht">Tijdvak en locatie bepaalt de stuurgroep. Dit kunnen jullie niet wijzigen.</p>
         </div>
-        {avf.status === "ingediend" && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd.</p>}
+        {avf.status === "ingediend" && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd. De stuurgroep beoordeelt het.</p>}
+        {avf.status === "aanpassing_gevraagd" && <p className="mt-3 font-medium text-kop">De stuurgroep vraagt om aanpassingen. Zie de secties met een open verbeterverzoek.</p>}
+        {avf.opnieuwTeControleren && <p className="mt-3 font-medium text-kop">Opnieuw te controleren: jullie hebben iets belangrijks gewijzigd na de goedkeuring.</p>}
       </section>
 
       <Link href={`/belevenissen/${avf.id}`} className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
         <FileText aria-hidden className="size-5" /> Het hele AVF lezen of afdrukken
+      </Link>
+
+      <Link href="/avf/indienen" className="flex min-h-aanraak items-center justify-between gap-2 rounded-han bg-merk px-4 font-bold text-op-merk">
+        <span className="flex items-center gap-2"><Send aria-hidden className="size-5" /> {avf.status === "ingediend" ? "Stand van het indienen" : avf.status === "goedgekeurd" ? "Status van de goedkeuring" : "Indienen"}</span>
+        <ChevronRight aria-hidden className="size-5" />
       </Link>
 
       <ul className="flex flex-col gap-2">
@@ -70,6 +80,7 @@ export default async function AvfOverzicht() {
                   <span className="block font-bold text-kop">{s.naam}</span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-2">
                     <StatusLabel status={v.status} />
+                    {verzoeken.some((z) => z.sectie === s.code && z.status === "open") ? <VerzoekLabel status="open" /> : verzoeken.some((z) => z.sectie === s.code && z.status === "aangepast") ? <VerzoekLabel status="aangepast" /> : null}
                   </span>
                   <span className="mt-1 block text-sm text-zacht">Eigenaar: {eigenaren}</span>
                   {bijgewerkt && (

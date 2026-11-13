@@ -13,7 +13,7 @@ type R = { ok: boolean; reden?: string; ontbrekend?: string[]; verzoeken?: { id:
 let VD: string, TEST: string;
 let avfTest1: string; // test-groep-1: voorbeeld-AVF
 let avfTest2: string; // test-groep-2: leeg AVF
-let avfVd1: string, avfVd2: string;
+let avfVd1: string;
 let origineel: Record<string, unknown>;
 let onderdeelId: string;
 let origineleFysiek: string | null;
@@ -49,7 +49,6 @@ beforeAll(async () => {
   avfTest1 = await avfId(TEST, 1);
   avfTest2 = await avfId(TEST, 2);
   avfVd1 = await avfId(VD, 1);
-  avfVd2 = await avfId(VD, 2);
   const { data } = await admin.from("avf").select("*").eq("id", avfTest1).single();
   origineel = data!;
   const { data: o } = await admin.from("avf_onderdeel").select("id, fysieke_veiligheid").eq("avf_id", avfTest1).eq("fase", "romp").order("volgorde").limit(1).single();

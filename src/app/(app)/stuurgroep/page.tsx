@@ -10,29 +10,22 @@ import { stuurgroepRolOpslaan } from "../namen-actions";
 
 export const metadata = { title: "Stuurgroep · BackPACK_" };
 
-// De vier vakken van PACK en hun rollen (docs/huisstijl.md); de pagina's komen per opdracht.
+// De vier vakken van PACK en hun rollen (docs/huisstijl.md). Elke rol heeft een eigen rolweergave.
 const PACK = [
-  {
-    letter: "P", naam: "Pleister", icoon: Bandage,
-    rollen: [
-      { code: "veiligheid_welzijn", naam: "Veiligheid & Welzijn" },
-      { code: "logistiek_facilitair", naam: "Logistiek & Facilitair" },
-    ],
-  },
-  {
-    letter: "A", naam: "Aansteker", icoon: Flame,
-    rollen: [
-      { code: "beleving_thema", naam: "Beleving & Thema", href: "/stuurgroep/beleving-thema" },
-      { code: "programma_kwaliteit", naam: "Programma & Kwaliteit", href: "/stuurgroep/programma" },
-    ],
-  },
+  { letter: "P", naam: "Pleister", icoon: Bandage, rollen: [
+    { code: "veiligheid_welzijn", naam: "Veiligheid & Welzijn" }, { code: "logistiek_facilitair", naam: "Logistiek & Facilitair" } ] },
+  { letter: "A", naam: "Aansteker", icoon: Flame, rollen: [
+    { code: "beleving_thema", naam: "Beleving & Thema" }, { code: "programma_kwaliteit", naam: "Programma & Kwaliteit" } ] },
   { letter: "C", naam: "Camera", icoon: Camera, rollen: [{ code: "communicatie_financien", naam: "Communicatie & Financiën" }] },
   { letter: "K", naam: "Kompas", icoon: Compass, rollen: [{ code: "projectleiding", naam: "Projectleiding" }] },
 ] as const;
 
-export default async function Stuurgroep() {
+export default async function Stuurgroep({ searchParams }: { searchParams: Promise<{ alle?: string }> }) {
   const profiel = (await getProfiel())!;
   if (profiel.soort !== "stuurgroep" && profiel.soort !== "docent") redirect("/");
+  // Een stuurgroepaccount opent standaard op de eigen rol; het overzicht van alle rollen staat achter "Overzicht".
+  const { alle } = await searchParams;
+  if (profiel.soort === "stuurgroep" && profiel.stuurgroeprol && !alle) redirect(`/stuurgroep/rol/${profiel.stuurgroeprol.code}`);
 
   const supabase = await maakServerClient();
   const { data: rollen } = await supabase
@@ -44,7 +37,7 @@ export default async function Stuurgroep() {
   return (
     <div className="flex flex-col gap-4">
       <PaginaKop titel="Stuurgroep" foto="ochtend-tentterrein" />
-      <p className="text-zacht">De werkpagina&apos;s van de stuurgroep, ingedeeld in de vier vakken van BackPACK_.</p>
+      <p className="text-zacht">De rollen van de stuurgroep, ingedeeld in de vier vakken van BackPACK_. Elke rol ziet de velden van alle zes belevenissen die bij de rol horen.</p>
 
       {PACK.map((vak) => {
         const Icoon = vak.icoon;
@@ -57,13 +50,13 @@ export default async function Stuurgroep() {
             <ul className="mt-3 flex flex-col gap-2">
               {vak.rollen.map((rol) => {
                 const eigen = profiel.stuurgroeprol?.code === rol.code;
-                const href = "href" in rol ? rol.href : undefined;
+                const href = `/stuurgroep/rol/${rol.code}`;
                 const inhoud = (
                   <>
                     <span className="flex-1">
                       <span className="block font-bold text-kop">{rol.naam}</span>
                       <span className="block text-sm text-zacht">
-                        {eigen ? "Jullie rol" : href ? "Open de werkpagina" : "Komt in een volgende stap"}
+                        {eigen ? "Jullie rol" : "Open de rolweergave"}
                       </span>
                     </span>
                     {href && <ChevronRight aria-hidden className="size-5 text-kop" />}

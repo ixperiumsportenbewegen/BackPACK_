@@ -184,7 +184,9 @@ Bevroren kopie bij elke indiening.
 | onderdeel_id | uuid → avf_onderdeel | optioneel |
 | projectgroeprol | enum `projectgroeprol` | voor wie het bedoeld is |
 | tekst | text | |
-| status | enum | `open`, `aangepast`, `afgehandeld` |
+| veld_sleutel | text | optioneel: het AVF-veld waar het verzoek over gaat (uit het dashboard) |
+| status | enum | `open`, `aangepast`, `afgehandeld`. Wordt `aangepast` zodra de projectgroep daarna iets opslaat in die sectie (of dat onderdeel); de database doet dat met triggers |
+| aangepast_op, afgehandeld_op | timestamptz | |
 | door_account, door_naam | uuid, text | |
 
 ### themacheck

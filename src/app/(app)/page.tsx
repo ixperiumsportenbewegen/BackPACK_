@@ -5,6 +5,7 @@ import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
+import { laadStanden } from "@/lib/beoordeling";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
@@ -31,6 +32,17 @@ export default async function OnzeMeerdaagse() {
   const rollenGesorteerd = [...(rollen ?? [])].sort(
     (a, b) => STUURGROEPROL_VOLGORDE.indexOf(a.code) - STUURGROEPROL_VOLGORDE.indexOf(b.code),
   );
+  const standen = toonStand && profiel.cluster ? Object.values(await laadStanden(profiel.cluster.id)) : [];
+  const wachten = standen.filter((s) => s.status === "ingediend" || s.opnieuwTeControleren).length;
+  const openVerzoeken = standen.reduce((n, s) => n + s.open, 0);
+  const regelVoor = (code: string): string => {
+    if (code !== "programma_kwaliteit" && code !== "projectleiding") return "Nog niets te melden";
+    const delen = [
+      wachten > 0 ? `${wachten} ${wachten === 1 ? "AVF wacht" : "AVF's wachten"} op beoordeling` : null,
+      openVerzoeken > 0 ? `${openVerzoeken} open ${openVerzoeken === 1 ? "verbeterverzoek" : "verbeterverzoeken"}` : null,
+    ].filter(Boolean);
+    return delen.length ? delen.join(" · ") : "Niets te beoordelen";
+  };
   const sfeer = themaBeeldUrl(thema?.sfeerbeeld_pad ?? STANDAARD_SFEERBEELD, 1600);
 
   return (
@@ -128,8 +140,8 @@ export default async function OnzeMeerdaagse() {
           <ul className="mt-2 divide-y divide-rand">
             {rollenGesorteerd.map((r) => (
               <li key={r.code} className="flex items-center justify-between gap-3 py-3">
-                <span className="font-medium text-kop">{r.naam}</span>
-                <span className="text-sm text-zacht">Nog niets te melden</span>
+                <Link href={`/stuurgroep/rol/${r.code}`} className="flex min-h-aanraak items-center font-medium text-kop underline">{r.naam}</Link>
+                <span className="text-right text-sm text-zacht">{regelVoor(r.code)}</span>
               </li>
             ))}
           </ul>

@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleDashed, Clock, Send, TriangleAlert } from "lucide-react";
+import { CheckCircle2, CircleDashed, Clock, RotateCw, Send, TriangleAlert } from "lucide-react";
 import { formatTijdvak } from "@/lib/tijd";
 
 export type AvfStatus = "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
@@ -16,6 +16,15 @@ export function AvfStatusLabel({ status }: { status: AvfStatus }) {
   return (
     <span className={`inline-flex items-center gap-1 rounded-han px-2 py-0.5 text-xs font-bold ${s.klasse}`}>
       <Icoon aria-hidden className="size-3.5" /> {s.tekst}
+    </span>
+  );
+}
+
+/** Label voor een goedgekeurd AVF waarin daarna iets belangrijks is gewijzigd. */
+export function OpnieuwLabel() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-han border-2 border-kop bg-vlak px-2 py-0.5 text-xs font-bold text-kop">
+      <RotateCw aria-hidden className="size-3.5" /> Opnieuw te controleren
     </span>
   );
 }

@@ -23,7 +23,9 @@ Voor een nieuwe sessie of een nieuwe collega. Lees eerst `CLAUDE.md` (leidende d
   - Verschijningsvorm met meerdere keuzes (Spel, Wedstrijd, Avontuur, Gezondheid, Recreatie, Show), locatie kiezen (Camping, Bivak of Anders) door de stuurgroep, navigatie door het AVF (sectiebalk, vorige en volgende), het BackPACK_-avatar als app-icoon.
 - Alles staat live. Test voor elke opdracht: log in met de testaccounts, ook op een telefoon.
 
-**Volgende stap: opdracht 4 (indienen en beoordelen).** Zie `docs/bouwvolgorde.md` en PRD hoofdstuk 5 en 12. Let op: de planning-functie die daar stond is al in opdracht 3 gebouwd; zie `docs/beslissingen.md`.
+- **Opdracht 4** Indienen en beoordelen: `/avf/indienen` (controlelijst, naam, samenvatting vanaf versie 2, waarschuwing bij open verzoeken zonder aanpassing), beoordelen op `/belevenissen/[id]` (verbeterverzoeken per sectie en onderdeel, themachecks, aanpassing vragen, goedkeuren, tabblad Versies), label "Opnieuw te controleren" via triggers, stuurgroepdashboard met rolweergave op `/stuurgroep/rol/[code]` (opent op de eigen rol, overzicht via `/stuurgroep?alle=1`). Migraties 12 en 13.
+
+**Volgende stap: opdracht 5 (materialen en budget).** Zie `docs/bouwvolgorde.md`. Daarbij ook `avf_indienen` laten doorzetten naar de budgetaanvraag en materialen meenemen in de wezenlijke-wijzigingstrigger.
 
 ## Hoe je werkt
 
@@ -39,7 +41,7 @@ Op deze Windows-machine blokkeert PowerShell `npx` en `npm`: gebruik `npx.cmd` e
 | Testdata laden | `npm run seed`; een programma terugzetten: `npm run seed -- --programma-opnieuw=VC` |
 | Iconen opnieuw maken | `node scripts/maak-iconen.mjs` |
 
-Migraties staan in `supabase/migrations/` (nu 1 t/m 11). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
+Migraties staan in `supabase/migrations/` (nu 1 t/m 13). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
 
 ## Valkuilen uit de vorige sessie
 

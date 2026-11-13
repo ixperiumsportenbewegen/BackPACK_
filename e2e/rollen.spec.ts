@@ -97,7 +97,7 @@ test("een student en de stuurgroep zien de rolverdeling-pagina van een projectgr
 
 test("de stuurgroep past alleen de namen bij de eigen rol aan", async ({ browser }) => {
   const s = await nieuweSessie(browser, "vd-stuur-programma");
-  await s.page.goto("/stuurgroep");
+  await s.page.goto("/stuurgroep?alle=1");
 
   const eigen = await veld(s.page, "Programma & Kwaliteit");
   await eigen.fill("Anna en Bram");
@@ -113,7 +113,7 @@ test("de stuurgroep past alleen de namen bij de eigen rol aan", async ({ browser
 
   // De docent kan alle rollen aanpassen
   const d = await nieuweSessie(browser, "docent");
-  await d.page.goto("/stuurgroep");
+  await d.page.goto("/stuurgroep?alle=1");
   await expect(d.page.locator("input#namen-beleving-thema")).toHaveCount(1);
   await d.ctx.close();
 });
@@ -133,6 +133,6 @@ test("startscherm: zes belevenissenkaarten; stand per rol alleen voor stuurgroep
   const stuur = await nieuweSessie(browser, "vd-stuur-veiligheid");
   await expect(stuur.page.locator("main article")).toHaveCount(6);
   await expect(stuur.page.getByRole("heading", { name: "Stand van zaken per rol" })).toBeVisible();
-  await expect(stuur.page.getByText("Nog niets te melden")).toHaveCount(6);
+  await expect(stuur.page.getByText("Nog niets te melden")).toHaveCount(4);
   await stuur.ctx.close();
 });

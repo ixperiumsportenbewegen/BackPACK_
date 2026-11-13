@@ -1,0 +1,61 @@
+/*
+  Ontwerpwaarden Ardennen-meerdaagse-app
+  Bron: HAN-huisstijl (blog3.han.nl/huisstijl), zie docs/huisstijl.md.
+  Alle kleuren en letters komen uit dit bestand. Niet elders hardcoderen.
+*/
+:root {
+  /* Primair palet */
+  --han-rood: #E50056;
+  --han-wit: #FFFFFF;
+  --han-zwart: #000000;
+
+  /* Grijswaarden */
+  --han-alabaster: #F8F8F8;
+  --han-mercury: #E3E3E3;
+  --han-gray: #919191;       /* niet voor tekst op wit */
+  --han-boulder: #757575;    /* secundaire tekst */
+  --han-mineshaft: #454545;  /* broodtekst */
+
+  /* Secundair palet = outdoorlaag (altijd zwarte tekst erop) */
+  --han-oranje: #F5A846;
+  --han-groen: #7AC48E;
+  --han-blauw: #6AC3ED;
+
+  /* Tertiair palet: ALLEEN grafieken en diagrammen */
+  --han-olijf: #BBD737;
+  --han-geel: #F8E260;
+  --han-koraal: #EB5241;
+  --han-violet: #B14196;
+  --han-navy: #325CA7;
+
+  /* Rollen in de interface */
+  --kleur-achtergrond: var(--han-alabaster);
+  --kleur-vlak: var(--han-wit);
+  --kleur-tekst: var(--han-mineshaft);
+  --kleur-kop: var(--han-zwart);
+  --kleur-tekst-zacht: var(--han-boulder);
+  --kleur-rand: var(--han-mercury);
+  --kleur-merk: var(--han-rood);
+  --kleur-op-merk: var(--han-wit);
+  --kleur-kopbalk: var(--han-wit);   /* wit: het HAN-logo staat alleen op wit */
+
+  /* Status (altijd met tekst of icoon) */
+  --status-goedgekeurd: var(--han-groen);
+  --status-actie: var(--han-oranje);
+  --status-ingediend: var(--han-blauw);
+  --status-ontwikkeling: var(--han-mercury);
+  --status-fout: var(--han-rood);
+
+  /* Meerdaagsethema: alleen rood, oranje, groen of blauw; per cluster overschreven */
+  --kleur-thema: var(--han-rood);
+  --kleur-op-thema: var(--han-wit);   /* wit op rood, zwart op oranje/groen/blauw */
+
+  /* Letter: Roboto als HAN-alternatief voor Avenir Next */
+  --font-basis: var(--font-roboto), system-ui, sans-serif;
+  --font-kop: var(--font-roboto-condensed), var(--font-roboto), system-ui, sans-serif;
+
+  /* Maten */
+  --radius: 8px;            /* basaal: kleine afronding */
+  --aanraakvlak: 48px;
+  --ruimte: 16px;
+}

@@ -1,0 +1,27 @@
+# Beslissingen
+
+| Datum | Besluit | Reden |
+|---|---|---|
+| 2026-11-04 | Experiment buiten HAN-ICT, zonder tussenkomst van HAN-privacyfunctionarissen | Kleinschalig experiment; dataminimalisatie en afscherming als waarborg |
+| 2026-11-04 | Gedeelde accounts per rol of groep (27), geen persoonlijke accounts | Eenvoud en geen persoonsgegevens |
+| 2026-11-04 | Offline alleen lezen; geen offline bewerken | Grootste technische risico |
+| 2026-11-04 | Docentfeedback, sjablonen en archief naar versie 2 | Focus eerste versie |
+| 2026-11-05 | Overal "meerdaagse" in plaats van "kamp"; HAN-huisstijl met outdoorelementen; meerdaagsethema als laag erbovenop | Besluit Bart |
+| 2026-11-13 | Zes stuurgroeprollen en zes projectgroeprollen volgens PRD hoofdstuk 4 | Besluit Bart |
+| 2026-11-13 | Eerste bouw = opdracht 1–5 (kern, thema, AVF, materialen en budget) | Besluit Bart |
+| 2026-11-13 | Projectgroep ziet eigen budgetaanvragen en de resterende clusterruimte | Besluit Bart |
+| 2026-11-13 | Supabase gratis abonnement met eigen export en wekelijkse geplande taak | Besluit Bart |
+| 2026-11-13 | Stuurgroep wijzigt AVF-inhoud nooit zelf; alleen verbeterverzoeken | Projectgroep blijft eigenaar |
+| 2026-11-13 | Stuurgroep wijst dag, tijd en locatie van elke belevenis toe | Besluit Bart |
+| 2026-11-13 | Goedgekeurd AVF blijft bewerkbaar; wezenlijke wijziging geeft "Opnieuw te controleren" | Besluit Bart |
+| 2026-11-13 | HAN-huisstijl volgens blog3.han.nl/huisstijl: HAN rood #E50056, wit, zwart, grijswaarden; secundair oranje, groen, blauw als outdoorlaag; Roboto als alternatief voor Avenir Next; accentkleur thema uit rood, oranje, groen of blauw | HAN-huisstijlregels |
+| 2026-11-13 | De app heet Backpack_ (underscore naar HAN_); de backpack is de metafoor | Besluit Bart |
+| 2026-11-13 | PACK-indeling: Pleister (Veiligheid & Welzijn, Logistiek & Facilitair), Aansteker (Beleving & Thema, Programma & Kwaliteit), Camera (Communicatie & Financiën), Kompas (Projectleiding) | Besluit Bart |
+| 2026-11-13 | HAN-logo's uit Barts map gebruiken (PNG, 2019); kopbalk wit omdat er geen witte logovariant is | Logo alleen op wit volgens HAN-regels |
+| 2026-11-13 | AVF krijgt sectie H Communicatie (voor, tijdens en na) | Besluit Bart |
+| 2026-11-13 | AVF sectie E: aanvullende EHBO-maatregelen ja/nee; nee = verwijzing naar algemeen EHBO-plan van de stuurgroep | Besluit Bart |
+| 2026-11-13 | Financieel plan in het AVF valt onder de Projectleider | Besluit Bart |
+| 2026-11-13 | Elk AVF-veld gekoppeld aan projectgroeprol, stuurgroeprol en PACK-vak; stuurgroepkoppeling niet zichtbaar voor projectgroepen; dashboard per PACK-vak en rol | Besluit Bart |
+| 2026-11-13 | PACK is een speelse indeling, niet te zwaar maken | Besluit Bart |
+| 2026-11-13 | Eén Supabase-project (gratis); testdata tot livegang, daarna oefencluster TEST in hetzelfde project | Ruimte voor één gratis project |
+| 2026-11-13 | Blijf-actief: dagelijkse Vercel Cron naar /api/blijf-actief met kleine Supabase-query, plus wekelijkse export via GitHub Actions | Voorkomt pauze na een week inactiviteit |

@@ -1,0 +1,279 @@
+{
+  "_toelichting": "Fictief voorbeeld-AVF. Wordt geladen bij vd-groep-1 (tot de livegang) en bij test-groep-1 (blijvend), gebaseerd op de opbouw van Voorbeeld AVF.pdf. Namen zijn verzonnen.",
+  "projectgroep": {
+    "cluster": "VD",
+    "nummer": 1
+  },
+  "status": "in_ontwikkeling",
+  "titel": "Oer-Olympische Spelen",
+  "verschijningsvorm": "Spel",
+  "publieke_samenvatting": "Stammen nemen het tegen elkaar op in een middag vol oude sporten. Neem sportkleding mee die vies mag worden.",
+  "organiserende_studenten": "Teststudent 1, Teststudent 2, Teststudent 3, Teststudent 4, Teststudent 5, Teststudent 6",
+  "doelgroep": "Studenten 18–22 jaar",
+  "aantal_deelnemers": 10,
+  "dag": "2027-06-28",
+  "starttijd": "13:00",
+  "eindtijd": "16:00",
+  "locatie_tekst": "Veld naast de camping",
+  "contactpersoon": "Teststudent 1",
+  "beginsituatie": {
+    "algemeen": "Tien studenten doen mee. Ze werken individueel bij de werponderdelen en in twee stammen bij estafette, volleybal en touwtrekken.",
+    "motorisch": "10 van de 10 deelnemers beheersen de basisvaardigheden. 5 van de 10 hebben moeite met verspringen en speerwerpen met het minder goede been of de minder goede arm.",
+    "cognitief": "6 van de 10 deelnemers begrijpen de achtergrond van de onderdelen direct. 2 van de 10 hebben extra uitleg nodig.",
+    "sociaal_emotioneel": "7 van de 10 deelnemers werken goed samen. 3 van de 10 moedigen teamgenoten weinig aan."
+  },
+  "doelen": {
+    "motorisch": "Aan het einde van de activiteit voeren 8 van de 10 deelnemers het verspringen en speerwerpen technisch juist uit.",
+    "cognitief": "Aan het einde van de activiteit kennen 9 van de 10 deelnemers de basis van de oer-Olympische Spelen.",
+    "sociaal_emotioneel": "Tijdens de estafette en het touwtrekken moedigt elke deelnemer zijn stamgenoten minstens één keer aan.",
+    "persoonlijk": [
+      {
+        "naam": "Teststudent 1",
+        "doel": "Ik geef bij elke deelnemer minstens drie keer een compliment of aanmoediging."
+      },
+      {
+        "naam": "Teststudent 2",
+        "doel": "Ik zorg dat er steeds genoeg materiaal klaarligt."
+      }
+    ]
+  },
+  "fasen": [
+    {
+      "fase": "kop",
+      "organisatievorm": "Klassikale uitleg in een halve kring, daarna twee stammen van vijf.",
+      "coachen_instructies": "‘Ga aan de slag en zoek je eigen materialen.’ ‘Bedenk een eigen vlag voor je stam.’",
+      "stemgebruik_houding": "Uitlegger staat voor de groep; deelnemers zitten in een halve kring.",
+      "opruimen": {
+        "wie": "Elke stam",
+        "wat": "Overgebleven natuurmaterialen",
+        "waar": "Terug in het bos, buiten de looproute",
+        "wanneer": "Direct na het maken van de vlag",
+        "hoe": "Samen",
+        "wat_erna": "Met de vlag terug naar de startplek"
+      }
+    },
+    {
+      "fase": "romp",
+      "organisatievorm": "Onderdelen na elkaar; werponderdelen individueel, overige in twee stammen.",
+      "coachen_instructies": "‘Zet af met je sterke voet.’ ‘Houd je arm lang bij het werpen.’ ‘Verdeel je eerlijk aan het touw.’",
+      "stemgebruik_houding": "Uitlegger staat aan de zijkant met overzicht; andere organisatoren lopen rond.",
+      "opruimen": {
+        "wie": "Stam 1 en 2",
+        "wat": "Stokken, stenen, touw en boomstammen",
+        "waar": "Materiaalbak en bosrand",
+        "wanneer": "Na het laatste onderdeel",
+        "hoe": "Per stam één soort materiaal",
+        "wat_erna": "Terug naar de startplek voor de prijsuitreiking"
+      }
+    },
+    {
+      "fase": "staart",
+      "organisatievorm": "Klassikaal; elke stam komt met de vlag naar voren.",
+      "coachen_instructies": "‘Stam 1 mag beginnen met lopen, laat jullie vlag zien.’",
+      "stemgebruik_houding": "Uitlegger vooraan, hard en duidelijk.",
+      "opruimen": {
+        "wie": "Elke stam",
+        "wat": "Vlaggen",
+        "waar": "In de hoek bij de tent",
+        "wanneer": "Na de prijsuitreiking",
+        "hoe": "Samen",
+        "wat_erna": "Afsluiting in een halve kring"
+      }
+    }
+  ],
+  "onderdelen": [
+    {
+      "fase": "kop",
+      "volgorde": 1,
+      "naam": "Vlag maken",
+      "duur_minuten": 20,
+      "beschrijving": "Twee stammen zoeken in het bos natuurmaterialen en maken een eigen stamvlag.",
+      "sociale_veiligheid": "Iedereen helpt mee; ideeën van anderen niet afkeuren.",
+      "fysieke_veiligheid": "Gevonden materialen controleren; niet struikelen over materiaal op de grond.",
+      "individu_moeilijker": "Eén deelnemer zoekt alle materialen.",
+      "individu_makkelijker": "Deelnemer krijgt al een stok.",
+      "groep_moeilijker": "Stam zoekt alleen in een klein deel van het bos.",
+      "groep_makkelijker": "Stam krijgt een voorbeeldontwerp.",
+      "usv_uitdagend": "Geen voorbeeld: zelf creatief zijn.",
+      "usv_speelbaar": "Elke stam heeft aan het eind een vlag.",
+      "usv_veilig_aanvulling": ""
+    },
+    {
+      "fase": "romp",
+      "volgorde": 1,
+      "naam": "Verspringen",
+      "duur_minuten": 20,
+      "beschrijving": "Traditioneel verspringen; punten per vak waarin je landt.",
+      "sociale_veiligheid": "Niemand uitlachen bij een korte sprong.",
+      "fysieke_veiligheid": "Geen zandbak: niet met volle kracht springen; aanloop vrij van kuilen en stenen.",
+      "individu_moeilijker": "Afzetten met het zwakkere been.",
+      "individu_makkelijker": "Groter afzetvak.",
+      "groep_moeilijker": "Minder aanloop voor de hele groep.",
+      "groep_makkelijker": "Meer rust tussen sprongen.",
+      "usv_uitdagend": "Afzetten met zwakkere been.",
+      "usv_speelbaar": "Iedereen springt op eigen niveau.",
+      "usv_veilig_aanvulling": ""
+    },
+    {
+      "fase": "romp",
+      "volgorde": 2,
+      "naam": "Speerwerpen",
+      "duur_minuten": 20,
+      "beschrijving": "Werpen met een rechte stok om de beurt; verder werpen geeft meer punten.",
+      "sociale_veiligheid": "Elkaar complimenteren; feedback netjes geven.",
+      "fysieke_veiligheid": "Niemand in het werpveld; alleen werpen op signaal.",
+      "individu_moeilijker": "Werpen met de niet-dominante arm.",
+      "individu_makkelijker": "Korte aanloop toestaan.",
+      "groep_moeilijker": "Zones waarin geworpen moet worden.",
+      "groep_makkelijker": "Groep staat dichterbij.",
+      "usv_uitdagend": "Werpen met de andere arm.",
+      "usv_speelbaar": "Iedereen komt even vaak aan de beurt.",
+      "usv_veilig_aanvulling": ""
+    },
+    {
+      "fase": "romp",
+      "volgorde": 3,
+      "naam": "Touwtrekken",
+      "duur_minuten": 15,
+      "beschrijving": "Twee stammen trekken aan een touw over een lijn.",
+      "sociale_veiligheid": "Teams eerlijk verdelen; iedereen een eigen plek aan het touw.",
+      "fysieke_veiligheid": "Touw niet om de handen wikkelen; geen onverwachte bewegingen.",
+      "individu_moeilijker": "Vooraan of achteraan staan.",
+      "individu_makkelijker": "Handschoenen dragen.",
+      "groep_moeilijker": "Kleinere afstand tot de lijn.",
+      "groep_makkelijker": "Grotere afstand tot de lijn.",
+      "usv_uitdagend": "Kleinere afstand maakt het spannender.",
+      "usv_speelbaar": "Iedereen doet mee.",
+      "usv_veilig_aanvulling": "Brandwonden voorkomen: met de benen werken."
+    },
+    {
+      "fase": "staart",
+      "volgorde": 1,
+      "naam": "Prijsuitreiking",
+      "duur_minuten": 15,
+      "beschrijving": "Punten worden opgeteld; elke stam loopt een ererondje met de vlag en de top drie wordt bekendgemaakt.",
+      "sociale_veiligheid": "Elke stam wordt in het zonnetje gezet, niet alleen de winnaar.",
+      "fysieke_veiligheid": "Niet over de vlaggen struikelen.",
+      "individu_moeilijker": "",
+      "individu_makkelijker": "",
+      "groep_moeilijker": "",
+      "groep_makkelijker": "",
+      "usv_uitdagend": "Laatste keer de stam vertegenwoordigen.",
+      "usv_speelbaar": "Elke stam komt naar voren.",
+      "usv_veilig_aanvulling": ""
+    }
+  ],
+  "veiligheid": {
+    "risicos": [
+      {
+        "risico": "Geraakt worden door een speer of steen",
+        "maatregel": "Werpveld afzetten, werpen alleen op signaal",
+        "wie": "Veiligheid & EHBO"
+      },
+      {
+        "risico": "Verzwikken bij verspringen op harde grond",
+        "maatregel": "Aanloop controleren, niet op volle kracht springen",
+        "wie": "Veiligheid & EHBO"
+      }
+    ],
+    "weer": {
+      "zeer_warm": {
+        "relevant": true,
+        "maatregel": "Elk half uur drinkpauze in de schaduw",
+        "alternatief": "Romp inkorten",
+        "stopcriterium": "Boven 32 °C of bij klachten",
+        "beslisser": "Projectleider met docent"
+      },
+      "zware_regen": {
+        "relevant": true,
+        "maatregel": "Partytent bij het veld",
+        "alternatief": "Werponderdelen vervallen; volleybal en touwtrekken onder de tent",
+        "stopcriterium": "Gladde ondergrond bij estafette",
+        "beslisser": "Projectleider"
+      },
+      "onweer": {
+        "relevant": true,
+        "maatregel": "Direct naar de sanitairgebouwen",
+        "alternatief": "Quiz over de Olympische Spelen binnen",
+        "stopcriterium": "Eerste onweer hoorbaar",
+        "beslisser": "Docent"
+      },
+      "koel": {
+        "relevant": false,
+        "maatregel": "",
+        "alternatief": "",
+        "stopcriterium": "",
+        "beslisser": ""
+      }
+    },
+    "ehbo": {
+      "aanvullend": true,
+      "maatregelen": "Teststudent 3 (EHBO-diploma) heeft de EHBO-koffer bij het werpveld; koelelement voor kneuzingen bij het touwtrekken."
+    }
+  },
+  "organisatie": {
+    "bijdrage_thema": "De stammen en de stamvlag sluiten aan op het meerdaagsethema Oerspelen.",
+    "samenhang": "Eerste belevenis van maandag; de stamindeling wordt later in de meerdaagse hergebruikt.",
+    "vervoer": "Te voet vanaf de camping (5 minuten).",
+    "opbouw_afbouw": "Opbouw 12:15–13:00, afbouw 16:00–16:30.",
+    "catering": "Water en fruit bij de start en na de romp.",
+    "allergieen_rekening_gehouden": true,
+    "corvee": "Projectgroep ruimt het veld op en controleert op achtergebleven afval.",
+    "afstemming": "Veld afgestemd met Logistiek & Facilitair."
+  },
+  "materialen": [
+    {
+      "fase": "kop",
+      "materiaal": "Verf (pot, afwasbaar)",
+      "aantal_camping": 2,
+      "aantal_bivak": 0
+    },
+    {
+      "fase": "romp",
+      "materiaal": "Touw (10 m)",
+      "aantal_camping": 1,
+      "aantal_bivak": 0
+    },
+    {
+      "fase": "romp",
+      "materiaal": "Volleybal",
+      "aantal_camping": 2,
+      "aantal_bivak": 0
+    },
+    {
+      "fase": "romp",
+      "materiaal": "Afzetlint (rol)",
+      "aantal_camping": 1,
+      "aantal_bivak": 0
+    },
+    {
+      "fase": "staart",
+      "materiaal": "Muziekbox",
+      "aantal_camping": 1,
+      "aantal_bivak": 0
+    },
+    {
+      "fase": "romp",
+      "omschrijving": "10 stenen en 10 rechte takken (ter plekke zoeken)",
+      "aantal_camping": 0,
+      "aantal_bivak": 0
+    }
+  ],
+  "financieel_plan": {
+    "regels": [
+      {
+        "omschrijving": "Stof voor vlaggen",
+        "bedrag": 25.0
+      },
+      {
+        "omschrijving": "Prijzen voor de winnende stam",
+        "bedrag": 35.0
+      }
+    ]
+  },
+  "communicatie": {
+    "voor": "Sportkleding die vies mag worden, dichte schoenen, waterfles. Verzamelen om 12:55 bij de partytent op de camping.",
+    "tijdens": "Fluitsignaal: één keer = stoppen, twee keer = verzamelen bij de vlag. Contactpersoon draagt de telefoon. Bij een calamiteit belt de contactpersoon de docent.",
+    "na": "Korte afsluiting in de kring; foto's van de stamvlaggen delen in het Teams-kanaal; terugkoppeling aan de stuurgroep na afloop."
+  }
+}

@@ -1,0 +1,83 @@
+# Schermen en navigatie
+
+Mobiel eerst (breedte 360–430 px), daarna tablet en laptop. Op de laptop wordt de onderste navigatie een zijbalk.
+
+## Navigatie
+
+Onderste balk met vier knoppen, voor elk account gelijk van vorm:
+
+| Knop | Projectgroep | Stuurgroep | Docent | Student |
+|---|---|---|---|---|
+| **Onze meerdaagse** | startscherm | startscherm | startscherm (met clusterkeuze VD, VC of TEST) | startscherm |
+| **Belevenissen** | eigen AVF bovenaan, daaronder de andere vijf (publiek) | alle zes AVF's met status | alle zes van het gekozen cluster | alle zes (publiek) |
+| **Stuurgroep** / **Budget** | Budget (eigen aanvragen) | Werkpagina's | Werkpagina's | – (knop verborgen) |
+| **Meer** | rolverdeling, Teams-knop, uitloggen | materialenlijst, thema instellen, Teams-knop, uitloggen | beheer, materialenlijst, thema, uitloggen | Teams-knop, uitloggen |
+
+Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "Backpack_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
+
+## Schermen opdracht 1–5
+
+### Inloggen
+Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit het logo `han-sport-en-bewegen`; daaronder sfeerfoto `wandeling-schemer-staand`. Geen "wachtwoord vergeten" (de docent reset).
+
+### Onze meerdaagse (startscherm) – OVZ-01, OVZ-02
+1. Kop met sfeerbeeld, naam en verhaal van het meerdaagsethema (anders: foto `vallei-viaduct` en tekst "Kies jullie meerdaagsethema").
+2. Aftellen tot 28 juni 2027.
+3. Zes belevenissen als kaarten: titel, publieke samenvatting, statuslabel.
+4. Alleen projectgroep: blok "Jullie AVF" met voortgang per sectie en open verbeterverzoeken.
+5. Alleen stuurgroep en docent: per stuurgroeprol één regel stand van zaken (bijv. "Budget: € 180 van € 250 vrij", "2 materiaaltekorten", "3 AVF's wachten op beoordeling").
+
+### AVF bewerken (projectgroep) – AVF-01 t/m AVF-05, PGR-01
+- Dag, tijd en locatie staan bovenaan als alleen-lezen (toegewezen door de stuurgroep; "nog niet ingepland" zolang leeg).
+- Overzicht met secties A–H als lijst met voortgangslabel (niet gestart, onvolledig, compleet) en de eigenaar-rol (projectgroeprol) van elke sectie. De stuurgroepkoppeling is hier niet zichtbaar.
+- Per sectie een eigen scherm met velden die automatisch opslaan (melding "Opgeslagen" of "Iemand anders heeft dit net gewijzigd – herladen?").
+- Sectie D: drie tabbladen Kop, Romp, Staart. Per fase de fasevelden en een lijst onderdelen (toevoegen, verschuiven, verwijderen). Een onderdeel opent in een eigen scherm.
+- Sectie E: risicotabel, vier weerscenario's als kaarten met schakelaar "relevant" en de vraag "Zijn aanvullende EHBO-maatregelen nodig?" (ja → velden; nee → verwijzing naar het algemene EHBO-plan).
+- Sectie H: drie blokken Voor, Tijdens en Na.
+- Sectie F: materialen kiezen per fase uit de basislijst (met beschikbare voorraad), aanvullend materiaal, financieel plan met regels en totaal.
+- Rolverdeling (onder "Meer" en als controle bij indienen).
+- Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting.
+- Knop **Afdrukken / PDF**: printvriendelijke weergave van het volledige AVF (PDF-01).
+
+### AVF beoordelen (stuurgroep en docent) – AVF-06 t/m AVF-09
+- Leesweergave van het AVF per sectie.
+- Bij elke sectie en elk onderdeel: "Verbeterverzoek" (tekst, voor welke projectgroeprol).
+- Themacheck per stuurgroeprol: akkoord of aandachtspunt met toelichting.
+- Knoppen **Aanpassing vragen** en **Goedkeuren** (vragen om een naam).
+- Tabblad "Versies": eerdere indieningen met wijzigingssamenvatting.
+
+### Belevenis bekijken (andere projectgroep en student)
+Alleen titel, verschijningsvorm, publieke samenvatting, dag, tijd en status.
+
+### Stuurgroepdashboard (stuurgroep en docent) – STG-01, STG-02, AVF-11
+Indeling in de vier PACK-vakken (kleine letter en icoon, speels en niet te zwaar), daaronder de zes rollen:
+
+- **P · Pleister**: Veiligheid & Welzijn, Logistiek & Facilitair
+- **A · Aansteker**: Beleving & Thema, Programma & Kwaliteit
+- **C · Camera**: Communicatie & Financiën
+- **K · Kompas**: Projectleiding
+
+Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen zijn te bekijken.
+
+**Rolweergave** (voor elke rol gelijk opgebouwd, gevuld via `src/config/avf-velden.ts`): een matrix met de zes belevenissen als rijen en de velden van die rol als kolommen of kaarten. Per veld: leeg, ingevuld of "opnieuw te controleren", laatste wijziging en open verbeterverzoeken. Tik op een veld → AVF op die plek → "Verbeterverzoek" (automatisch voor de juiste projectgroeprol).
+
+**Extra per rol in opdracht 1–5:**
+- **Beleving & Thema**: meerdaagsethema instellen (THM-01) met live voorbeeld; accentkleur uit HAN rood, oranje, groen of blauw; tip over passend sfeerbeeld.
+- **Programma & Kwaliteit**: status van alle AVF's en open verbeterverzoeken.
+- **Projectleiding**: dag en tijd per belevenis toewijzen (met waarschuwing bij overlap); rolverdelingen van alle groepen.
+- **Logistiek & Facilitair**: locatie per belevenis toewijzen; materiaalbehoefte en tekorten per locatie (MAT-02), correcties.
+- **Communicatie & Financiën**: budgetoverzicht en aanvragen beoordelen (BUD-01 t/m BUD-06).
+- **Veiligheid & Welzijn**: AVF's met ontbrekende weerafweging of EHBO-antwoord.
+
+### Budget (projectgroep) – BUD-02, BUD-03, BUD-06
+Eigen aanvragen met status en besluit, resterende ruimte van het cluster, knop "Losse aanvraag" (alleen na goedkeuring van het AVF).
+
+### Materialenlijst – MAT-00
+Lijst met zoekveld en filter op categorie; toevoegen, wijzigen, op inactief zetten (alleen Logistiek & Facilitair en docent).
+
+### Beheer (docent)
+Accounts per cluster met knop "Wachtwoord resetten"; clustergegevens (budget, Teams-link, Forms-link); knop "Alles exporteren" (JSON en Excel).
+
+## Stijl
+
+Zie `docs/huisstijl.md`. Kort: HAN rood, wit en zwart als basis; secundaire HAN-kleuren (oranje, groen, blauw) als outdoorlaag met zwarte tekst; Roboto en Roboto Condensed; foto's uit `assets/fotos`; Lucide-lijniconen tot de HAN-iconenset er is; statuskleuren altijd met tekst of icoon.

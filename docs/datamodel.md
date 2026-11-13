@@ -1,0 +1,239 @@
+# Datamodel
+
+Voorstel voor versie 1. Tabellen gemarkeerd met *(later)* horen bij latere opdrachten; neem ze pas op als de bouwvolgorde erom vraagt. Alle tabellen krijgen `id uuid primary key default gen_random_uuid()` (tenzij anders vermeld), `created_at` en `updated_at` (met trigger).
+
+## Opzet en accounts
+
+### editie
+| veld | type | opmerking |
+|---|---|---|
+| naam | text | "Ardennen-meerdaagse 2027" |
+| startdatum, einddatum | date | 2027-06-28 t/m 2027-06-30 |
+
+### cluster
+| veld | type | opmerking |
+|---|---|---|
+| editie_id | uuid → editie | |
+| code | text | `VD`, `VC` of `TEST`, uniek per editie; TEST is een fictief oefencluster |
+| naam | text | |
+| budget_totaal | numeric(10,2) | standaard 250.00 |
+| teams_link | text | knop naar Teams-kanaal |
+| forms_link | text | declaratieformulier |
+| meerdaagsemodus_aan | boolean | standaard false *(gebruikt in latere opdracht)* |
+
+### meerdaagsethema
+Eén per cluster (`cluster_id` is primary key).
+| veld | type | opmerking |
+|---|---|---|
+| cluster_id | uuid → cluster | PK |
+| naam | text | leeg = nog geen thema → neutrale HAN-stijl |
+| verhaal | text | korte verhaallijn |
+| slogan | text | optioneel |
+| accentkleur | text | hex, bijv. `#E1005C`; contrast wordt gecontroleerd |
+| sfeerbeeld_pad | text | pad in Storage-bucket `thema` |
+| logo_pad | text | optioneel |
+| bijgewerkt_door_naam | text | ingevulde naam |
+
+### stuurgroeprol
+Zes per cluster.
+| veld | type | opmerking |
+|---|---|---|
+| cluster_id | uuid → cluster | |
+| code | enum `stuurgroeprol_code` | `projectleiding`, `programma_kwaliteit`, `beleving_thema`, `veiligheid_welzijn`, `logistiek_facilitair`, `communicatie_financien` |
+| naam | text | weergavenaam, bijv. "Programma & Kwaliteit" |
+| focus | text | bijv. "Planning, samenhang en overdracht" |
+| studenten | text | namen van de twee studenten (vrije tekst) |
+| pack | enum `pack_vak` | `P`, `A`, `C` of `K` (zie PRD 4.1) |
+
+Uniek: (`cluster_id`, `code`).
+
+PACK-indeling stuurgroeprollen: projectleiding → K; programma_kwaliteit en beleving_thema → A; veiligheid_welzijn en logistiek_facilitair → P; communicatie_financien → C.
+PACK-indeling projectgroeprollen (vast in code): projectleider → K; programma_beleving → A; veiligheid_ehbo, logistiek_materialen en catering → P; corvee_communicatie → C.
+
+### projectgroep
+Zes per cluster.
+| veld | type | opmerking |
+|---|---|---|
+| cluster_id | uuid → cluster | |
+| nummer | int | 1–6, uniek per cluster |
+| naam | text | bijv. "Projectgroep 3" of een eigen naam |
+
+### projectgroep_rol
+Zes vaste rollen per projectgroep. PK (`projectgroep_id`, `rol`).
+| veld | type | opmerking |
+|---|---|---|
+| projectgroep_id | uuid → projectgroep | |
+| rol | enum `projectgroeprol` | `projectleider`, `programma_beleving`, `veiligheid_ehbo`, `logistiek_materialen`, `catering`, `corvee_communicatie` |
+| namen | text | verantwoordelijke student(en), vrije tekst |
+
+### account
+Koppelt een Supabase Auth-gebruiker aan een rol. PK = `auth.users.id`.
+| veld | type | opmerking |
+|---|---|---|
+| id | uuid → auth.users | |
+| gebruikersnaam | text | uniek, bijv. `vd-groep-3` |
+| soort | enum `accountsoort` | `docent`, `stuurgroep`, `projectgroep`, `student` |
+| cluster_id | uuid → cluster | leeg bij docent |
+| projectgroep_id | uuid → projectgroep | alleen bij soort `projectgroep` |
+| stuurgroeprol_id | uuid → stuurgroeprol | alleen bij soort `stuurgroep` |
+
+Inloggen met gebruikersnaam: de app zet de gebruikersnaam om naar een intern e-mailadres `<gebruikersnaam>@ardennen.invalid` (e-mailbevestiging uit). Wachtwoord resetten doet de docent via een serverfunctie met de service role.
+
+Hulpfuncties (SQL, `security definer`, `stable`): `mijn_soort()`, `mijn_cluster()`, `mijn_projectgroep()`, `mijn_stuurgroeprol()`, `is_docent()`. Alle afschermingsregels gebruiken deze functies.
+
+## AVF
+
+### avf
+Eén per projectgroep (`projectgroep_id` uniek). Velden van sectie A staan als kolommen; B, C, E, G en H als `jsonb` met een vaste structuur (zie onder). De koppeling van elk veld aan projectgroeprol, stuurgroeprol en PACK-vak staat niet in de database maar in `src/config/avf-velden.ts` (bron: `docs/avf-velden.md`).
+| veld | type | opmerking |
+|---|---|---|
+| projectgroep_id | uuid → projectgroep | uniek |
+| cluster_id | uuid → cluster | voor snelle afscherming |
+| status | enum `avf_status` | `in_ontwikkeling`, `ingediend`, `aanpassing_gevraagd`, `goedgekeurd` |
+| opnieuw_te_controleren | boolean | true na wezenlijke wijziging na goedkeuring; status blijft `goedgekeurd` |
+| versie | int | ophogen bij elke indiening |
+| **A** titel | text | |
+| verschijningsvorm | text | bijv. spel, wedstrijd, tocht, workshop |
+| publieke_samenvatting | text | zonder spoilers |
+| organiserende_studenten | text | namen |
+| doelgroep | text | |
+| aantal_deelnemers | int | |
+| dag | date | binnen de editie; toegewezen door de stuurgroep |
+| starttijd, eindtijd | time | toegewezen door de stuurgroep |
+| locatie_id | uuid → locatie | *(locatie komt in latere opdracht; tot dan vrij tekstveld `locatie_tekst`)* |
+| locatie_tekst | text | tijdelijk |
+| contactpersoon | text | |
+| **B** beginsituatie | jsonb | `{algemeen, motorisch, cognitief, sociaal_emotioneel}` |
+| **C** doelen | jsonb | `{motorisch, cognitief, sociaal_emotioneel, persoonlijk: [{naam, doel}]}` |
+| **E** veiligheid | jsonb | `{risicos: [{risico, maatregel, wie}], weer: {zeer_warm, zware_regen, onweer, koel}, ehbo: {aanvullend: bool, maatregelen}}` met per weerscenario `{relevant: bool, maatregel, alternatief, stopcriterium, beslisser}` |
+| **G** organisatie | jsonb | `{bijdrage_thema, samenhang, vervoer, opbouw_afbouw, catering, allergieen_rekening_gehouden: bool, corvee, afstemming}` |
+| **H** communicatie | jsonb | `{voor, tijdens, na}` |
+| sectie_bijgewerkt | jsonb | per sectie `updated_at` en ingevulde naam, voor de waarschuwing bij gelijktijdig werken |
+| ingediend_op, ingediend_door_naam | timestamptz, text | |
+| goedgekeurd_op, goedgekeurd_door_naam | timestamptz, text | |
+| goedgekeurd_door_account | uuid → account | |
+
+### avf_fase
+Drie per AVF (kop, romp, staart). PK (`avf_id`, `fase`).
+| veld | type | opmerking |
+|---|---|---|
+| avf_id | uuid → avf | |
+| fase | enum `fase` | `kop`, `romp`, `staart` |
+| organisatievorm | text | |
+| overzichtstekening_pad | text | Storage-bucket `avf` |
+| coachen_instructies | text | aanwijzingen en instructies |
+| stemgebruik_houding | text | |
+| opruimen | jsonb | `{wie, wat, waar, wanneer, hoe, wat_erna}` (6 W's) |
+
+### avf_onderdeel
+| veld | type | opmerking |
+|---|---|---|
+| avf_id | uuid → avf | |
+| fase | enum `fase` | |
+| volgorde | int | |
+| naam | text | |
+| duur_minuten | int | |
+| beschrijving | text | |
+| sociale_veiligheid | text | |
+| fysieke_veiligheid | text | |
+| individu_moeilijker, individu_makkelijker | text | |
+| groep_moeilijker, groep_makkelijker | text | |
+| usv_uitdagend, usv_speelbaar | text | |
+| usv_veilig_aanvulling | text | "veilig" toont de fysieke veiligheid; dit is alleen een aanvulling |
+| afbeelding_pad | text | optioneel |
+| niet_van_toepassing | text[] | velden die bewust als n.v.t. zijn gemarkeerd |
+
+### avf_versie
+Bevroren kopie bij elke indiening.
+| veld | type | opmerking |
+|---|---|---|
+| avf_id | uuid → avf | |
+| versie | int | |
+| inhoud | jsonb | volledige momentopname van avf, fasen, onderdelen, materialen en financieel plan |
+| ingediend_door_naam | text | |
+| wijzigingssamenvatting | text | verplicht vanaf versie 2 |
+
+### verbeterverzoek
+| veld | type | opmerking |
+|---|---|---|
+| avf_id | uuid → avf | |
+| sectie | text | `A`–`G` |
+| onderdeel_id | uuid → avf_onderdeel | optioneel |
+| projectgroeprol | enum `projectgroeprol` | voor wie het bedoeld is |
+| tekst | text | |
+| status | enum | `open`, `aangepast`, `afgehandeld` |
+| door_account, door_naam | uuid, text | |
+
+### themacheck
+PK (`avf_id`, `stuurgroeprol_code`).
+| veld | type | opmerking |
+|---|---|---|
+| oordeel | enum | `akkoord`, `aandachtspunt` |
+| toelichting | text | |
+| door_naam | text | |
+
+## Materialen en budget
+
+### materiaal
+Eén lijst voor beide clusters.
+| veld | type | opmerking |
+|---|---|---|
+| naam | text | |
+| categorie | text | |
+| voorraad_camping, voorraad_bivak | int | |
+| opmerking | text | |
+| actief | boolean | inactief = niet meer kiesbaar; bestaande keuzes krijgen een melding |
+
+### avf_materiaal
+| veld | type | opmerking |
+|---|---|---|
+| avf_id | uuid → avf | |
+| fase | enum `fase` | optioneel |
+| materiaal_id | uuid → materiaal | leeg bij aanvullend materiaal |
+| omschrijving | text | alleen bij aanvullend materiaal |
+| aantal_camping, aantal_bivak | int | |
+| aantal_gecorrigeerd_camping, aantal_gecorrigeerd_bivak | int | door stuurgroep, optioneel |
+
+View `materiaal_behoefte` (per cluster, per materiaal): voorraad, totale behoefte per locatie, tekort.
+
+### budgetaanvraag
+| veld | type | opmerking |
+|---|---|---|
+| cluster_id | uuid → cluster | |
+| projectgroep_id | uuid → projectgroep | |
+| avf_id | uuid → avf | |
+| soort | enum | `avf` (financieel plan, één per AVF) of `los` |
+| omschrijving | text | |
+| regels | jsonb | `[{omschrijving, bedrag}]` |
+| bedrag_aangevraagd | numeric(10,2) | som van regels |
+| status | enum `budgetstatus` | `concept`, `aangevraagd`, `toegekend`, `teruggegeven`, `afgewezen` |
+| bedrag_toegekend | numeric(10,2) | mag lager zijn dan aangevraagd |
+| besluit_toelichting | text | verplicht bij teruggeven, afwijzen of lager bedrag |
+| besluit_door_naam, besluit_op | text, timestamptz | |
+| besteed | numeric(10,2) | handmatig na aankoop (Should) |
+
+Functie `budget_resterend(cluster_id)` (`security definer`): budget_totaal minus toegekend. Projectgroepen gebruiken deze functie; zij kunnen de aanvragen van anderen niet lezen.
+
+## Logboek
+
+### wijziging
+| veld | type | opmerking |
+|---|---|---|
+| tabel, record_id | text, uuid | |
+| actie | text | bijv. `ingediend`, `goedgekeurd`, `budget_toegekend` |
+| account_id, naam | uuid, text | |
+| details | jsonb | |
+
+## Storage
+
+| bucket | inhoud | afscherming |
+|---|---|---|
+| `avf` | afbeeldingen bij AVF, fasen en onderdelen; pad `cluster/<cluster_id>/avf/<avf_id>/...` | zelfde regels als `avf` |
+| `thema` | sfeerbeeld en logo; pad `cluster/<cluster_id>/...` | lezen: hele cluster en docent; schrijven: stuurgroep en docent |
+| `algemeen` | foto's uit `assets/fotos` | lezen: iedereen die is ingelogd |
+
+Afbeeldingen worden bij upload verkleind (max. 1600 px, WebP) en EXIF-gegevens worden verwijderd.
+
+## Latere opdrachten *(nog niet bouwen)*
+
+`locatie`, `draaiboek_onderdeel`, `deadline`, `besluit`, `infopagina`, `teaser`, `corveetaak`, `inkoopregel`. Zie PRD hoofdstuk 6.

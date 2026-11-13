@@ -1,0 +1,661 @@
+{
+  "_toelichting": "Fictieve testdata. Geen echte studenten. VD en VC worden bij de livegang leeggemaakt; cluster TEST blijft altijd bestaan als oefencluster. Wachtwoorden staan NIET in dit bestand; het seed-script genereert ze en schrijft ze naar seed/wachtwoorden.local.json (in .gitignore).",
+  "editie": {
+    "naam": "Ardennen-meerdaagse 2027",
+    "startdatum": "2027-06-28",
+    "einddatum": "2027-06-30"
+  },
+  "projectgroeprollen": [
+    {
+      "code": "projectleider",
+      "naam": "Projectleider",
+      "taken": "Planning, taakverdeling en afstemming",
+      "pack": "K"
+    },
+    {
+      "code": "programma_beleving",
+      "naam": "Programma & Beleving",
+      "taken": "Activiteit, thema en deelnemerservaring",
+      "pack": "A"
+    },
+    {
+      "code": "veiligheid_ehbo",
+      "naam": "Veiligheid & EHBO",
+      "taken": "Risico's, instructies en slechtweerplan",
+      "pack": "P"
+    },
+    {
+      "code": "logistiek_materialen",
+      "naam": "Logistiek & Materialen",
+      "taken": "Locatie, vervoer, op- en afbouw",
+      "pack": "P"
+    },
+    {
+      "code": "catering",
+      "naam": "Catering",
+      "taken": "Eten, drinken, allergieën en uitgifte",
+      "pack": "P"
+    },
+    {
+      "code": "corvee_communicatie",
+      "naam": "Corvee & Communicatie",
+      "taken": "Schoonmaakrooster, afspraken en draaiboek",
+      "pack": "C"
+    }
+  ],
+  "clusters": [
+    {
+      "code": "VD",
+      "naam": "Cluster VD",
+      "budget_totaal": 250.0,
+      "teams_link": "https://teams.microsoft.com/",
+      "forms_link": "https://forms.office.com/",
+      "meerdaagsethema": {
+        "naam": "Oerspelen",
+        "verhaal": "Drie dagen terug naar de oertijd: stammen strijden in de Ardennen om de eer van de vallei.",
+        "slogan": "Eén vallei, zes stammen",
+        "accentkleur": "#F5A846"
+      },
+      "stuurgroeprollen": [
+        {
+          "code": "projectleiding",
+          "naam": "Projectleiding",
+          "focus": "Aansturing, besluiten en groepsdynamiek",
+          "studenten": "Student A, Student B",
+          "pack": "K"
+        },
+        {
+          "code": "programma_kwaliteit",
+          "naam": "Programma & Kwaliteit",
+          "focus": "Planning, samenhang en overdracht",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "beleving_thema",
+          "naam": "Beleving & Thema",
+          "focus": "Verhaal, sfeer, huisstijl en pre-exposure",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "veiligheid_welzijn",
+          "naam": "Veiligheid & Welzijn",
+          "focus": "Risicoanalyse, EHBO, weerplan en catering",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "logistiek_facilitair",
+          "naam": "Logistiek & Facilitair",
+          "focus": "Locaties, materialen, op-/afbouw en corvee",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "communicatie_financien",
+          "naam": "Communicatie & Financiën",
+          "focus": "Documenten, budget, inkoop en evaluatie",
+          "studenten": "Student A, Student B",
+          "pack": "C"
+        }
+      ],
+      "projectgroepen": [
+        {
+          "nummer": 1,
+          "naam": "Projectgroep 1",
+          "rolverdeling": {
+            "projectleider": "Teststudent 1",
+            "programma_beleving": "Teststudent 2",
+            "veiligheid_ehbo": "Teststudent 3",
+            "logistiek_materialen": "Teststudent 4",
+            "catering": "Teststudent 5",
+            "corvee_communicatie": "Teststudent 6"
+          }
+        },
+        {
+          "nummer": 2,
+          "naam": "Projectgroep 2",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 3,
+          "naam": "Projectgroep 3",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 4,
+          "naam": "Projectgroep 4",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 5,
+          "naam": "Projectgroep 5",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 6,
+          "naam": "Projectgroep 6",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        }
+      ]
+    },
+    {
+      "code": "VC",
+      "naam": "Cluster VC",
+      "budget_totaal": 250.0,
+      "teams_link": "https://teams.microsoft.com/",
+      "forms_link": "https://forms.office.com/",
+      "meerdaagsethema": {
+        "naam": null
+      },
+      "stuurgroeprollen": [
+        {
+          "code": "projectleiding",
+          "naam": "Projectleiding",
+          "focus": "Aansturing, besluiten en groepsdynamiek",
+          "studenten": "Student A, Student B",
+          "pack": "K"
+        },
+        {
+          "code": "programma_kwaliteit",
+          "naam": "Programma & Kwaliteit",
+          "focus": "Planning, samenhang en overdracht",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "beleving_thema",
+          "naam": "Beleving & Thema",
+          "focus": "Verhaal, sfeer, huisstijl en pre-exposure",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "veiligheid_welzijn",
+          "naam": "Veiligheid & Welzijn",
+          "focus": "Risicoanalyse, EHBO, weerplan en catering",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "logistiek_facilitair",
+          "naam": "Logistiek & Facilitair",
+          "focus": "Locaties, materialen, op-/afbouw en corvee",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "communicatie_financien",
+          "naam": "Communicatie & Financiën",
+          "focus": "Documenten, budget, inkoop en evaluatie",
+          "studenten": "Student A, Student B",
+          "pack": "C"
+        }
+      ],
+      "projectgroepen": [
+        {
+          "nummer": 1,
+          "naam": "Projectgroep 1",
+          "rolverdeling": {
+            "projectleider": "Teststudent 1",
+            "programma_beleving": "Teststudent 2",
+            "veiligheid_ehbo": "Teststudent 3",
+            "logistiek_materialen": "Teststudent 4",
+            "catering": "Teststudent 5",
+            "corvee_communicatie": "Teststudent 6"
+          }
+        },
+        {
+          "nummer": 2,
+          "naam": "Projectgroep 2",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 3,
+          "naam": "Projectgroep 3",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 4,
+          "naam": "Projectgroep 4",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 5,
+          "naam": "Projectgroep 5",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        },
+        {
+          "nummer": 6,
+          "naam": "Projectgroep 6",
+          "rolverdeling": {
+            "projectleider": "",
+            "programma_beleving": "",
+            "veiligheid_ehbo": "",
+            "logistiek_materialen": "",
+            "catering": "",
+            "corvee_communicatie": ""
+          }
+        }
+      ]
+    },
+    {
+      "code": "TEST",
+      "naam": "Oefencluster",
+      "budget_totaal": 250.0,
+      "teams_link": "",
+      "forms_link": "",
+      "meerdaagsethema": {
+        "naam": null
+      },
+      "stuurgroeprollen": [
+        {
+          "code": "projectleiding",
+          "naam": "Projectleiding",
+          "focus": "Aansturing, besluiten en groepsdynamiek",
+          "studenten": "Student A, Student B",
+          "pack": "K"
+        },
+        {
+          "code": "programma_kwaliteit",
+          "naam": "Programma & Kwaliteit",
+          "focus": "Planning, samenhang en overdracht",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "beleving_thema",
+          "naam": "Beleving & Thema",
+          "focus": "Verhaal, sfeer, huisstijl en pre-exposure",
+          "studenten": "Student A, Student B",
+          "pack": "A"
+        },
+        {
+          "code": "veiligheid_welzijn",
+          "naam": "Veiligheid & Welzijn",
+          "focus": "Risicoanalyse, EHBO, weerplan en catering",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "logistiek_facilitair",
+          "naam": "Logistiek & Facilitair",
+          "focus": "Locaties, materialen, op-/afbouw en corvee",
+          "studenten": "Student A, Student B",
+          "pack": "P"
+        },
+        {
+          "code": "communicatie_financien",
+          "naam": "Communicatie & Financiën",
+          "focus": "Documenten, budget, inkoop en evaluatie",
+          "studenten": "Student A, Student B",
+          "pack": "C"
+        }
+      ],
+      "projectgroepen": [
+        {
+          "nummer": 1,
+          "naam": "Testgroep 1",
+          "rolverdeling": {
+            "projectleider": "Teststudent 1",
+            "programma_beleving": "Teststudent 2",
+            "veiligheid_ehbo": "Teststudent 3",
+            "logistiek_materialen": "Teststudent 4",
+            "catering": "Teststudent 5",
+            "corvee_communicatie": "Teststudent 6"
+          }
+        },
+        {
+          "nummer": 2,
+          "naam": "Testgroep 2",
+          "rolverdeling": {}
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "gebruikersnaam": "docent",
+      "soort": "docent"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-projectleiding",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "projectleiding"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-programma",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "programma_kwaliteit"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-beleving",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "beleving_thema"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-veiligheid",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "veiligheid_welzijn"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-logistiek",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "logistiek_facilitair"
+    },
+    {
+      "gebruikersnaam": "vd-stuur-financien",
+      "soort": "stuurgroep",
+      "cluster": "VD",
+      "stuurgroeprol": "communicatie_financien"
+    },
+    {
+      "gebruikersnaam": "vd-groep-1",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 1
+    },
+    {
+      "gebruikersnaam": "vd-groep-2",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 2
+    },
+    {
+      "gebruikersnaam": "vd-groep-3",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 3
+    },
+    {
+      "gebruikersnaam": "vd-groep-4",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 4
+    },
+    {
+      "gebruikersnaam": "vd-groep-5",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 5
+    },
+    {
+      "gebruikersnaam": "vd-groep-6",
+      "soort": "projectgroep",
+      "cluster": "VD",
+      "projectgroep": 6
+    },
+    {
+      "gebruikersnaam": "vd-student",
+      "soort": "student",
+      "cluster": "VD"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-projectleiding",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "projectleiding"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-programma",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "programma_kwaliteit"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-beleving",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "beleving_thema"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-veiligheid",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "veiligheid_welzijn"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-logistiek",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "logistiek_facilitair"
+    },
+    {
+      "gebruikersnaam": "vc-stuur-financien",
+      "soort": "stuurgroep",
+      "cluster": "VC",
+      "stuurgroeprol": "communicatie_financien"
+    },
+    {
+      "gebruikersnaam": "vc-groep-1",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 1
+    },
+    {
+      "gebruikersnaam": "vc-groep-2",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 2
+    },
+    {
+      "gebruikersnaam": "vc-groep-3",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 3
+    },
+    {
+      "gebruikersnaam": "vc-groep-4",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 4
+    },
+    {
+      "gebruikersnaam": "vc-groep-5",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 5
+    },
+    {
+      "gebruikersnaam": "vc-groep-6",
+      "soort": "projectgroep",
+      "cluster": "VC",
+      "projectgroep": 6
+    },
+    {
+      "gebruikersnaam": "vc-student",
+      "soort": "student",
+      "cluster": "VC"
+    },
+    {
+      "gebruikersnaam": "test-stuur",
+      "soort": "stuurgroep",
+      "cluster": "TEST",
+      "stuurgroeprol": "projectleiding"
+    },
+    {
+      "gebruikersnaam": "test-groep-1",
+      "soort": "projectgroep",
+      "cluster": "TEST",
+      "projectgroep": 1
+    },
+    {
+      "gebruikersnaam": "test-groep-2",
+      "soort": "projectgroep",
+      "cluster": "TEST",
+      "projectgroep": 2
+    },
+    {
+      "gebruikersnaam": "test-student",
+      "soort": "student",
+      "cluster": "TEST"
+    }
+  ],
+  "materialen": [
+    {
+      "naam": "Touw (10 m)",
+      "categorie": "Pionieren",
+      "voorraad_camping": 6,
+      "voorraad_bivak": 4
+    },
+    {
+      "naam": "Pionierpalen",
+      "categorie": "Pionieren",
+      "voorraad_camping": 30,
+      "voorraad_bivak": 20
+    },
+    {
+      "naam": "Volleybal",
+      "categorie": "Sport en spel",
+      "voorraad_camping": 3,
+      "voorraad_bivak": 1
+    },
+    {
+      "naam": "Pionnen",
+      "categorie": "Sport en spel",
+      "voorraad_camping": 40,
+      "voorraad_bivak": 20
+    },
+    {
+      "naam": "Hesjes (set van 10)",
+      "categorie": "Sport en spel",
+      "voorraad_camping": 4,
+      "voorraad_bivak": 2
+    },
+    {
+      "naam": "Afzetlint (rol)",
+      "categorie": "Sport en spel",
+      "voorraad_camping": 5,
+      "voorraad_bivak": 3
+    },
+    {
+      "naam": "Verf (pot, afwasbaar)",
+      "categorie": "Knutselen",
+      "voorraad_camping": 6,
+      "voorraad_bivak": 0
+    },
+    {
+      "naam": "Muziekbox",
+      "categorie": "Techniek",
+      "voorraad_camping": 2,
+      "voorraad_bivak": 1
+    },
+    {
+      "naam": "Zaklamp",
+      "categorie": "Techniek",
+      "voorraad_camping": 10,
+      "voorraad_bivak": 10
+    },
+    {
+      "naam": "EHBO-koffer",
+      "categorie": "Veiligheid",
+      "voorraad_camping": 2,
+      "voorraad_bivak": 2
+    },
+    {
+      "naam": "Dekzeil 4x6 m",
+      "categorie": "Bivak",
+      "voorraad_camping": 0,
+      "voorraad_bivak": 15
+    },
+    {
+      "naam": "Waterjerrycan 20 l",
+      "categorie": "Catering",
+      "voorraad_camping": 4,
+      "voorraad_bivak": 6
+    },
+    {
+      "naam": "Partytent",
+      "categorie": "Faciliteiten",
+      "voorraad_camping": 2,
+      "voorraad_bivak": 0
+    }
+  ],
+  "pack": [
+    {
+      "vak": "P",
+      "voorwerp": "Pleister"
+    },
+    {
+      "vak": "A",
+      "voorwerp": "Aansteker"
+    },
+    {
+      "vak": "C",
+      "voorwerp": "Camera"
+    },
+    {
+      "vak": "K",
+      "voorwerp": "Kompas"
+    }
+  ]
+}

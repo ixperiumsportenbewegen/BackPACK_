@@ -358,6 +358,7 @@ test("de verschijningsvorm heeft meerdere keuzes", async ({ browser }) => {
   const s = await nieuweSessie(browser, "vd-groep-1");
   const p = s.page;
   await p.goto("/avf/A");
+  await p.waitForLoadState("networkidle"); // wachten tot de pagina klaar is voor aanraken
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
   const groep = p.getByRole("group", { name: "Verschijningsvorm" });
   for (const vorm of ["Spel", "Wedstrijd", "Avontuur", "Gezondheid", "Recreatie", "Show"]) {
@@ -366,12 +367,15 @@ test("de verschijningsvorm heeft meerdere keuzes", async ({ browser }) => {
   await expect(groep.getByRole("button", { name: "Tocht" })).toHaveCount(0);
   await expect(groep.getByRole("button", { name: "Spel" })).toHaveAttribute("aria-pressed", "true");
 
+  // Snel achter elkaar aantikken (zoals op een telefoon): alles wordt bewaard, zonder onterechte waarschuwing
   await groep.getByRole("button", { name: "Show" }).click();
-  await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Spel, Show");
   await groep.getByRole("button", { name: "Avontuur" }).click();
+  await expect(groep.getByRole("button", { name: "Show" })).toHaveAttribute("aria-pressed", "true");
+  await expect(groep.getByRole("button", { name: "Avontuur" })).toHaveAttribute("aria-pressed", "true");
   await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Spel, Avontuur, Show");
   await groep.getByRole("button", { name: "Spel" }).click();
   await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Avontuur, Show");
+  await expect(p.getByText(/Iemand anders heeft dit net gewijzigd/)).toHaveCount(0);
 
   // Andere groepen zien de gekozen vormen op de publieke kaart
   const groep2 = await nieuweSessie(browser, "vd-groep-2");

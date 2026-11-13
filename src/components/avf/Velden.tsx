@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import type { VeldDoel, Waarde } from "@/app/(app)/avf/actions";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
@@ -170,16 +170,43 @@ interface MeerKeuzeProps {
   eigenaar?: string | null;
 }
 
-/** Een of meer opties kiezen. De keuze wordt opgeslagen als tekst, in de vaste volgorde van de opties. */
+/**
+ * Een of meer opties kiezen. De keuze wordt opgeslagen als tekst, in de vaste volgorde van de opties.
+ * Aantikken werkt direct (ook meerdere keren snel achter elkaar); het opslaan loopt achter elkaar,
+ * zodat een snelle tweede tik geen onterechte "iemand anders heeft dit gewijzigd" geeft.
+ */
 export function MeerKeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: MeerKeuzeProps) {
   const { vergrendeld } = useAvfEditor();
   const v = useVeld(doel, begin);
-  const gekozen = typeof v.opgeslagen === "string" && v.opgeslagen ? v.opgeslagen.split(", ") : [];
+  const [lokaal, setLokaal] = useState<string | null>(begin);
+  const lokaalRef = useRef<string | null>(begin); // wat er nu getoond wordt
+  const bewaardRef = useRef<string | null>(begin); // wat er laatst is opgeslagen
+  const keten = useRef<Promise<void>>(Promise.resolve());
+  const gekozen = lokaal ? lokaal.split(", ") : [];
 
   function wissel(optie: string) {
-    const nieuw = gekozen.includes(optie) ? gekozen.filter((g) => g !== optie) : [...gekozen, optie];
-    const tekst = opties.filter((o) => nieuw.includes(o)).join(", ");
-    void v.opslaan(tekst === "" ? null : tekst);
+    const nu = lokaalRef.current ? lokaalRef.current.split(", ") : [];
+    const nieuw = nu.includes(optie) ? nu.filter((g) => g !== optie) : [...nu, optie];
+    const tekst = opties.filter((o) => nieuw.includes(o)).join(", ") || null;
+    lokaalRef.current = tekst;
+    setLokaal(tekst);
+    keten.current = keten.current.then(async () => {
+      const gelukt = await v.opslaan(tekst, bewaardRef.current);
+      if (gelukt) {
+        bewaardRef.current = tekst;
+      } else {
+        // niet opgeslagen: terug naar wat er wel staat (bij een conflict toont het veld de waarschuwing)
+        lokaalRef.current = bewaardRef.current;
+        setLokaal(bewaardRef.current);
+      }
+    });
+  }
+
+  function neemOver(w: string | null) {
+    bewaardRef.current = w;
+    lokaalRef.current = w;
+    setLokaal(w);
+    v.resetNaar(w);
   }
 
   return (
@@ -206,8 +233,14 @@ export function MeerKeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: Me
       </div>
       <ConflictBlok
         conflict={v.conflict}
-        onHun={() => v.resetNaar(v.conflict?.huidig ?? null)}
-        onMijn={() => { if (v.conflict) void v.opslaan(v.conflict.mijn, v.conflict.huidig); }}
+        onHun={() => neemOver((v.conflict?.huidig as string | null) ?? null)}
+        onMijn={() => {
+          const c = v.conflict;
+          if (!c) return;
+          void v.opslaan(c.mijn, c.huidig).then((ok) => {
+            if (ok) neemOver(c.mijn as string | null);
+          });
+        }}
       />
       <MeldingRegel melding={v.melding} />
     </div>

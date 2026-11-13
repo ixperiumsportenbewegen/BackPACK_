@@ -1,26 +1,47 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Alle kleuren, letters en maten komen uit src/styles/tokens.css */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-achtergrond: var(--kleur-achtergrond);
+  --color-vlak: var(--kleur-vlak);
+  --color-tekst: var(--kleur-tekst);
+  --color-kop: var(--kleur-kop);
+  --color-zacht: var(--kleur-tekst-zacht);
+  --color-rand: var(--kleur-rand);
+  --color-merk: var(--kleur-merk);
+  --color-op-merk: var(--kleur-op-merk);
+  --color-thema: var(--kleur-thema);
+  --color-op-thema: var(--kleur-op-thema);
+  --color-fout: var(--status-fout);
+  --font-sans: var(--font-basis);
+  --font-heading: var(--font-kop);
+  --radius-han: var(--radius);
+  --spacing-aanraak: var(--aanraakvlak);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--kleur-achtergrond);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--kleur-achtergrond);
+  color: var(--kleur-tekst);
+  font-family: var(--font-basis);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-kop);
+  color: var(--kleur-kop);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+/* Zichtbare focus, ook buiten in fel licht */
+:focus-visible {
+  outline: 3px solid var(--han-zwart);
+  outline-offset: 2px;
 }

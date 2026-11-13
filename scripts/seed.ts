@@ -45,12 +45,12 @@ function opslaanWachtwoorden() {
   writeFileSync(wachtwoordPad, JSON.stringify(wachtwoorden, null, 2) + "\n");
 }
 
-function check<T>(res: { data: T | null; error: { message: string } | null }, wat: string): T {
+function check<T>(res: { data: T; error: { message: string } | null }, wat: string): NonNullable<T> {
   if (res.error || res.data === null) {
     console.error(`Fout bij ${wat}: ${res.error?.message ?? "geen resultaat"}`);
     process.exit(1);
   }
-  return res.data;
+  return res.data as NonNullable<T>;
 }
 
 async function main() {

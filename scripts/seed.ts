@@ -114,45 +114,66 @@ async function main() {
     }
   }
 
-  // Programma per cluster. Bestaande regels blijven staan, zodat wijzigingen van de stuurgroep niet worden overschreven.
-  // Elk cluster heeft zijn eigen programma (VC is gespiegeld); TEST gebruikt het programma van VD.
-  // Met --programma-opnieuw=VC,VD worden bestaande regels van die clusters overschreven (toewijzingen blijven staan).
+  // Programma per cluster. Elk cluster heeft zijn eigen programma (VC is gespiegeld); TEST gebruikt dat van VD.
+  // - Heeft een cluster al een programma, dan blijft dat staan: de stuurgroep kan tijden aanpassen en activiteiten
+  //   toevoegen of verwijderen, en dat mag een nieuwe seed nooit terugdraaien.
+  // - Met --programma-opnieuw=VC,VD wordt het programma van die clusters teruggezet naar het standaardprogramma:
+  //   de belevenisvakken blijven bestaan (met hun toegewezen projectgroep), de vaste activiteiten worden vervangen.
   const opnieuw = new Set(
     (process.argv.find((x) => x.startsWith("--programma-opnieuw="))?.split("=")[1] ?? "").split(",").filter(Boolean),
   );
-  const dagenVan = (code: string): { dag: string; regels: Record<string, unknown>[] }[] => {
+  type SeedRegel = Record<string, unknown>;
+  const dagenVan = (code: string): { dag: string; regels: SeedRegel[] }[] => {
     const bron = programma.programmas[code];
     return typeof bron === "string" ? programma.programmas[bron].dagen : bron.dagen;
   };
+  const seedPerCluster = (code: string): SeedRegel[] =>
+    dagenVan(code).flatMap((d) => d.regels.map((r): SeedRegel => ({ ...r, dag: d.dag })));
+  const rij = (cluster: string, volgorde: number, r: SeedRegel) => ({
+    cluster_id: cluster, volgorde, dag: r.dag, starttijd: r.start, eindtijd: r.eind,
+    soort: r.soort ?? "vast", titel: r.titel, omschrijving: r.omschrijving ?? null, locatie: r.locatie ?? null,
+    deelnemers: r.deelnemers ?? [], rocks_rivers_groepen: r.rocks_rivers_groepen ?? [],
+    oorspronkelijke_starttijd: null, oorspronkelijke_eindtijd: null,
+  });
+
   for (const c of basis.clusters) {
-    let volgorde = 0;
-    for (const dag of dagenVan(c.code)) {
-      for (const r of dag.regels) {
-        volgorde++;
-        check(await admin.from("programma_regel").upsert({
-          cluster_id: clusterId[c.code], volgorde, dag: dag.dag, starttijd: r.start, eindtijd: r.eind,
-          soort: r.soort ?? "vast", titel: r.titel, omschrijving: r.omschrijving ?? null, locatie: r.locatie ?? null,
-          deelnemers: r.deelnemers ?? [], rocks_rivers_groepen: r.rocks_rivers_groepen ?? [],
-        }, { onConflict: "cluster_id,volgorde", ignoreDuplicates: !opnieuw.has(c.code) }).select(), `programma ${c.code} ${volgorde}`);
+    const cluster = clusterId[c.code];
+    const standaard = seedPerCluster(c.code);
+    const { count } = await admin.from("programma_regel").select("id", { count: "exact", head: true }).eq("cluster_id", cluster);
+
+    if ((count ?? 0) === 0) {
+      check(await admin.from("programma_regel").insert(standaard.map((r, i) => rij(cluster, i + 1, r))).select(), `programma ${c.code}`);
+    } else if (opnieuw.has(c.code)) {
+      const { data: bestaand } = await admin.from("programma_regel").select("id, soort, volgorde").eq("cluster_id", cluster).order("volgorde");
+      const vakken = (bestaand ?? []).filter((r) => r.soort === "belevenis");
+      const zesVakken = standaard.filter((r) => r.soort === "belevenis");
+      if (vakken.length !== zesVakken.length) {
+        console.error(`Programma ${c.code} niet opnieuw geladen: ${vakken.length} belevenisvakken gevonden, ${zesVakken.length} verwacht.`);
+        process.exit(1);
+      }
+      // Eerst alle volgnummers vrijmaken, dan de vaste activiteiten vervangen en de vakken bijwerken
+      for (const [i, r] of (bestaand ?? []).entries()) await admin.from("programma_regel").update({ volgorde: 1000 + i }).eq("id", r.id);
+      await admin.from("programma_regel").delete().eq("cluster_id", cluster).eq("soort", "vast");
+      let vak = 0;
+      for (const [i, r] of standaard.entries()) {
+        if (r.soort === "belevenis") {
+          const bestaandVak = vakken[vak++];
+          check(await admin.from("programma_regel").update(rij(cluster, i + 1, r)).eq("id", bestaandVak.id).select(), `vak ${c.code}`);
+        } else {
+          check(await admin.from("programma_regel").insert(rij(cluster, i + 1, r)).select(), `vast ${c.code}`);
+        }
       }
     }
-    // Voorlopige toewijzing: elke groep krijgt het tijdvak waarin zij volgens het programma organiseert
-    const { data: regels } = await admin.from("programma_regel")
-      .select("id, volgorde").eq("cluster_id", clusterId[c.code]).eq("soort", "belevenis");
-    let nr = 0;
-    const organisatorPerVolgorde = new Map<number, number>();
-    for (const dag of dagenVan(c.code)) {
-      for (const r of dag.regels) {
-        nr++;
-        if (r.soort === "belevenis") organisatorPerVolgorde.set(nr, r.organisator as number);
-      }
-    }
-    for (const regel of regels ?? []) {
-      const groepNr = organisatorPerVolgorde.get(regel.volgorde);
-      const pgId = groepNr ? groepId[`${c.code}:${groepNr}`] : undefined;
+
+    // Voorlopige toewijzing: elke groep krijgt het tijdvak waarin zij volgens het programma organiseert.
+    // Het n-de belevenisvak (op volgorde) hoort bij de n-de organisator uit het standaardprogramma.
+    const organisatoren = standaard.filter((r) => r.soort === "belevenis").map((r) => r.organisator as number);
+    const { data: vakken } = await admin.from("programma_regel")
+      .select("id, volgorde").eq("cluster_id", cluster).eq("soort", "belevenis").order("volgorde");
+    for (const [i, vak] of (vakken ?? []).entries()) {
+      const pgId = groepId[`${c.code}:${organisatoren[i]}`];
       if (!pgId) continue;
-      await admin.from("avf").update({ programma_regel_id: regel.id })
-        .eq("projectgroep_id", pgId).is("programma_regel_id", null);
+      await admin.from("avf").update({ programma_regel_id: vak.id }).eq("projectgroep_id", pgId).is("programma_regel_id", null);
     }
   }
 

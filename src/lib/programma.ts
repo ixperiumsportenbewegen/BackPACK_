@@ -47,5 +47,15 @@ export interface ProgrammaRegel {
   deelnemers: number[];
   rocks_rivers_groepen: number[];
   bijgewerkt_door_naam: string | null;
+  oorspronkelijke_starttijd: string | null;
+  oorspronkelijke_eindtijd: string | null;
   updated_at: string;
+}
+
+/** Zijn de tijden van deze activiteit aangepast ten opzichte van het begin? Dan staat er een uitroepteken bij. */
+export function isAangepast(
+  r: Pick<ProgrammaRegel, "oorspronkelijke_starttijd" | "oorspronkelijke_eindtijd" | "starttijd" | "eindtijd">,
+): boolean {
+  if (r.oorspronkelijke_starttijd === null || r.oorspronkelijke_eindtijd === null) return false;
+  return r.oorspronkelijke_starttijd.slice(0, 5) !== r.starttijd.slice(0, 5) || r.oorspronkelijke_eindtijd.slice(0, 5) !== r.eindtijd.slice(0, 5);
 }

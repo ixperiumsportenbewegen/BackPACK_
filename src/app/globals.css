@@ -17,6 +17,9 @@
   --color-goedgekeurd: var(--status-goedgekeurd);
   --color-actie: var(--status-actie);
   --color-ingediend: var(--status-ingediend);
+  --color-han-oranje: var(--han-oranje);
+  --color-han-groen: var(--han-groen);
+  --color-han-blauw: var(--han-blauw);
   --font-sans: var(--font-basis);
   --font-heading: var(--font-kop);
   --radius-han: var(--radius);

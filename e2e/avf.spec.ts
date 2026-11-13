@@ -54,6 +54,7 @@ test.afterAll(async () => {
   for (const nr of [1, 2, 3, 4, 5, 6]) await admin.from("avf").update({ programma_regel_id: regel[nr] }).eq("id", avf[nr]);
   const { data: r } = await admin.from("programma_regel").select("id, titel, starttijd").eq("id", regel[1]!).single();
   if (r?.starttijd !== "19:30:00") await admin.from("programma_regel").update({ starttijd: "19:30:00", eindtijd: "21:00:00" }).eq("id", regel[1]!);
+  await admin.from("programma_regel").update({ oorspronkelijke_starttijd: null, oorspronkelijke_eindtijd: null }).eq("id", regel[1]!);
 });
 
 test("het voorbeeld-AVF is compleet en staat in het juiste tijdvak", async ({ browser }) => {
@@ -345,7 +346,7 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
   await details.getByLabel("Start").fill("20:00");
   await details.getByLabel("Einde").fill("21:30");
   await details.getByRole("button", { name: "Opslaan" }).click();
-  await expect(details.getByText("Opgeslagen", { exact: true })).toBeVisible();
+  await expect(p.getByRole("status")).toContainText("Opgeslagen");
   await groep.page.goto("/avf");
   await expect(groep.page.getByText("maandag 28 juni · 20:00–21:30").first()).toBeVisible();
   await groep.page.goto("/programma");

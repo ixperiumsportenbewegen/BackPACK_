@@ -97,9 +97,12 @@ Het vaste programma van de meerdaagse, per cluster. Zes regels hebben soort `bel
 | locatie | text | bijv. "Camping" of "Bivaklocatie" |
 | deelnemers | int[] | nummers (1–6) van de projectgroepen die aan de belevenis meedoen |
 | rocks_rivers_groepen | int[] | nummers van de projectgroepen die op hetzelfde moment met Rocks n Rivers zijn |
+| oorspronkelijke_starttijd, oorspronkelijke_eindtijd | time | de tijd zoals die oorspronkelijk was, zolang de tijd is aangepast (uitroepteken); leeg als de tijd gelijk is aan het begin of de stuurgroep de wijziging heeft bevestigd |
 | bijgewerkt_door_naam | text | ingevulde naam van de stuurgroep |
 
-Alleen lezen voor het cluster; wijzigen via `programma_regel_wijzigen`. Het aantal belevenisregels blijft zes.
+Alleen lezen voor het cluster; wijzigen via de functies `programma_regel_wijzigen`, `programma_regel_toevoegen`, `programma_regel_verwijderen` en `programma_wijzigingen_bevestigen`.
+Het aantal belevenisregels blijft zes: een regel van soort `belevenis` kan niet worden toegevoegd of verwijderd en de soort kan niet veranderen (de database dwingt dat af); de tijd kan wel worden aangepast. Vaste regels kunnen worden toegevoegd en verwijderd.
+Verandert de eindtijd van een regel, dan schuiven de aansluitende regels van dezelfde dag standaard mee (dezelfde duur); bij een gat in het programma stopt het meeschuiven. Volgnummers (`volgorde`) mogen gaten hebben.
 
 ## AVF
 

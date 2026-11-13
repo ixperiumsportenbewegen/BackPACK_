@@ -396,20 +396,25 @@ describe("Programma", () => {
     expect(terug.ok).toBe(true);
   });
 
-  it("ongeldige tijden of deelnemers worden geweigerd", async () => {
-    const { data: regel } = await admin.from("programma_regel").select("*").eq("cluster_id", VD).eq("volgorde", 2).single();
+  it("ongeldige tijden of groepsnummers worden geweigerd en veranderen niets", async () => {
+    // Let op: dit test op een belevenisvak en een vaste activiteit; de uitkomst is altijd "geweigerd", dus er verandert niets.
+    const { data: regels } = await admin.from("programma_regel").select("*").eq("cluster_id", VD).in("volgorde", [2, 6]).order("volgorde");
     const stuur = await inloggenAls("vd-stuur-programma");
-    const basis = {
-      p_id: regel!.id, p_titel: regel!.titel, p_omschrijving: null, p_locatie: null,
-      p_dag: regel!.dag, p_start: "10:00", p_eind: "09:00",
-      p_deelnemers: [], p_rocks_rivers: [], p_verwacht: regel!.updated_at, p_naam: "Testpersoon",
-    };
-    const tijd = (await stuur.rpc("programma_regel_wijzigen", basis)).data as Resultaat;
-    expect(tijd.ok).toBe(false);
-    const groepen = await stuur.rpc("programma_regel_wijzigen", { ...basis, p_start: "08:00", p_eind: "09:00", p_deelnemers: [7] });
-    expect(groepen.error).not.toBeNull();
-    const { data: na } = await admin.from("programma_regel").select("starttijd").eq("id", regel!.id).single();
-    expect(na?.starttijd).toBe(regel!.starttijd);
+    for (const regel of regels ?? []) {
+      const basis = {
+        p_id: regel.id, p_titel: regel.titel, p_omschrijving: null, p_locatie: null,
+        p_dag: regel.dag, p_start: "10:00", p_eind: "09:00",
+        p_deelnemers: [], p_rocks_rivers: [], p_verwacht: regel.updated_at, p_naam: "Testpersoon",
+      };
+      const tijd = (await stuur.rpc("programma_regel_wijzigen", basis)).data as Resultaat;
+      expect(tijd.ok, "eindtijd voor starttijd").toBe(false);
+      const groepen = (await stuur.rpc("programma_regel_wijzigen", { ...basis, p_start: "08:00", p_eind: "09:00", p_deelnemers: [7] })).data as Resultaat;
+      expect(groepen.ok, "groepsnummer 7").toBe(false);
+      const rr = (await stuur.rpc("programma_regel_wijzigen", { ...basis, p_start: "08:00", p_eind: "09:00", p_rocks_rivers: [0] })).data as Resultaat;
+      expect(rr.ok, "groepsnummer 0").toBe(false);
+      const { data: na } = await admin.from("programma_regel").select("starttijd, eindtijd, updated_at").eq("id", regel.id).single();
+      expect(na).toEqual({ starttijd: regel.starttijd, eindtijd: regel.eindtijd, updated_at: regel.updated_at });
+    }
   });
 });
 

@@ -15,6 +15,11 @@ Onderste balk met vier knoppen, voor elk account gelijk van vorm:
 
 Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
 
+## Programma
+
+- **Programma (iedereen):** per dag een gekleurde kop (maandag oranje, dinsdag groen, woensdag blauw). Vaste activiteiten zijn grijs. De zes belevenisvakken vallen op met een zwarte rand en een balk bovenaan met de verantwoordelijke projectgroep ("Projectgroep 2 is verantwoordelijk"), de titel van de belevenis, wie meedoet en wie met Rocks n Rivers is. Aangepaste tijden hebben een uitroepteken en de oorspronkelijke tijd ("Tijd aangepast, was 08:00–08:30").
+- **Programma beheren (stuurgroep en docent):** dezelfde dagindeling. Per activiteit: tijd, titel, toelichting en locatie aanpassen. Een andere eindtijd laat de aansluitende activiteiten van die dag standaard meeschuiven, met een voorbeeld vooraf. Activiteiten toevoegen (na een activiteit of aan het einde van de dag) en verwijderen (met de keuze om de volgende tijden naar voren te schuiven). Een belevenisvak is vast: de tijd is aanpasbaar, maar het vak is niet te verwijderen. Uitroeptekens kun je per activiteit of allemaal bevestigen.
+
 ## Navigatie binnen het AVF
 
 - **Sectiebalk** bovenaan elk AVF-scherm (blijft staan bij scrollen): Overzicht en A t/m H, met de huidige sectie gemarkeerd en een icoon voor compleet of onvolledig. Ook op de onderdeelschermen van sectie D.

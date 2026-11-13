@@ -46,7 +46,10 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `avf_goedkeuren(avf_id, naam)` | Stuurgroep, docent | Status → `goedgekeurd`; legt account, naam en tijd vast; zet `opnieuw_te_controleren` op false |
 | `avf_planning_toewijzen(avf_id, programma_regel_id, locatie, naam)` | Stuurgroep, docent | Wijst een belevenis aan een tijdvak (regel van soort `belevenis`) en een locatie toe; weigert als het tijdvak al bij een andere groep hoort; legt het vast in het logboek |
 | `avf_planning_wisselen(avf_a, avf_b, naam)` | Stuurgroep, docent | Laat twee groepen van tijdvak wisselen |
-| `programma_regel_wijzigen(regel_id, ..., verwacht_updated_at, naam)` | Stuurgroep, docent | Past titel, tijd, locatie en deelnemers van een programmaregel aan; waarschuwt als iemand anders de regel net wijzigde; legt het vast in het logboek |
+| `programma_regel_wijzigen(regel_id, ..., verwacht_updated_at, naam, schuif)` | Stuurgroep, docent | Past titel, tijd, locatie en deelnemers van een programmaregel aan; schuift standaard de aansluitende activiteiten van die dag mee en bewaart de oorspronkelijke tijden (uitroepteken); waarschuwt als iemand anders de regel net wijzigde; legt het vast in het logboek |
+| `programma_regel_toevoegen(na_regel_id, titel, ..., schuif, naam)` | Stuurgroep, docent | Voegt een vaste activiteit toe na een bestaande activiteit (nooit een belevenisvak) |
+| `programma_regel_verwijderen(regel_id, schuif, naam)` | Stuurgroep, docent | Verwijdert een vaste activiteit; een belevenisvak wordt geweigerd |
+| `programma_wijzigingen_bevestigen(cluster_id, regel_id, naam)` | Stuurgroep, docent | Haalt de uitroeptekens weg zonder de tijden te veranderen |
 | `budget_besluit(aanvraag_id, besluit, bedrag, toelichting, naam)` | Stuurgroep, docent | `toegekend` (eventueel lager bedrag), `teruggegeven` of `afgewezen`; toelichting verplicht behalve bij volledig toekennen |
 | `budget_aanvraag_indienen(aanvraag_id, naam)` | PG eigen | Losse aanvraag (`soort = los`), alleen als het AVF is goedgekeurd |
 | `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Geeft alleen het resterende bedrag terug |

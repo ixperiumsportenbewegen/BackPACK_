@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, TriangleAlert } from "lucide-react";
-import { kiesGroep, locatieOpslaan, regelOpslaan, type RegelVelden } from "./actions";
+import { kiesGroep, locatieOpslaan } from "./actions";
+import { ProgrammaRegels } from "./ProgrammaRegels";
 import { formatGroepNummers, type ProgrammaRegel } from "@/lib/programma";
 import { formatDag, formatTijd } from "@/lib/tijd";
 
@@ -156,113 +157,14 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
   );
 }
 
-function Chips({ label, waarde, onChange }: { label: string; waarde: number[]; onChange: (n: number[]) => void }) {
-  return (
-    <fieldset>
-      <legend className="font-bold text-kop">{label}</legend>
-      <div className="mt-1 flex flex-wrap gap-2">
-        {[1, 2, 3, 4, 5, 6].map((n) => {
-          const aan = waarde.includes(n);
-          return (
-            <button
-              key={n} type="button" aria-pressed={aan}
-              onClick={() => onChange(aan ? waarde.filter((x) => x !== n) : [...waarde, n].sort())}
-              className={`flex size-aanraak items-center justify-center rounded-han border-2 font-bold ${aan ? "border-kop bg-kop text-white" : "border-zacht bg-vlak text-kop"}`}
-            >
-              {n}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
-
-function naarVelden(r: ProgrammaRegel): RegelVelden {
-  return {
-    titel: r.titel, omschrijving: r.omschrijving ?? "", locatie: r.locatie ?? "", dag: r.dag,
-    start: formatTijd(r.starttijd), eind: formatTijd(r.eindtijd), deelnemers: r.deelnemers, rocksRivers: r.rocks_rivers_groepen,
-  };
-}
-
-/** Eén regel van het programma bewerken. Met het tijdstip van de laatste wijziging wordt een gelijktijdige wijziging herkend. */
-function RegelFormulier({ regel, naam }: { regel: ProgrammaRegel; naam: string }) {
-  const router = useRouter();
-  const [v, setV] = useState<RegelVelden>(naarVelden(regel));
-  const [verwacht, setVerwacht] = useState(regel.updated_at);
-  const [melding, setMelding] = useState<Melding | null>(null);
-  const [conflict, setConflict] = useState<ProgrammaRegel | null>(null);
-  const set = <K extends keyof RegelVelden>(k: K, w: RegelVelden[K]) => setV((x) => ({ ...x, [k]: w }));
-
-  async function bewaar() {
-    setMelding({ soort: "bezig", tekst: "Bezig met opslaan…" });
-    const res = await regelOpslaan(regel.id, v, verwacht, naam);
-    if (res.status === "ok") {
-      setVerwacht(res.updatedAt);
-      setConflict(null);
-      setMelding({ soort: "ok", tekst: "Opgeslagen" });
-      router.refresh();
-    } else if (res.status === "conflict") {
-      setConflict(res.huidig);
-      setMelding({ soort: "waarschuwing", tekst: `${res.huidig.bijgewerkt_door_naam || "Iemand anders"} heeft deze regel net gewijzigd.` });
-    } else {
-      setMelding({ soort: "fout", tekst: res.melding });
-    }
-  }
-
-  return (
-    <details className="rounded-han border border-rand bg-vlak">
-      <summary className="flex min-h-aanraak cursor-pointer items-center gap-3 p-3">
-        <span className="rounded-han bg-kop px-2 py-1 text-sm font-bold text-white">{formatTijd(regel.starttijd)}–{formatTijd(regel.eindtijd)}</span>
-        <span className="flex-1 font-bold text-kop">{regel.titel}</span>
-        <span className="text-sm text-zacht">{formatDag(regel.dag).split(" ")[0]}</span>
-      </summary>
-      <div className="flex flex-col gap-3 border-t border-rand p-3">
-        <label className="font-bold text-kop">Titel<input value={v.titel} onChange={(e) => set("titel", e.target.value)} maxLength={120} className={`${INVOER} mt-1 min-h-aanraak`} /></label>
-        <label className="font-bold text-kop">Toelichting<textarea value={v.omschrijving} onChange={(e) => set("omschrijving", e.target.value)} maxLength={300} rows={2} className={`${INVOER} mt-1 py-2`} /></label>
-        <label className="font-bold text-kop">Locatie<input value={v.locatie} onChange={(e) => set("locatie", e.target.value)} maxLength={120} className={`${INVOER} mt-1 min-h-aanraak`} /></label>
-        <label className="font-bold text-kop">Dag<input type="date" value={v.dag} onChange={(e) => set("dag", e.target.value)} className={`${INVOER} mt-1 min-h-aanraak`} /></label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="font-bold text-kop">Start<input type="time" value={v.start} onChange={(e) => set("start", e.target.value)} className={`${INVOER} mt-1 min-h-aanraak`} /></label>
-          <label className="font-bold text-kop">Einde<input type="time" value={v.eind} onChange={(e) => set("eind", e.target.value)} className={`${INVOER} mt-1 min-h-aanraak`} /></label>
-        </div>
-        {regel.soort === "belevenis" && (
-          <>
-            <Chips label="Projectgroepen die meedoen" waarde={v.deelnemers} onChange={(n) => set("deelnemers", n)} />
-            <Chips label="Projectgroepen met Rocks & Rivers" waarde={v.rocksRivers} onChange={(n) => set("rocksRivers", n)} />
-          </>
-        )}
-        {conflict && (
-          <div role="alert" className="rounded-han border-2 border-kop bg-vlak p-3">
-            <p className="font-medium text-kop">
-              Nu staat er: {conflict.titel}, {formatTijd(conflict.starttijd)}–{formatTijd(conflict.eindtijd)}. Wat wil je?
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" onClick={() => { setV(naarVelden(conflict)); setVerwacht(conflict.updated_at); setConflict(null); setMelding(null); }} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
-                Hun versie houden
-              </button>
-              <button type="button" onClick={() => { setVerwacht(conflict.updated_at); setConflict(null); void (async () => {
-                setMelding({ soort: "bezig", tekst: "Bezig met opslaan…" });
-                const res = await regelOpslaan(regel.id, v, conflict.updated_at, naam);
-                if (res.status === "ok") { setVerwacht(res.updatedAt); setMelding({ soort: "ok", tekst: "Opgeslagen" }); router.refresh(); }
-                else setMelding({ soort: "fout", tekst: res.status === "fout" ? res.melding : "Opnieuw gewijzigd door iemand anders." });
-              })(); }} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk">
-                Mijn versie bewaren
-              </button>
-            </div>
-          </div>
-        )}
-        <button type="button" onClick={() => void bewaar()} disabled={!naam.trim()} className="min-h-aanraak rounded-han bg-merk px-4 text-lg font-bold text-op-merk disabled:opacity-60">
-          Opslaan
-        </button>
-        <Melding m={melding} />
-      </div>
-    </details>
-  );
-}
-
 export function ProgrammaBeheer({ regels, groepen }: { regels: ProgrammaRegel[]; groepen: GroepRij[] }) {
   const [naam, setNaam] = useState("");
+  const [bericht, setBericht] = useState<string | null>(null);
+  useEffect(() => {
+    if (!bericht) return;
+    const t = setTimeout(() => setBericht(null), 9000);
+    return () => clearTimeout(t);
+  }, [bericht]);
   useEffect(() => {
     try {
       // Eenmalig na het laden: opslag in de browser bestaat niet op de server.
@@ -296,9 +198,21 @@ export function ProgrammaBeheer({ regels, groepen }: { regels: ProgrammaRegel[];
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xl">Het hele programma aanpassen</h2>
-        <p className="text-zacht">Tijden, titels en locaties van alle regels. Wijzigt een tijdvak, dan verschuift de belevenis in dat tijdvak mee.</p>
-        {regels.map((r) => <RegelFormulier key={r.id} regel={r} naam={naam} />)}
+        <p className="text-zacht">
+          Tijden, titels en locaties van alle activiteiten, per dag. Verandert de eindtijd van een activiteit, dan schuiven de
+          aansluitende activiteiten van die dag standaard mee, met een uitroepteken zodat iedereen ziet wat is aangepast.
+          Je kunt vaste activiteiten toevoegen en verwijderen. De zes belevenisvakken van de projectgroepen blijven altijd staan.
+        </p>
+        <ProgrammaRegels regels={regels} groepen={groepen} naam={naam} onBericht={setBericht} />
       </section>
+
+      {bericht && (
+        <div role="status" aria-live="polite" className="fixed inset-x-4 bottom-24 z-30 mx-auto flex max-w-xl items-start gap-3 rounded-han bg-kop p-3 text-white shadow-lg md:bottom-6 md:left-64">
+          <Check aria-hidden className="mt-0.5 size-5 shrink-0" />
+          <p className="flex-1 font-medium">{bericht}</p>
+          <button type="button" onClick={() => setBericht(null)} className="min-h-aanraak px-2 font-bold underline">Sluiten</button>
+        </div>
+      )}
     </div>
   );
 }

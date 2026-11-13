@@ -21,8 +21,9 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | projectgroep_rol (rolverdeling) | L S | L | L S | L | – |
 | account | L S (via beheerfunctie) | L eigen | L eigen | – | L eigen |
 | avf – volledige inhoud | L S | L (wijzigen alleen via verbeterverzoek) | L, S zolang status niet `ingediend` is | – | – |
-| avf.dag, starttijd, eindtijd, locatie | L S | F (`avf_planning_toewijzen`) | L | via `avf_publiek` | via `avf_publiek` |
-| avf – publieke velden (view `avf_publiek`: titel, verschijningsvorm, publieke_samenvatting, dag, tijden, status) | L | L | L | L | L |
+| avf.programma_regel_id (tijdvak) en locatie_tekst | L, wijzigen via F | F (`avf_planning_toewijzen`, `avf_planning_wisselen`) | L (nooit wijzigen) | tijdvak via `avf_publiek`, locatie – | tijdvak via `avf_publiek`, locatie – |
+| programma_regel (vast programma per cluster) | L, wijzigen via F | L, wijzigen via F (`programma_regel_wijzigen`) | L | L | L |
+| avf – publieke velden (view `avf_publiek`: titel, verschijningsvorm, publieke_samenvatting, tijdvak met dag en tijden, status) | L | L | L | L | L |
 | avf.status, versie, goedkeuring | F | F (`aanpassing_vragen`, `goedkeuren`) | F (`indienen`) | – | – |
 | avf_fase, avf_onderdeel, avf_materiaal | L S | L | L, S zolang status niet `ingediend` is | – | – |
 | avf_materiaal.aantal_gecorrigeerd_* | L S | L S | L | – | – |
@@ -43,7 +44,9 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `avf_indienen(avf_id, naam, wijzigingssamenvatting)` | PG eigen | Controleert verplichte velden (volgens `docs/avf-velden.md`) en of alle zes projectgroeprollen een naam hebben; maakt `avf_versie`; zet status op `ingediend`; zet budgetaanvraag `concept` → `aangevraagd` |
 | `avf_aanpassing_vragen(avf_id, naam)` | Stuurgroep, docent | Alleen als er minstens één open verbeterverzoek is; status → `aanpassing_gevraagd` |
 | `avf_goedkeuren(avf_id, naam)` | Stuurgroep, docent | Status → `goedgekeurd`; legt account, naam en tijd vast; zet `opnieuw_te_controleren` op false |
-| `avf_planning_toewijzen(avf_id, dag, starttijd, eindtijd, locatie, naam)` | Stuurgroep, docent | Legt dag, tijd en locatie vast; geeft een waarschuwing (geen blokkade) bij overlap met een andere belevenis op dezelfde locatie |
+| `avf_planning_toewijzen(avf_id, programma_regel_id, locatie, naam)` | Stuurgroep, docent | Wijst een belevenis aan een tijdvak (regel van soort `belevenis`) en een locatie toe; weigert als het tijdvak al bij een andere groep hoort; legt het vast in het logboek |
+| `avf_planning_wisselen(avf_a, avf_b, naam)` | Stuurgroep, docent | Laat twee groepen van tijdvak wisselen |
+| `programma_regel_wijzigen(regel_id, ..., verwacht_updated_at, naam)` | Stuurgroep, docent | Past titel, tijd, locatie en deelnemers van een programmaregel aan; waarschuwt als iemand anders de regel net wijzigde; legt het vast in het logboek |
 | `budget_besluit(aanvraag_id, besluit, bedrag, toelichting, naam)` | Stuurgroep, docent | `toegekend` (eventueel lager bedrag), `teruggegeven` of `afgewezen`; toelichting verplicht behalve bij volledig toekennen |
 | `budget_aanvraag_indienen(aanvraag_id, naam)` | PG eigen | Losse aanvraag (`soort = los`), alleen als het AVF is goedgekeurd |
 | `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Geeft alleen het resterende bedrag terug |
@@ -56,7 +59,7 @@ Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijzi
 1. `vd-groep-1` kan het AVF van `vd-groep-2` niet lezen, ook niet via directe query, Storage-pad of `avf_versie`.
 2. `vd-groep-1` ziet van `vd-groep-2` alleen de velden van `avf_publiek`.
 3. Geen enkel VD-account (behalve docent) ziet iets van VC en andersom; TEST-accounts zien niets van VD en VC en andersom.
-4. `vd-groep-1` kan zijn eigen AVF niet wijzigen als het `ingediend` is en kan nooit dag, tijd of locatie wijzigen.
+4. `vd-groep-1` kan zijn eigen AVF niet wijzigen als het `ingediend` is en kan nooit tijdvak of locatie wijzigen.
 10. Een stuurgroepaccount kan geen AVF-inhoud wijzigen, wel verbeterverzoeken plaatsen en de planning toewijzen.
 5. `vd-groep-1` kan `avf.status` niet rechtstreeks wijzigen en geen budget toekennen.
 6. `vd-groep-1` kan de budgetaanvragen van andere groepen niet lezen, wel `budget_resterend`.

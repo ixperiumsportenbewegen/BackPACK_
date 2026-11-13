@@ -47,7 +47,7 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 - Tabblad "Versies": eerdere indieningen met wijzigingssamenvatting.
 
 ### Belevenis bekijken (andere projectgroep en student)
-Alleen titel, verschijningsvorm, publieke samenvatting, dag, tijd en status.
+Alleen titel, verschijningsvorm, publieke samenvatting, tijdvak (dag en tijd) en status.
 
 ### Stuurgroepdashboard (stuurgroep en docent) – STG-01, STG-02, AVF-11
 Indeling in de vier PACK-vakken (kleine letter en icoon, speels en niet te zwaar), daaronder de zes rollen:

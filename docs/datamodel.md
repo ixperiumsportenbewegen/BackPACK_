@@ -81,6 +81,26 @@ Inloggen met gebruikersnaam: de app zet de gebruikersnaam om naar een intern e-m
 
 Hulpfuncties (SQL, `security definer`, `stable`): `mijn_soort()`, `mijn_cluster()`, `mijn_projectgroep()`, `mijn_stuurgroeprol()`, `is_docent()`. Alle afschermingsregels gebruiken deze functies.
 
+## Programma
+
+### programma_regel
+Het vaste programma van de meerdaagse, per cluster. Zes regels hebben soort `belevenis`: dat zijn de tijdvakken waarin een projectgroep haar belevenis organiseert (één groep per tijdvak). De overige regels zijn vast (verzamelen, busreis, maaltijden, verplaatsingen enz.).
+| veld | type | opmerking |
+|---|---|---|
+| cluster_id | uuid → cluster | |
+| volgorde | int | volgorde in het hele programma; uniek per cluster |
+| dag | date | |
+| starttijd, eindtijd | time | |
+| soort | enum `programma_soort` | `vast` of `belevenis` |
+| titel | text | bijv. "Spiegelprogramma ochtend · 3 uur" |
+| omschrijving | text | korte toelichting bij een vaste regel |
+| locatie | text | bijv. "Camping" of "Bivaklocatie" |
+| deelnemers | int[] | nummers (1–6) van de projectgroepen die aan de belevenis meedoen |
+| rocks_rivers_groepen | int[] | nummers van de projectgroepen die op hetzelfde moment met Rocks n Rivers zijn |
+| bijgewerkt_door_naam | text | ingevulde naam van de stuurgroep |
+
+Alleen lezen voor het cluster; wijzigen via `programma_regel_wijzigen`. Het aantal belevenisregels blijft zes.
+
 ## AVF
 
 ### avf
@@ -98,10 +118,8 @@ Eén per projectgroep (`projectgroep_id` uniek). Velden van sectie A staan als k
 | organiserende_studenten | text | namen |
 | doelgroep | text | |
 | aantal_deelnemers | int | |
-| dag | date | binnen de editie; toegewezen door de stuurgroep |
-| starttijd, eindtijd | time | toegewezen door de stuurgroep |
-| locatie_id | uuid → locatie | *(locatie komt in latere opdracht; tot dan vrij tekstveld `locatie_tekst`)* |
-| locatie_tekst | text | tijdelijk |
+| programma_regel_id | uuid → programma_regel | toegewezen tijdvak (een regel van soort `belevenis`); uniek: één groep per tijdvak; dag en tijd komen altijd uit deze regel; alleen te wijzigen via `avf_planning_toewijzen` |
+| locatie_tekst | text | locatie; alleen te wijzigen door de stuurgroep via `avf_planning_toewijzen` (later eventueel `locatie_id` → `locatie`) |
 | contactpersoon | text | |
 | **B** beginsituatie | jsonb | `{algemeen, motorisch, cognitief, sociaal_emotioneel}` |
 | **C** doelen | jsonb | `{motorisch, cognitief, sociaal_emotioneel, persoonlijk: [{naam, doel}]}` |
@@ -121,6 +139,7 @@ Drie per AVF (kop, romp, staart). PK (`avf_id`, `fase`).
 | fase | enum `fase` | `kop`, `romp`, `staart` |
 | organisatievorm | text | |
 | overzichtstekening_pad | text | Storage-bucket `avf` |
+| overzichtstekening_bijschrift | text | |
 | coachen_instructies | text | aanwijzingen en instructies |
 | stemgebruik_houding | text | |
 | opruimen | jsonb | `{wie, wat, waar, wanneer, hoe, wat_erna}` (6 W's) |
@@ -141,6 +160,7 @@ Drie per AVF (kop, romp, staart). PK (`avf_id`, `fase`).
 | usv_uitdagend, usv_speelbaar | text | |
 | usv_veilig_aanvulling | text | "veilig" toont de fysieke veiligheid; dit is alleen een aanvulling |
 | afbeelding_pad | text | optioneel |
+| afbeelding_bijschrift | text | |
 | niet_van_toepassing | text[] | velden die bewust als n.v.t. zijn gemarkeerd |
 
 ### avf_versie

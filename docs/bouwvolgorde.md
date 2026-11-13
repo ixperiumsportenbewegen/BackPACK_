@@ -52,7 +52,9 @@ Bouw:
 - Voortgang per sectie; eigenaar-rol per sectie (PGR-02).
 - Belevenissen-scherm: eigen AVF en de andere vijf als publieke kaarten.
 - Printweergave volledig AVF (PDF-01).
-- Testdata: `seed/avf-voorbeeld.json` ingeladen bij `vd-groep-1`.
+- Vast programma per cluster (`programma_regel`, `seed/programma.json`): zes tijdvakken voor belevenissen, één groep per tijdvak, plus de vaste regels (verzamelen, busreis, maaltijden, verplaatsingen) en Rocks n Rivers als parallelle activiteit. Programma-pagina voor iedereen (lezen) en voor de stuurgroep (tijden, locaties en deelnemers aanpassen, groepen toewijzen en wisselen). Dit is een eerste versie van PRG-01 en AVF-10; filters, locatielijst en pdf volgen in opdracht 6 en 9.
+- Publieke titel en korte omschrijving voor andere groepen: sectie A, velden titel en publieke samenvatting (`avf_publiek`).
+- Testdata: `seed/avf-voorbeeld.json` ingeladen bij `vd-groep-1` (en bij `test-groep-1`).
 - Afschermingstests 1 en 2.
 
 **Klaar als:** `vd-groep-1` kan het voorbeeld-AVF volledig bekijken en aanpassen op een telefoon; twee browsers tegelijk op hetzelfde account overschrijven elkaar niet ongemerkt; `vd-groep-2` ziet alleen de publieke kaart.
@@ -69,7 +71,6 @@ Bouw:
 - Beoordelingsscherm voor stuurgroep en docent (AVF-06 t/m AVF-08), versie-overzicht.
 - Trigger voor `opnieuw_te_controleren` (AVF-09): goedgekeurd AVF blijft bewerkbaar; wezenlijke wijziging geeft het label "Opnieuw te controleren".
 - Stuurgroepdashboard met PACK-indeling en een rolweergave voor alle zes rollen, gevuld via `src/config/avf-velden.ts` (zie `docs/schermen.md`).
-- Planning toewijzen met `avf_planning_toewijzen`: dag en tijd door Projectleiding, locatie door Logistiek & Facilitair (beide mogen in de database, de interface toont het bij de juiste rol).
 - Logboekregels in `wijziging` voor indienen, aanpassing vragen en goedkeuren.
 - Afschermingstests 4, 5 en 10.
 

@@ -21,7 +21,7 @@ Afkortingen SG-rol: PRL Projectleiding · P&K Programma & Kwaliteit · B&T Belev
 | `doelgroep` | Doelgroep | ✔ | PB | P&K | A | |
 | `aantal_deelnemers` | Aantal deelnemers | ✔ | PL | PRL | K | |
 | `contactpersoon` | Contactpersoon tijdens de belevenis | ✔ | PL | PRL | K | |
-| `dag`, `starttijd`, `eindtijd` | Dag en tijd (toegewezen) | – (alleen-lezen) | – | PRL (wijst toe) | K | |
+| `dag`, `starttijd`, `eindtijd` | Dag en tijd (toegewezen: tijdvak uit het programma) | – (alleen-lezen) | – | P&K (programma en toewijzing) | A | |
 | `locatie_id` / `locatie_tekst` | Locatie (toegewezen) | – (alleen-lezen) | – | L&F (wijst toe) | P | |
 
 ## B Beginsituatie
@@ -105,9 +105,9 @@ Bij "nee" toont de app: "Voor deze belevenis geldt het algemene EHBO-plan" met e
 | P · Pleister | Veiligheid & Welzijn | D sociale en fysieke veiligheid, USV veilig; E volledig; G catering en allergieën |
 | P · Pleister | Logistiek & Facilitair | A locatie (toewijzen); D opruimen; F materialen; G vervoer, opbouw en afbouw, corvee |
 | A · Aansteker | Beleving & Thema | A publieke samenvatting; G bijdrage aan het meerdaagsethema |
-| A · Aansteker | Programma & Kwaliteit | A verschijningsvorm, doelgroep; B; C; D organisatie, onderdelen, differentiatie, USV; G samenhang |
+| A · Aansteker | Programma & Kwaliteit | A verschijningsvorm, doelgroep, tijdvak (programma en toewijzing); B; C; D organisatie, onderdelen, differentiatie, USV; G samenhang |
 | C · Camera | Communicatie & Financiën | F financieel plan; H communicatie voor, tijdens en na |
-| K · Kompas | Projectleiding | A titel, organiserende studenten, aantal, contactpersoon, dag en tijd (toewijzen); G rolverdeling en afstemming; plus de status van alle AVF's |
+| K · Kompas | Projectleiding | A titel, organiserende studenten, aantal, contactpersoon; G rolverdeling en afstemming; plus de status van alle AVF's |
 
 Per rol toont het dashboard voor elk van de zes AVF's: welke van zijn velden leeg of ingevuld zijn, de laatste wijziging en open verbeterverzoeken. Klik op een veld → leesweergave van het AVF op die plek → "Verbeterverzoek" (automatisch gericht aan de PG-rol van dat veld).
 

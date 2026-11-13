@@ -1,3 +1,4 @@
+import { PaginaKop } from "@/components/PaginaKop";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -9,7 +10,7 @@ export default async function Meer() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-3xl">Meer</h1>
+      <PaginaKop titel="Meer" foto="wandeling-schemer-staand" />
 
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="text-sm font-medium text-zacht">Ingelogd als</p>

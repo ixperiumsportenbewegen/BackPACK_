@@ -1,5 +1,6 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 import { getProfiel } from "@/lib/profiel";
+import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
 import { kiesCluster } from "./actions";
 
 const STARTDATUM = new Date("2027-06-28T00:00:00+02:00");
@@ -13,6 +14,7 @@ export default async function OnzeMeerdaagse() {
   const thema = profiel.thema;
   const heeftThema = Boolean(thema?.naam);
   const dagen = dagenTot(STARTDATUM);
+  const sfeer = themaBeeldUrl(thema?.sfeerbeeld_pad ?? STANDAARD_SFEERBEELD, 1600);
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,15 +44,7 @@ export default async function OnzeMeerdaagse() {
       )}
 
       <section className="relative overflow-hidden rounded-han bg-kop text-white">
-        <Image
-          src="/fotos/vallei-viaduct-1600.webp"
-          alt=""
-          width={1600}
-          height={1200}
-          priority
-          sizes="(min-width: 768px) 768px, 100vw"
-          className="absolute inset-0 size-full object-cover opacity-60"
-        />
+        {sfeer && <img src={sfeer} alt="" className="absolute inset-0 size-full object-cover opacity-60" />}
         <div className="relative flex min-h-56 flex-col justify-end gap-2 bg-gradient-to-t from-black/80 to-transparent p-4">
           <h1 className="text-3xl !text-white">{heeftThema ? thema!.naam : "Kies jullie meerdaagsethema"}</h1>
           {heeftThema && thema!.verhaal && <p className="text-white">{thema!.verhaal}</p>}

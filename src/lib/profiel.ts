@@ -11,7 +11,10 @@ export interface Profiel {
   cluster: { id: string; code: string; naam: string; teams_link: string | null } | null;
   alleClusters: { code: string; naam: string }[]; // alleen gevuld bij de docent
   stuurgroeprol: { code: string; naam: string; pack: string } | null;
-  thema: { naam: string | null; verhaal: string | null; slogan: string | null; accentkleur: string | null } | null;
+  thema: {
+    naam: string | null; verhaal: string | null; slogan: string | null; accentkleur: string | null;
+    sfeerbeeld_pad: string | null; logo_pad: string | null; bijgewerkt_door_naam: string | null;
+  } | null;
 }
 
 /** Het ingelogde account met label, cluster en meerdaagsethema. null = niet ingelogd. */
@@ -48,7 +51,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
   let thema: Profiel["thema"] = null;
   if (cluster) {
     const { data } = await supabase
-      .from("meerdaagsethema").select("naam, verhaal, slogan, accentkleur")
+      .from("meerdaagsethema").select("naam, verhaal, slogan, accentkleur, sfeerbeeld_pad, logo_pad, bijgewerkt_door_naam")
       .eq("cluster_id", cluster.id).maybeSingle();
     thema = data;
   }

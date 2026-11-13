@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config({ path: ".env.local", quiet: true });
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({

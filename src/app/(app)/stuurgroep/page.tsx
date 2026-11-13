@@ -2,7 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Bandage, Camera, ChevronRight, Compass, Flame } from "lucide-react";
 import { PaginaKop } from "@/components/PaginaKop";
+import { NamenRegel } from "@/components/NamenRegel";
+import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { getProfiel } from "@/lib/profiel";
+import { maakServerClient } from "@/lib/supabase/server";
+import { stuurgroepRolOpslaan } from "../namen-actions";
 
 export const metadata = { title: "Stuurgroep · BackPACK_" };
 
@@ -29,6 +33,13 @@ const PACK = [
 export default async function Stuurgroep() {
   const profiel = (await getProfiel())!;
   if (profiel.soort !== "stuurgroep" && profiel.soort !== "docent") redirect("/");
+
+  const supabase = await maakServerClient();
+  const { data: rollen } = await supabase
+    .from("stuurgroeprol").select("id, code, naam, focus, studenten, updated_at").eq("cluster_id", profiel.cluster?.id ?? "");
+  const gesorteerd = [...(rollen ?? [])].sort(
+    (a, b) => STUURGROEPROL_VOLGORDE.indexOf(a.code) - STUURGROEPROL_VOLGORDE.indexOf(b.code),
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -76,6 +87,26 @@ export default async function Stuurgroep() {
           </section>
         );
       })}
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl">Onze stuurgroep</h2>
+        <p className="text-zacht">
+          {profiel.soort === "docent"
+            ? "De studenten per rol. Als docent kun je alle namen aanpassen."
+            : "De studenten per rol. Je past alleen de namen bij jullie eigen rol aan."}
+        </p>
+        {gesorteerd.map((rol) => (
+          <NamenRegel
+            key={rol.id}
+            label={rol.naam}
+            uitleg={rol.focus ?? undefined}
+            beginNamen={rol.studenten}
+            beginUpdatedAt={rol.updated_at}
+            kanBewerken={profiel.soort === "docent" || profiel.stuurgroeprol?.code === rol.code}
+            opslaan={stuurgroepRolOpslaan.bind(null, rol.id)}
+          />
+        ))}
+      </section>
     </div>
   );
 }

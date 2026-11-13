@@ -1,5 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
+import { ChevronRight, CircleDashed } from "lucide-react";
+import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { getProfiel } from "@/lib/profiel";
+import { maakServerClient } from "@/lib/supabase/server";
 import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
 import { kiesCluster } from "./actions";
 
@@ -14,6 +18,16 @@ export default async function OnzeMeerdaagse() {
   const thema = profiel.thema;
   const heeftThema = Boolean(thema?.naam);
   const dagen = dagenTot(STARTDATUM);
+  const supabase = await maakServerClient();
+  const { data: groepen } = await supabase
+    .from("projectgroep").select("id, nummer, naam").eq("cluster_id", profiel.cluster?.id ?? "").order("nummer");
+  const toonStand = profiel.soort === "stuurgroep" || profiel.soort === "docent";
+  const { data: rollen } = toonStand
+    ? await supabase.from("stuurgroeprol").select("code, naam").eq("cluster_id", profiel.cluster?.id ?? "")
+    : { data: null };
+  const rollenGesorteerd = [...(rollen ?? [])].sort(
+    (a, b) => STUURGROEPROL_VOLGORDE.indexOf(a.code) - STUURGROEPROL_VOLGORDE.indexOf(b.code),
+  );
   const sfeer = themaBeeldUrl(thema?.sfeerbeeld_pad ?? STANDAARD_SFEERBEELD, 1600);
 
   return (
@@ -59,12 +73,64 @@ export default async function OnzeMeerdaagse() {
         </p>
       </section>
 
-      <section className="rounded-han border border-rand bg-vlak p-4">
-        <h2 className="text-xl">Belevenissen</h2>
-        <p className="mt-1 text-zacht">
-          Jullie BackPACK_ is nog leeg. Hier komen straks de zes belevenissen van {profiel.cluster?.naam ?? "jullie cluster"}.
+      <section aria-labelledby="belevenissen-kop" className="flex flex-col gap-3">
+        <div className="flex items-end justify-between">
+          <h2 id="belevenissen-kop" className="text-xl">Belevenissen</h2>
+          <Link href="/belevenissen" className="flex min-h-aanraak items-center font-medium text-kop underline">
+            Alles bekijken
+          </Link>
+        </div>
+        <p className="text-zacht">
+          Jullie BackPACK_ is nog leeg. Zodra de projectgroepen hun belevenis invullen, verschijnt die hier.
         </p>
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {(groepen ?? []).map((g) => (
+            <li key={g.id}>
+              <Link
+                href="/belevenissen"
+                className="flex min-h-aanraak items-center gap-3 rounded-han border border-rand bg-vlak p-4"
+              >
+                <span className="flex-1">
+                  <span className="block font-bold text-kop">{g.naam}</span>
+                  <span className="block text-sm text-zacht">Nog geen belevenis ingevuld</span>
+                  <span className="mt-1 inline-flex items-center gap-1 rounded-han bg-rand px-2 py-0.5 text-xs font-bold text-kop">
+                    <CircleDashed aria-hidden className="size-3.5" /> In ontwikkeling
+                  </span>
+                </span>
+                <ChevronRight aria-hidden className="size-5 text-kop" />
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
+
+      {profiel.soort === "projectgroep" && (
+        <section aria-label="Snel naar" className="grid gap-3 sm:grid-cols-2">
+          <Link href="/meer/rolverdeling" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+            Rolverdeling invullen <ChevronRight aria-hidden className="size-5" />
+          </Link>
+          <Link href="/budget" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+            Budget <ChevronRight aria-hidden className="size-5" />
+          </Link>
+        </section>
+      )}
+
+      {toonStand && (
+        <section aria-labelledby="stand-kop" className="rounded-han border border-rand bg-vlak p-4">
+          <h2 id="stand-kop" className="text-xl">Stand van zaken per rol</h2>
+          <ul className="mt-2 divide-y divide-rand">
+            {rollenGesorteerd.map((r) => (
+              <li key={r.code} className="flex items-center justify-between gap-3 py-3">
+                <span className="font-medium text-kop">{r.naam}</span>
+                <span className="text-sm text-zacht">Nog niets te melden</span>
+              </li>
+            ))}
+          </ul>
+          <Link href="/stuurgroep" className="mt-2 flex min-h-aanraak items-center font-bold text-kop underline">
+            Naar de werkpagina&apos;s
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

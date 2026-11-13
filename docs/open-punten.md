@@ -11,3 +11,4 @@ Nog niet besloten. Claude Code gebruikt de **tijdelijke keuze** en meldt het aan
 | 5 | Wanneer gaan de eerste VD-projectgroepen de app echt gebruiken? | Na opdracht 5 | livegang |
 | 6 | Webadres (nu back-pack-one.vercel.app; eigen naam kan later) | `<projectnaam>.vercel.app` | 1 |
 | 7 | Avenir Next-webfontlicentie | Roboto en Roboto Condensed (door de HAN toegestaan alternatief) | – |
+| 8 | Supabase remt inloggen af op ca. 30 pogingen per 5 minuten per IP-adres (gemeten 13 november 2026: foutmelding `over_request_rate_limit`). Als een hele klas tegelijk inlogt vanaf het schoolwifi kunnen studenten tijdelijk niet inloggen | "Ingelogd blijven" staat standaard aan, dus meestal één keer per telefoon inloggen. Bart kijkt in Supabase onder Authentication → Rate Limits of de limiet omhoog kan; anders de groepen laten inloggen met een paar minuten ertussen | livegang |

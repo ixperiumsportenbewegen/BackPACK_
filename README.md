@@ -43,3 +43,13 @@ De wachtwoorden staan na `npm run seed` in `seed/wachtwoorden.local.json` (niet 
 ## Let op bij tests
 
 Supabase remt inloggen af op ca. 30 pogingen per 5 minuten per IP-adres (zie `docs/open-punten.md`, punt 8). Draai `npm test` en `npm run test:e2e` daarom niet vlak achter elkaar; de inlogtest voor alle accounts (`e2e/inloggen.spec.ts`) gebruikt er in één keer 31.
+
+## Programma en AVF
+
+- `seed/programma.json`: het standaardprogramma (28–30 juni) met de zes tijdvakken voor belevenissen; `npm run seed` laadt het per cluster en laat bestaande regels staan.
+- `seed/avf-voorbeeld.json`: het voorbeeld-AVF bij `vd-groep-1` en `test-groep-1` (alleen als het AVF nog leeg is).
+- `src/config/avf-velden.ts`: alle AVF-velden met eigenaar, verplichting en stuurgroepkoppeling (bron: `docs/avf-velden.md`; een test bewaakt dat beide gelijk blijven).
+
+## Testsessies
+
+De tests hergebruiken sessies (30 minuten, map `.auth-cache/`, niet in git), zodat we onder de inloglimiet van Supabase blijven. Alleen `e2e/inloggen.spec.ts` logt echt in met alle accounts: draai die los en niet vlak achter andere tests.

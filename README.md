@@ -37,3 +37,5 @@ De wachtwoorden staan na `npm run seed` in `seed/wachtwoorden.local.json` (niet 
 
 - `npm test`: afschermingstests (3, 7 en 9 uit `docs/rechtenmatrix.md`) tegen het Supabase-project.
 - `npm run test:e2e`: inloggen met alle accounts op een telefoonscherm. Eenmalig `npx.cmd playwright install chromium`.
+
+- Tegen de Vercel-site: `BASE_URL=https://back-pack-one.vercel.app npm run test:e2e` (in PowerShell: `$env:BASE_URL="https://back-pack-one.vercel.app"; npm.cmd run test:e2e`).

@@ -28,3 +28,4 @@
 | 2026-11-13 | `budget_totaal` staat in aparte tabel `cluster_budget` (docent en stuurgroep van het cluster) in plaats van op `cluster` | Row Level Security werkt per rij; projectgroepen en studenten mogen het totaalbedrag niet lezen |
 | 2026-11-13 | `wijziging` krijgt extra kolommen `cluster_id` en `projectgroep_id` | Nodig om het logboek per cluster en per groep af te schermen |
 | 2026-11-13 | Afschermingstests draaien met Vitest tegen het Supabase-project (geen Docker) | Eenvoudiger voor Bart; testaccounts bestaan al in het project |
+| 2026-11-13 | Webadres voorlopig https://back-pack-one.vercel.app (Vercel, team iXperium Sport en Bewegen) | Open punt 6: tijdelijke keuze `<projectnaam>.vercel.app` |

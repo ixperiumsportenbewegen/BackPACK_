@@ -9,5 +9,5 @@ Nog niet besloten. Claude Code gebruikt de **tijdelijke keuze** en meldt het aan
 | 3 | Precieze AVF-deadlines VD en VC | Geen deadline in de app tot ze bekend zijn | later |
 | 4 | Hoe wachtwoorden bij de groepen komen | Docent deelt per groep via het eigen Teams-kanaal | livegang |
 | 5 | Wanneer gaan de eerste VD-projectgroepen de app echt gebruiken? | Na opdracht 5 | livegang |
-| 6 | Webadres | `<projectnaam>.vercel.app` | 1 |
+| 6 | Webadres (nu back-pack-one.vercel.app; eigen naam kan later) | `<projectnaam>.vercel.app` | 1 |
 | 7 | Avenir Next-webfontlicentie | Roboto en Roboto Condensed (door de HAN toegestaan alternatief) | – |

@@ -11,7 +11,8 @@
   "organiserende_studenten": "Teststudent 1, Teststudent 2, Teststudent 3, Teststudent 4, Teststudent 5, Teststudent 6",
   "doelgroep": "Studenten 18–22 jaar",
   "aantal_deelnemers": 10,
-  "locatie_tekst": "Veld naast de camping",
+  "locatie_keuze": "camping",
+  "locatie_detail": "Veld naast de camping",
   "contactpersoon": "Teststudent 1",
   "beginsituatie": {
     "algemeen": "Tien studenten doen mee. Ze werken individueel bij de werponderdelen en in twee stammen bij estafette, volleybal en touwtrekken.",

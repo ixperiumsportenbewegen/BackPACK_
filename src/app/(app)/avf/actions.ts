@@ -9,7 +9,7 @@ export type Waarde = string | number | boolean | null;
 export type FaseCode = "kop" | "romp" | "staart";
 export type JsonSectie = "beginsituatie" | "doelen" | "veiligheid" | "organisatie" | "communicatie";
 
-const KOLOMMEN_A = ["titel", "verschijningsvorm", "publieke_samenvatting", "organiserende_studenten", "doelgroep", "aantal_deelnemers", "contactpersoon"] as const;
+const KOLOMMEN_A = ["titel", "verschijningsvorm", "publieke_samenvatting", "organiserende_studenten", "doelgroep", "aantal_deelnemers", "contactpersoon", "locatie_keuze", "locatie_detail"] as const;
 const FASE_KOLOMMEN = ["organisatievorm", "coachen_instructies", "stemgebruik_houding", "overzichtstekening_pad", "overzichtstekening_bijschrift"] as const;
 const ONDERDEEL_KOLOMMEN = [
   "naam", "duur_minuten", "beschrijving", "sociale_veiligheid", "fysieke_veiligheid", "individu_moeilijker", "individu_makkelijker",
@@ -112,6 +112,9 @@ export async function slaVeldOp(doel: VeldDoel, oudRuw: Waarde, nieuwRuw: Waarde
     if (gekozen.length === 0 || !gekozen.every((g) => (VERSCHIJNINGSVORMEN as readonly string[]).includes(g))) {
       return { status: "fout", melding: "Kies uit de genoemde vormen." };
     }
+  }
+  if (doel.soort === "kolom" && doel.kolom === "locatie_keuze" && nieuw !== null && nieuw !== "camping" && nieuw !== "bivak") {
+    return { status: "fout", melding: "Kies camping of bivak." };
   }
   if (typeof nieuw === "string" && nieuw.length > maxLengteVoor(doel)) return { status: "fout", melding: "Deze tekst is te lang." };
   if (doel.soort === "fase" && doel.kolom === "overzichtstekening_pad" && typeof nieuw === "string"

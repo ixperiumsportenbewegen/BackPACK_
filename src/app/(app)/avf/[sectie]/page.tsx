@@ -4,7 +4,7 @@ import { AvfEditor } from "@/components/avf/AvfEditor";
 import { FaseEditor } from "@/components/avf/FaseEditor";
 import { LijstEditor, type LijstItem } from "@/components/avf/Lijsten";
 import { SectieKop, rolNaam } from "@/components/avf/Sectie";
-import { JaNeeVeld, MeerKeuzeVeld, TekstVeld } from "@/components/avf/Velden";
+import { EnkeleKeuzeVeld, JaNeeVeld, MeerKeuzeVeld, TekstVeld } from "@/components/avf/Velden";
 import { EhboBlok, WeerEditor } from "@/components/avf/WeerEditor";
 import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
@@ -35,6 +35,14 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
         const eigenaar = rolNaam(v.pgRol);
         if (v.veldtype === "jaNee") {
           return <JaNeeVeld key={v.sleutel} doel={doelVoor(v)} begin={typeof w === "boolean" ? w : null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} />;
+        }
+        if (v.veldtype === "keuze") {
+          return (
+            <EnkeleKeuzeVeld
+              key={v.sleutel} doel={doelVoor(v)} begin={(w as string | null) ?? null} label={v.label} hulp={v.hulp} eigenaar={eigenaar}
+              opties={(v.opties ?? []).map((o) => ({ waarde: o.toLowerCase(), label: o }))}
+            />
+          );
         }
         if (v.veldtype === "meerkeuze") {
           return <MeerKeuzeVeld key={v.sleutel} doel={doelVoor(v)} begin={(w as string | null) ?? null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} opties={v.opties ?? []} />;
@@ -101,9 +109,9 @@ export default async function SectiePagina({
           ) : (
             <p className="mt-1 font-bold text-kop">Nog niet ingepland</p>
           )}
-          <p className="mt-1 text-tekst">Locatie: {avf.locatie ?? <span className="text-zacht">nog niet bekend</span>}</p>
+          {avf.tijdvak?.locatie && <p className="mt-1 text-tekst">Het programma plaatst dit tijdvak op: {avf.tijdvak.locatie}</p>}
           <p className="mt-2 text-sm text-zacht">
-            Tijdvak en locatie worden door de stuurgroep bepaald. Jullie kunnen dit zelf niet wijzigen.
+            Het tijdvak bepaalt de stuurgroep. De locatie (camping of bivak) kiezen jullie hieronder zelf.
           </p>
         </section>
         <Velden velden={eenvoudig} avf={avf} />

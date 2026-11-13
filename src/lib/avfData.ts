@@ -42,6 +42,13 @@ export interface AvfGegevens {
   onderdelen: OnderdeelRij[];
 }
 
+/** "Camping · het grasveld achter de tent", of alleen de keuze, of null als er nog niets is gekozen. */
+export function locatieTekst(keuze: string | null, detail: string | null): string | null {
+  if (!keuze) return null;
+  const naam = keuze === "bivak" ? "Bivak" : "Camping";
+  return detail?.trim() ? `${naam} · ${detail.trim()}` : naam;
+}
+
 const FASEN = ["kop", "romp", "staart"] as const;
 
 /** Laadt een AVF met fasen, onderdelen en tijdvak. De database bepaalt wat de gebruiker mag zien (null = geen toegang). */
@@ -80,7 +87,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
   const inhoud: AvfInhoud = {
     titel: a.titel, verschijningsvorm: a.verschijningsvorm, publieke_samenvatting: a.publieke_samenvatting,
     organiserende_studenten: a.organiserende_studenten, doelgroep: a.doelgroep, aantal_deelnemers: a.aantal_deelnemers,
-    contactpersoon: a.contactpersoon,
+    contactpersoon: a.contactpersoon, locatie_keuze: a.locatie_keuze, locatie_detail: a.locatie_detail,
     beginsituatie: a.beginsituatie ?? {}, doelen: a.doelen ?? {}, veiligheid: a.veiligheid ?? {},
     organisatie: a.organisatie ?? {}, communicatie: a.communicatie ?? {},
     fasen, onderdelen,
@@ -97,7 +104,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     status: a.status,
     opnieuwTeControleren: a.opnieuw_te_controleren,
     versie: a.versie,
-    locatie: a.locatie_tekst,
+    locatie: locatieTekst(a.locatie_keuze, a.locatie_detail),
     tijdvak: (regel.data as Tijdvak | null) ?? null,
     sectieBijgewerkt: (a.sectie_bijgewerkt ?? {}) as AvfGegevens["sectieBijgewerkt"],
     inhoud, fasen, onderdelen,

@@ -18,12 +18,12 @@ export default async function ProgrammaBeherenPagina() {
   const supabase = await maakServerClient();
   const [{ regels }, { data: avfs }] = await Promise.all([
     laadProgramma(cluster.id),
-    supabase.from("avf").select("id, titel, programma_regel_id, locatie_tekst, projectgroep:projectgroep_id(nummer, naam)").eq("cluster_id", cluster.id),
+    supabase.from("avf").select("id, titel, programma_regel_id, locatie_keuze, locatie_detail, projectgroep:projectgroep_id(nummer, naam)").eq("cluster_id", cluster.id),
   ]);
   const groepen: GroepRij[] = (avfs ?? [])
     .map((a) => {
       const pg = a.projectgroep as unknown as { nummer: number; naam: string };
-      return { avfId: a.id, nummer: pg.nummer, naam: pg.naam, titel: a.titel, regelId: a.programma_regel_id, locatie: a.locatie_tekst };
+      return { avfId: a.id, nummer: pg.nummer, naam: pg.naam, titel: a.titel, regelId: a.programma_regel_id, locatie: a.locatie_keuze, detail: a.locatie_detail };
     })
     .sort((a, b) => a.nummer - b.nummer);
 

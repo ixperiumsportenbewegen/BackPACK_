@@ -53,7 +53,7 @@ describe("veldenlijst en docs/avf-velden.md lopen gelijk", () => {
   it("wezenlijke velden zijn aangemerkt zoals in de docs (W ✔)", () => {
     const wezenlijk = AVF_VELDEN.filter((v) => v.wezenlijk).map((v) => v.sleutel).sort();
     expect(wezenlijk).toEqual([
-      "avf_materiaal", "avf_materiaal.aanvullend", "fysieke_veiligheid", "onderdelen", "veiligheid.ehbo.aanvullend",
+      "avf_materiaal", "avf_materiaal.aanvullend", "fysieke_veiligheid", "locatie_keuze", "onderdelen", "veiligheid.ehbo.aanvullend",
       "veiligheid.ehbo.maatregelen", "veiligheid.risicos[]", "veiligheid.weer.*", "verschijningsvorm",
     ].sort());
   });
@@ -66,6 +66,7 @@ function volledig(): AvfInhoud {
     titel: voorbeeld.titel, verschijningsvorm: voorbeeld.verschijningsvorm,
     publieke_samenvatting: voorbeeld.publieke_samenvatting, organiserende_studenten: voorbeeld.organiserende_studenten,
     doelgroep: voorbeeld.doelgroep, aantal_deelnemers: voorbeeld.aantal_deelnemers, contactpersoon: voorbeeld.contactpersoon,
+    locatie_keuze: voorbeeld.locatie_keuze, locatie_detail: voorbeeld.locatie_detail,
     beginsituatie: voorbeeld.beginsituatie, doelen: voorbeeld.doelen, veiligheid: voorbeeld.veiligheid,
     organisatie: voorbeeld.organisatie, communicatie: voorbeeld.communicatie,
     fasen: voorbeeld.fasen, onderdelen: voorbeeld.onderdelen, rollenIngevuld: 6,

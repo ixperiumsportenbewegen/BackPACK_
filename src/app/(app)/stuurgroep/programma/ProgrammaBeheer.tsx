@@ -14,7 +14,9 @@ export interface GroepRij {
   naam: string;
   titel: string | null;
   regelId: string | null;
+  /** camping of bivak, gekozen door de projectgroep */
   locatie: string | null;
+  detail: string | null;
 }
 
 const NAAM_SLEUTEL = "backpack_programmanaam";
@@ -40,17 +42,6 @@ function Tijdvak({ r }: { r: ProgrammaRegel }) {
   );
 }
 
-const LOCATIES = ["Camping", "Bivak"] as const;
-type LocatieKeuze = "" | (typeof LOCATIES)[number] | "Anders";
-
-/** Een bewaarde locatie terugvertalen naar de keuze: camping, bivak of anders (met de ingevulde naam). */
-function leesLocatie(w: string | null): { keuze: LocatieKeuze; anders: string } {
-  const t = (w ?? "").trim();
-  if (!t) return { keuze: "", anders: "" };
-  const bekend = LOCATIES.find((l) => l.toLowerCase() === t.toLowerCase());
-  return bekend ? { keuze: bekend, anders: "" } : { keuze: "Anders", anders: t };
-}
-
 /** Eén tijdvak voor een belevenis: kies de projectgroep en de locatie. */
 function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen: GroepRij[]; naam: string }) {
   const router = useRouter();
@@ -58,9 +49,7 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
   const [keuze, setKeuze] = useState(bezetter?.avfId ?? "");
   const [melding, setMelding] = useState<Melding | null>(null);
   const [bezet, setBezet] = useState<{ avfId: string; door: string; kanWisselen: boolean } | null>(null);
-  const startLocatie = leesLocatie(bezetter?.locatie ?? null);
-  const [locKeuze, setLocKeuze] = useState<LocatieKeuze>(startLocatie.keuze);
-  const [locAnders, setLocAnders] = useState(startLocatie.anders);
+  const [locKeuze, setLocKeuze] = useState<string>(bezetter?.locatie ?? "");
 
   async function kies(avfId: string, wissel = false) {
     setKeuze(avfId);
@@ -125,33 +114,21 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
 
       <label htmlFor={`locatie-${regel.id}`} className="mt-3 block font-bold text-kop">Locatie</label>
       <p className="text-sm text-zacht">
-        {regel.locatie ? `Programma: ${regel.locatie}. ` : ""}Kies camping, bivak of anders. Projectgroepen kunnen dit niet wijzigen.
+        {regel.locatie ? `Programma: ${regel.locatie}. ` : ""}De projectgroep kiest camping of bivak zelf in sectie A van het AVF. Hier kun je de keuze corrigeren.
       </p>
       <select
         id={`locatie-${regel.id}`} value={locKeuze} disabled={!bezetter || !naam.trim()}
         onChange={(e) => {
-          const k = e.target.value as LocatieKeuze;
-          setLocKeuze(k);
-          if (k !== "Anders") void bewaarLocatie(k);
+          setLocKeuze(e.target.value);
+          if (e.target.value) void bewaarLocatie(e.target.value);
         }}
         className={`${INVOER} min-h-aanraak`}
       >
-        <option value="">{bezetter ? "Nog niet gekozen" : "Wijs eerst een groep toe"}</option>
-        <option value="Camping">Camping</option>
-        <option value="Bivak">Bivak</option>
-        <option value="Anders">Anders, namelijk…</option>
+        <option value="">{bezetter ? "Nog niet gekozen door de projectgroep" : "Wijs eerst een groep toe"}</option>
+        <option value="camping">Camping</option>
+        <option value="bivak">Bivak</option>
       </select>
-      {locKeuze === "Anders" && (
-        <label className="mt-2 block font-bold text-kop">
-          Naam van de locatie
-          <input
-            id={`locatie-anders-${regel.id}`} value={locAnders} onChange={(e) => setLocAnders(e.target.value)}
-            onBlur={() => { if (locAnders.trim()) void bewaarLocatie(locAnders.trim()); }}
-            disabled={!bezetter || !naam.trim()} maxLength={120} placeholder="Bijvoorbeeld: veld naast de camping"
-            className={`${INVOER} mt-1 min-h-aanraak`}
-          />
-        </label>
-      )}
+      {bezetter?.detail && <p className="mt-1 text-sm text-zacht">Waar precies: {bezetter.detail}</p>}
       <Melding m={melding} />
     </div>
   );

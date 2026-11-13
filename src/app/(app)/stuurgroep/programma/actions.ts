@@ -81,7 +81,7 @@ export async function kiesGroep(regelId: string, avfId: string | null, naam: str
   if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
 
   const { data: bezetter } = await supabase
-    .from("avf").select("id, locatie_tekst, projectgroep:projectgroep_id(naam)").eq("programma_regel_id", regelId).maybeSingle();
+    .from("avf").select("id, projectgroep:projectgroep_id(naam)").eq("programma_regel_id", regelId).maybeSingle();
 
   const klaar = (): ToewijsResultaat => {
     revalidatePath("/programma");
@@ -92,16 +92,16 @@ export async function kiesGroep(regelId: string, avfId: string | null, naam: str
 
   if (avfId === null) {
     if (!bezetter) return klaar();
-    const { data, error } = await supabase.rpc("avf_planning_toewijzen", { p_avf_id: bezetter.id, p_regel_id: null, p_locatie: bezetter.locatie_tekst, p_naam: naam });
+    const { data, error } = await supabase.rpc("avf_planning_toewijzen", { p_avf_id: bezetter.id, p_regel_id: null, p_locatie: null, p_naam: naam });
     return error || !(data as Rpc).ok ? { status: "fout", melding: FOUT } : klaar();
   }
 
-  const { data: groep } = await supabase.from("avf").select("id, programma_regel_id, locatie_tekst").eq("id", avfId).maybeSingle();
+  const { data: groep } = await supabase.from("avf").select("id, programma_regel_id").eq("id", avfId).maybeSingle();
   if (!groep) return { status: "fout", melding: "Deze projectgroep is niet gevonden." };
   if (bezetter?.id === groep.id) return klaar();
 
   if (!bezetter) {
-    const { data, error } = await supabase.rpc("avf_planning_toewijzen", { p_avf_id: groep.id, p_regel_id: regelId, p_locatie: groep.locatie_tekst, p_naam: naam });
+    const { data, error } = await supabase.rpc("avf_planning_toewijzen", { p_avf_id: groep.id, p_regel_id: regelId, p_locatie: null, p_naam: naam });
     return error || !(data as Rpc).ok ? { status: "fout", melding: FOUT } : klaar();
   }
 
@@ -113,12 +113,12 @@ export async function kiesGroep(regelId: string, avfId: string | null, naam: str
   return error || !(data as Rpc).ok ? { status: "fout", melding: FOUT } : klaar();
 }
 
-/** Past de locatie van een toegewezen belevenis aan. */
+/** Corrigeert de locatie (camping of bivak) van een belevenis. De projectgroep kiest die zelf; dit is voor als de stuurgroep het wil aanpassen. */
 export async function locatieOpslaan(avfId: string, locatie: string, naam: string): Promise<{ status: "ok" } | { status: "fout"; melding: string }> {
   const supabase = await beheerder();
   if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan locaties aanpassen." };
   if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
-  if (locatie.length > 120) return { status: "fout", melding: "Deze locatie is te lang." };
+  if (locatie !== "camping" && locatie !== "bivak") return { status: "fout", melding: "Kies camping of bivak." };
   const { data: avf } = await supabase.from("avf").select("programma_regel_id").eq("id", avfId).maybeSingle();
   if (!avf?.programma_regel_id) return { status: "fout", melding: "Wijs eerst een tijdvak toe." };
   const { data, error } = await supabase.rpc("avf_planning_toewijzen", { p_avf_id: avfId, p_regel_id: avf.programma_regel_id, p_locatie: locatie, p_naam: naam });

@@ -246,3 +246,49 @@ export function MeerKeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: Me
     </div>
   );
 }
+
+interface KeuzeProps {
+  doel: VeldDoel;
+  begin: string | null;
+  label: string;
+  opties: { waarde: string; label: string }[];
+  hulp?: string;
+  eigenaar?: string | null;
+}
+
+/** Precies één optie kiezen (bijvoorbeeld camping of bivak). Aantikken slaat direct op. */
+export function EnkeleKeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: KeuzeProps) {
+  const { vergrendeld } = useAvfEditor();
+  const v = useVeld(doel, begin);
+
+  return (
+    <div>
+      <p className="font-bold text-kop">{label}</p>
+      <Eigenaar rol={eigenaar} />
+      {hulp && <p className="text-sm text-zacht">{hulp}</p>}
+      <div role="radiogroup" aria-label={label} className="mt-2 grid grid-cols-2 gap-2">
+        {opties.map((o) => {
+          const aan = v.opgeslagen === o.waarde;
+          return (
+            <button
+              key={o.waarde} type="button" role="radio" aria-checked={aan} disabled={vergrendeld}
+              onClick={() => { if (!aan) void v.opslaan(o.waarde); }}
+              className={`flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 px-3 font-bold disabled:opacity-60 ${
+                aan ? "border-kop bg-kop text-white" : "border-zacht bg-vlak text-kop"
+              }`}
+            >
+              {aan && <Check aria-hidden className="size-5" />}
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+      <ConflictBlok
+        conflict={v.conflict}
+        onHun={() => v.resetNaar(v.conflict?.huidig ?? null)}
+        onMijn={() => { if (v.conflict) void v.opslaan(v.conflict.mijn, v.conflict.huidig); }}
+      />
+      <MeldingRegel melding={v.melding} />
+    </div>
+  );
+}

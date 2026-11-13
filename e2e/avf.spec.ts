@@ -29,10 +29,10 @@ test.beforeAll(async () => {
   }
   // Beginwaarden komen uit het voorbeeldbestand, niet uit wat er toevallig in de database staat: zo herstelt de test zichzelf.
   await admin.from("avf").update({
-    titel: voorbeeld.titel, doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, locatie_tekst: voorbeeld.locatie_tekst,
+    titel: voorbeeld.titel, doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, locatie_keuze: voorbeeld.locatie_keuze, locatie_detail: voorbeeld.locatie_detail,
   }).eq("id", avf[1]);
   const { data: a } = await admin.from("avf").select("veiligheid").eq("id", avf[1]).single();
-  oorspronkelijk = { doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, titel: voorbeeld.titel, veiligheid: a!.veiligheid, locatie: voorbeeld.locatie_tekst };
+  oorspronkelijk = { doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, titel: voorbeeld.titel, veiligheid: a!.veiligheid, locatie: voorbeeld.locatie_keuze };
   const { data: o } = await admin.from("avf_onderdeel").select("id").eq("avf_id", avf[1]);
   onderdeelIds = (o ?? []).map((x) => x.id);
 });
@@ -40,7 +40,7 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   await admin.from("avf").update({
     doelgroep: oorspronkelijk.doelgroep, contactpersoon: oorspronkelijk.contactpersoon, titel: oorspronkelijk.titel,
-    veiligheid: oorspronkelijk.veiligheid, locatie_tekst: oorspronkelijk.locatie,
+    veiligheid: oorspronkelijk.veiligheid, locatie_keuze: oorspronkelijk.locatie, locatie_detail: voorbeeld.locatie_detail,
   }).eq("id", avf[1]);
   const { data: o } = await admin.from("avf_onderdeel").select("id").eq("avf_id", avf[1]);
   const extra = (o ?? []).map((x) => x.id).filter((id) => !onderdeelIds.includes(id));
@@ -83,8 +83,17 @@ test("een veld wijzigen blijft bewaard na verversen; tijdvak en locatie zijn all
   await expect(s.page.getByText(/Laatst gewijzigd door Testgebruiker/).or(s.page.getByText("Jullie tijdvak"))).toBeVisible();
 
   // Het tijdvak is geen invoerveld
-  await expect(s.page.getByLabel("Locatie")).toHaveCount(0);
-  await expect(s.page.getByText("Jullie kunnen dit zelf niet wijzigen")).toBeVisible();
+  await expect(s.page.getByLabel("Tijdvak")).toHaveCount(0);
+  await expect(s.page.getByText("Het tijdvak bepaalt de stuurgroep")).toBeVisible();
+
+  // De locatie kiezen de projectgroepen zelf: camping of bivak, en waar precies
+  const keuze = s.page.getByRole("radiogroup", { name: "Op welke locatie vindt de belevenis plaats?" });
+  await expect(keuze.getByRole("radio")).toHaveCount(2);
+  await keuze.getByRole("radio", { name: "Bivak" }).click();
+  await expect(s.page.getByText("Opgeslagen", { exact: true }).first()).toBeVisible();
+  await expect.poll(async () => (await admin.from("avf").select("locatie_keuze").eq("id", avf[1]).single()).data?.locatie_keuze).toBe("bivak");
+  await keuze.getByRole("radio", { name: "Camping" }).click();
+  await expect.poll(async () => (await admin.from("avf").select("locatie_keuze").eq("id", avf[1]).single()).data?.locatie_keuze).toBe("camping");
 
   // Het overzicht toont wie het laatst iets wijzigde
   await s.page.goto("/avf");
@@ -333,22 +342,16 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
   // Locatie aanpassen
   await p.reload();
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
-  // Het voorbeeld heeft een eigen naam: dat staat als "Anders" met de naam ingevuld
-  await expect(p.locator(`#locatie-${regel[1]}`)).toHaveValue("Anders");
-  await expect(p.locator(`#locatie-anders-${regel[1]}`)).toHaveValue("Veld naast de camping");
-  await p.locator(`#locatie-${regel[1]}`).selectOption("Bivak");
+  // De projectgroep koos camping; de stuurgroep kan het corrigeren
+  await expect(p.locator(`#locatie-${regel[1]}`)).toHaveValue("camping");
+  await expect(p.getByText("Waar precies: Veld naast de camping")).toBeVisible();
+  await p.locator(`#locatie-${regel[1]}`).selectOption("bivak");
   await expect(p.getByText("Locatie opgeslagen", { exact: true }).first()).toBeVisible();
-  await expect.poll(async () => (await admin.from("avf").select("locatie_tekst").eq("id", avf[1]).single()).data?.locatie_tekst).toBe("Bivak");
+  await expect.poll(async () => (await admin.from("avf").select("locatie_keuze").eq("id", avf[1]).single()).data?.locatie_keuze).toBe("bivak");
   await groep.page.goto("/avf");
-  await expect(groep.page.getByText("Bivak", { exact: true }).first()).toBeVisible();
-  // Anders: met een eigen naam
-  await p.locator(`#locatie-${regel[1]}`).selectOption("Anders");
-  const naamVeld = p.locator(`#locatie-anders-${regel[1]}`);
-  await naamVeld.fill("Grote wei bij de camping");
-  await naamVeld.blur();
-  await expect.poll(async () => (await admin.from("avf").select("locatie_tekst").eq("id", avf[1]).single()).data?.locatie_tekst).toBe("Grote wei bij de camping");
-  await groep.page.goto("/avf");
-  await expect(groep.page.getByText("Grote wei bij de camping").first()).toBeVisible();
+  await expect(groep.page.getByText("Bivak", { exact: false }).first()).toBeVisible();
+  await p.locator(`#locatie-${regel[1]}`).selectOption("camping");
+  await expect.poll(async () => (await admin.from("avf").select("locatie_keuze").eq("id", avf[1]).single()).data?.locatie_keuze).toBe("camping");
 
   // Een tijd aanpassen in het programma: de projectgroep ziet de nieuwe tijd (programma en toewijzing matchen)
   await p.reload();

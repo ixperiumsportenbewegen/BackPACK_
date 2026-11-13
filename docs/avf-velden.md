@@ -22,7 +22,8 @@ Afkortingen SG-rol: PRL Projectleiding · P&K Programma & Kwaliteit · B&T Belev
 | `aantal_deelnemers` | Aantal deelnemers | ✔ | PL | PRL | K | |
 | `contactpersoon` | Contactpersoon tijdens de belevenis | ✔ | PL | PRL | K | |
 | `dag`, `starttijd`, `eindtijd` | Dag en tijd (toegewezen: tijdvak uit het programma) | – (alleen-lezen) | – | P&K (programma en toewijzing) | A | |
-| `locatie_id` / `locatie_tekst` | Locatie (toegewezen) | – (alleen-lezen) | – | L&F (wijst toe) | P | |
+| `locatie_keuze` | Op welke locatie vindt de belevenis plaats? (camping of bivak, gekozen door de projectgroep) | ✔ | LM | L&F | P | ✔ |
+| `locatie_detail` | Waar precies rondom de camping of het bivak? | – | LM | L&F | P | |
 
 ## B Beginsituatie
 | Sleutel | Label | Verplicht | PG-rol | SG-rol | PACK | W |

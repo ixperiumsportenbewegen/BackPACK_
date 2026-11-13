@@ -81,7 +81,7 @@ describe("Controle van verplichte velden: database en schermen zijn het eens", (
       const inhoud = {
         titel: rij!.titel, verschijningsvorm: rij!.verschijningsvorm, publieke_samenvatting: rij!.publieke_samenvatting,
         organiserende_studenten: rij!.organiserende_studenten, doelgroep: rij!.doelgroep, aantal_deelnemers: rij!.aantal_deelnemers,
-        contactpersoon: rij!.contactpersoon, beginsituatie: rij!.beginsituatie, doelen: rij!.doelen, veiligheid: rij!.veiligheid,
+        contactpersoon: rij!.contactpersoon, locatie_keuze: rij!.locatie_keuze, locatie_detail: rij!.locatie_detail, beginsituatie: rij!.beginsituatie, doelen: rij!.doelen, veiligheid: rij!.veiligheid,
         organisatie: rij!.organisatie, communicatie: rij!.communicatie, fasen: fasen ?? [], onderdelen: onderdelen ?? [],
         rollenIngevuld: (rollen ?? []).filter((r) => (r.namen ?? "").trim() !== "").length,
       } as unknown as AvfInhoud;

@@ -37,6 +37,8 @@ export interface AvfInhoud {
   doelgroep: string | null;
   aantal_deelnemers: number | null;
   contactpersoon: string | null;
+  locatie_keuze: string | null;
+  locatie_detail: string | null;
   beginsituatie: Json;
   doelen: Json;
   veiligheid: Json;
@@ -87,7 +89,7 @@ const FASEN: FaseCode[] = ["kop", "romp", "staart"];
 
 // Velden die niet uit één eenvoudige waarde te beoordelen zijn
 const SPECIAAL = new Set([
-  "tijdvak", "locatie", "veiligheid.risicos[]", "veiligheid.weer.*", "veiligheid.ehbo.aanvullend",
+  "tijdvak", "veiligheid.risicos[]", "veiligheid.weer.*", "veiligheid.ehbo.aanvullend",
   "veiligheid.ehbo.maatregelen", "organisatie.allergieen_rekening_gehouden", "projectgroep_rol",
   "avf_materiaal", "avf_materiaal.aanvullend", "budgetaanvraag", "doelen.persoonlijk[]",
 ]);
@@ -216,7 +218,7 @@ export function alleOntbrekend(voortgang: SectieVoortgang[]): Ontbrekend[] {
 export function legeInhoud(): AvfInhoud {
   return {
     titel: null, verschijningsvorm: null, publieke_samenvatting: null, organiserende_studenten: null,
-    doelgroep: null, aantal_deelnemers: null, contactpersoon: null,
+    doelgroep: null, aantal_deelnemers: null, contactpersoon: null, locatie_keuze: null, locatie_detail: null,
     beginsituatie: {}, doelen: {}, veiligheid: {}, organisatie: {}, communicatie: {},
     fasen: FASEN.map((fase) => ({ fase, organisatievorm: null, coachen_instructies: null, stemgebruik_houding: null, overzichtstekening_pad: null, opruimen: {} })),
     onderdelen: [],

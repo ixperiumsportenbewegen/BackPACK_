@@ -136,6 +136,17 @@ async function main() {
     oorspronkelijke_starttijd: null, oorspronkelijke_eindtijd: null,
   });
 
+  // Basislijst met materialen (één lijst voor beide clusters). Bestaande materialen blijven zoals ze zijn.
+  {
+    const { data: bestaand } = await admin.from("materiaal").select("naam");
+    const namen = new Set((bestaand ?? []).map((m) => m.naam.trim().toLowerCase()));
+    const nieuw = (basis.materialen as { naam: string; categorie: string; voorraad_camping: number; voorraad_bivak: number }[])
+      .filter((m) => !namen.has(m.naam.trim().toLowerCase()))
+      .map((m) => ({ ...m, bijgewerkt_door_naam: "Seed" }));
+    if (nieuw.length) check(await admin.from("materiaal").insert(nieuw).select(), "materialen");
+    console.log(`Materialen: ${nieuw.length} toegevoegd, ${namen.size} bestonden al.`);
+  }
+
   for (const c of basis.clusters) {
     const cluster = clusterId[c.code];
     const standaard = seedPerCluster(c.code);
@@ -190,7 +201,7 @@ async function main() {
       titel: voorbeeld.titel, verschijningsvorm: voorbeeld.verschijningsvorm, publieke_samenvatting: voorbeeld.publieke_samenvatting,
       organiserende_studenten: voorbeeld.organiserende_studenten, doelgroep: voorbeeld.doelgroep,
       aantal_deelnemers: voorbeeld.aantal_deelnemers, contactpersoon: voorbeeld.contactpersoon,
-      locatie_tekst: voorbeeld.locatie_tekst,
+      locatie_keuze: voorbeeld.locatie_keuze, locatie_detail: voorbeeld.locatie_detail,
       beginsituatie: voorbeeld.beginsituatie, doelen, veiligheid, organisatie: voorbeeld.organisatie, communicatie: voorbeeld.communicatie,
     }).eq("id", leegAvf!.id).select(), `voorbeeld-avf ${code}`);
     for (const f of voorbeeld.fasen) {

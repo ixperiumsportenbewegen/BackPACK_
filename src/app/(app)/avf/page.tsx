@@ -49,9 +49,9 @@ export default async function AvfOverzicht() {
           </p>
           <p className="mt-1 flex items-center gap-2 text-tekst">
             <MapPin aria-hidden className="size-4 shrink-0" />
-            {avf.locatie ?? "Locatie nog niet bekend"}
+            {avf.locatie ?? "Locatie nog niet gekozen: kies camping of bivak in sectie A"}
           </p>
-          <p className="mt-1 text-sm text-zacht">Tijdvak en locatie bepaalt de stuurgroep. Dit kunnen jullie niet wijzigen.</p>
+          <p className="mt-1 text-sm text-zacht">Het tijdvak bepaalt de stuurgroep. De locatie (camping of bivak) kiezen jullie zelf in sectie A.</p>
         </div>
         {avf.status === "ingediend" && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd. De stuurgroep beoordeelt het.</p>}
         {avf.status === "aanpassing_gevraagd" && <p className="mt-3 font-medium text-kop">De stuurgroep vraagt om aanpassingen. Zie de secties met een open verbeterverzoek.</p>}

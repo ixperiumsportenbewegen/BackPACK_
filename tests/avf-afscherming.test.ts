@@ -141,6 +141,19 @@ describe("Test 4: eigen AVF wijzigen, maar nooit tijdvak, locatie of status", ()
     expect(nee.data ?? []).toHaveLength(0);
   });
 
+  it("de projectgroep kiest zelf camping of bivak (en niets anders) en schrijft er waar precies", async () => {
+    const client = await inloggenAls("vd-groep-1");
+    const { data: voor } = await admin.from("avf").select("locatie_keuze, locatie_detail").eq("id", avf[1]).single();
+    const zet = (w: Record<string, unknown>) => client.from("avf").update(w).eq("id", avf[1]).select("locatie_keuze, locatie_detail");
+    expect((await zet({ locatie_keuze: "bivak", locatie_detail: "Bij de rivier" })).data?.[0]).toEqual({ locatie_keuze: "bivak", locatie_detail: "Bij de rivier" });
+    for (const fout of ["anders", "Camping", "", "veld"]) expect((await zet({ locatie_keuze: fout })).error, fout).not.toBeNull();
+    expect((await zet({ locatie_detail: "x".repeat(201) })).error).not.toBeNull();
+    // andermans AVF niet
+    const ander = await client.from("avf").update({ locatie_keuze: "camping" }).eq("id", avf[2]).select();
+    expect(ander.data ?? []).toHaveLength(0);
+    await admin.from("avf").update(voor!).eq("id", avf[1]);
+  });
+
   it("de projectgroep kan tijdvak, locatie, status, versie en goedkeuring niet wijzigen", async () => {
     const client = await inloggenAls("vd-groep-1");
     const { data: regel } = await admin.from("programma_regel").select("id").eq("cluster_id", VD).eq("soort", "belevenis").limit(1).single();
@@ -463,9 +476,10 @@ describe("Planning toewijzen", () => {
     const { data: leeg } = await admin.from("avf").select("programma_regel_id").eq("id", avf[1]).single();
     expect(leeg?.programma_regel_id).toBeNull();
     // opnieuw toewijzen met locatie
-    expect(((await toewijzen(stuur, avf[1], origineleRegel[1], "Veld naast de camping")).data as Resultaat).ok).toBe(true);
-    const { data: met } = await admin.from("avf").select("programma_regel_id, locatie_tekst").eq("id", avf[1]).single();
-    expect(met).toEqual({ programma_regel_id: origineleRegel[1], locatie_tekst: "Veld naast de camping" });
+    expect(((await toewijzen(stuur, avf[1], origineleRegel[1], "Veld naast de camping")).data as Resultaat).reden).toBe("ongeldig_locatie");
+    expect(((await toewijzen(stuur, avf[1], origineleRegel[1], "Bivak")).data as Resultaat).ok).toBe(true);
+    const { data: met } = await admin.from("avf").select("programma_regel_id, locatie_keuze").eq("id", avf[1]).single();
+    expect(met).toEqual({ programma_regel_id: origineleRegel[1], locatie_keuze: "bivak" });
 
     // wisselen
     const wissel = (await stuur.rpc("avf_planning_wisselen", { p_avf_a: avf[1], p_avf_b: avf[2], p_naam: "Testpersoon" })).data as Resultaat;
@@ -492,8 +506,12 @@ describe("Planning toewijzen", () => {
   });
 
   it("de docent kan in elk cluster toewijzen", async () => {
-    const res = (await toewijzen(await inloggenAls("docent"), avf[1], origineleRegel[1], "Veld naast de camping")).data as Resultaat;
+    const res = (await toewijzen(await inloggenAls("docent"), avf[1], origineleRegel[1], "Camping")).data as Resultaat;
     expect(res.ok).toBe(true);
+    // een lege locatie laat de keuze van de projectgroep staan
+    expect(((await toewijzen(await inloggenAls("docent"), avf[1], origineleRegel[1], null)).data as Resultaat).ok).toBe(true);
+    const { data: na } = await admin.from("avf").select("locatie_keuze").eq("id", avf[1]).single();
+    expect(na?.locatie_keuze).toBe("camping");
   });
 });
 

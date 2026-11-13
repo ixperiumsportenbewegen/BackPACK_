@@ -111,7 +111,10 @@ export const AVF_VELDEN: AvfVeld[] = [
   veld({ sleutel: "aantal_deelnemers", sectie: "A", label: "Aantal deelnemers", veldtype: "getal", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K" }),
   veld({ sleutel: "contactpersoon", sectie: "A", label: "Contactpersoon tijdens de belevenis", veldtype: "tekst", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K", maxLengte: 100 }),
   veld({ sleutel: "tijdvak", docSleutels: ["dag", "starttijd", "eindtijd"], sectie: "A", label: "Dag en tijd (toegewezen)", veldtype: "toegewezen", v: "nee", pg: null, sg: "programma_kwaliteit", pack: "A" }),
-  veld({ sleutel: "locatie", docSleutels: ["locatie_id", "locatie_tekst"], sectie: "A", label: "Locatie (toegewezen)", veldtype: "toegewezen", v: "nee", pg: null, sg: "logistiek_facilitair", pack: "P" }),
+  veld({ sleutel: "locatie_keuze", sectie: "A", label: "Op welke locatie vindt de belevenis plaats?", veldtype: "keuze", v: "ja", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true,
+    opties: ["Camping", "Bivak"], hulp: "Kies camping of bivak. Dit bepaalt welke materialen er beschikbaar zijn." }),
+  veld({ sleutel: "locatie_detail", sectie: "A", label: "Waar precies? (rondom de camping of het bivak)", veldtype: "tekst", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", maxLengte: 200,
+    hulp: "Bijvoorbeeld: het grasveld achter de tent, of het pad langs de rivier." }),
 
   // B Beginsituatie
   veld({ sleutel: "beginsituatie.algemeen", sectie: "B", label: "Algemene omschrijving van de groep", veldtype: "lang", v: "ja", pg: "programma_beleving", sg: "programma_kwaliteit", pack: "A", maxLengte: 1000,

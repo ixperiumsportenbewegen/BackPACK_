@@ -1,8 +1,8 @@
-# Backpack_
+# BackPACK_
 
-**Backpack_** is een mobiele webapp (PWA) voor de Ardennen-meerdaagse van Sportkunde (HAN), 28–30 juni 2027. Twee clusters (VD en VC) van elk ca. 55 studenten. Per cluster zes projectgroepen die elk een belevenis voorbereiden met een AVF (Activiteiten Voorbereidings Formulier) en een stuurgroep van studenten met zes rollen. De app geeft elk cluster overzicht over de eigen meerdaagse, met het zelfgekozen meerdaagsethema centraal.
+**BackPACK_** is een mobiele webapp (PWA) voor de Ardennen-meerdaagse van Sportkunde (HAN), 28–30 juni 2027. Twee clusters (VD en VC) van elk ca. 55 studenten. Per cluster zes projectgroepen die elk een belevenis voorbereiden met een AVF (Activiteiten Voorbereidings Formulier) en een stuurgroep van studenten met zes rollen. De app geeft elk cluster overzicht over de eigen meerdaagse, met het zelfgekozen meerdaagsethema centraal.
 
-De naam is ook de metafoor: alles wat je nodig hebt voor de meerdaagse zit in je backpack. De underscore verwijst naar de HAN-stijl (HAN_). De vier vakken heten **PACK**: Pleister (veiligheid, welzijn, logistiek), Aansteker (beleving, thema, AVF's), Camera (communicatie en financiën) en Kompas (projectleiding). Zie PRD 4.1 en `docs/huisstijl.md`.
+De naam is ook de metafoor: alles wat je nodig hebt voor de meerdaagse zit in je BackPACK_. De underscore verwijst naar de HAN-stijl (HAN_). De vier vakken heten **PACK**: Pleister (veiligheid, welzijn, logistiek), Aansteker (beleving, thema, AVF's), Camera (communicatie en financiën) en Kompas (projectleiding). Zie PRD 4.1 en `docs/huisstijl.md`.
 
 Dit is een experiment van docent Bart, gebouwd zonder HAN-ICT. Bart is geen ontwikkelaar: leg keuzes kort en in gewone taal uit.
 

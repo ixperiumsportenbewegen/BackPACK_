@@ -17,7 +17,7 @@ Bouw:
 - Seed-script dat `seed/basis.json` laadt in het Supabase-project, inclusief de 27 accounts en de 4 TEST-accounts, met wachtwoorden in een lokaal, niet-gecommit bestand.
 - Inloggen met gebruikersnaam en wachtwoord; uitloggen.
 - Layout met kopbalk, onderste navigatie en lege schermen; ontwerpwaarden uit `src/styles/tokens.css`; Roboto en Roboto Condensed via `next/font/google`; HAN-logo's uit `assets/logo` volgens `docs/huisstijl.md`.
-- PWA-manifest met naam "Backpack_" (short_name "Backpack"), een eenvoudig backpack-icoon in HAN rood op wit en themakleur HAN rood (nog geen offline).
+- PWA-manifest met naam "BackPACK_" (short_name "BackPACK_"), een eenvoudig backpack-icoon in HAN rood op wit en themakleur HAN rood (nog geen offline).
 - Afschermingstests 3, 7 en 9 uit de rechtenmatrix.
 
 **Klaar als:** alle 27 accounts kunnen inloggen en zien het juiste accountlabel; tests slagen; deploy op Vercel werkt.

@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Backpack_",
-    short_name: "Backpack",
-    description: "Alles voor de Ardennen-meerdaagse van Sportkunde in je backpack.",
+    name: "BackPACK_",
+    short_name: "BackPACK_",
+    description: "Alles voor de Ardennen-meerdaagse van Sportkunde in je BackPACK_.",
     start_url: "/",
     scope: "/",
     display: "standalone",

@@ -86,11 +86,11 @@ Kies uit **HAN rood, oranje, groen of blauw**. Zo blijft de app binnen de HAN-hu
 
 ## Naam en metafoor
 
-De app heet **Backpack_**: alles wat je nodig hebt voor de meerdaagse zit erin. De underscore sluit aan op het HAN-woordmerk (HAN_).
+De app heet **BackPACK_**: alles wat je nodig hebt voor de meerdaagse zit erin. De underscore sluit aan op het HAN-woordmerk (HAN_).
 
-- Als woordmerk (kopbalk, inlogscherm, app-icoon): **Backpack_** in Roboto Condensed 700, HAN zwart, de underscore in HAN rood.
-- In lopende tekst: "Backpack" zonder underscore, of "je backpack".
-- Ondertitel: "Pleister, Aansteker, Camera en Kompas: alles in je Backpack_".
+- Als woordmerk (kopbalk, inlogscherm, app-icoon): **BackPACK_** in Roboto Condensed 700, HAN zwart, de underscore in HAN rood.
+- In lopende tekst ook altijd **BackPACK_** (met underscore, PACK in hoofdletters).
+- Ondertitel: "Pleister, Aansteker, Camera en Kompas: alles in je BackPACK_".
 
 ### PACK: de vier vakken
 
@@ -107,12 +107,12 @@ PACK is een speelse indeling, geen zwaar concept: een kleine letter en een icoon
 
 | Plek | Tekst |
 |---|---|
-| Inlogscherm | "Backpack_ · Pleister, Aansteker, Camera en Kompas: alles in je Backpack_" |
-| Lege staat AVF | "Jullie backpack is nog leeg. Begin met sectie A." |
+| Inlogscherm | "BackPACK_ · Pleister, Aansteker, Camera en Kompas: alles in je BackPACK_" |
+| Lege staat AVF | "Jullie BackPACK_ is nog leeg. Begin met sectie A." |
 | Voortgang AVF | "5 van 8 vakken ingepakt" (vakken = secties A–H) |
 | AVF goedgekeurd | "Goedgekeurd – deze belevenis is klaar voor vertrek" |
-| Indienen | "Backpack dichtdoen en indienen?" |
-| Offline opgeslagen (later) | "Je backpack is ingepakt voor onderweg · laatst bijgewerkt 14:32" |
+| Indienen | "BackPACK_ dichtdoen en indienen?" |
+| Offline opgeslagen (later) | "Je BackPACK_ is ingepakt voor onderweg · laatst bijgewerkt 14:32" |
 | Meerdaagsemodus (later) | Tabnaam "Onderweg" |
 | Informatiepagina paklijst (later) | "Wat moet er in je eigen backpack?" |
 

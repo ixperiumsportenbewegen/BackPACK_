@@ -17,11 +17,11 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Backpack_",
-  description: "Alles voor de Ardennen-meerdaagse van Sportkunde in je backpack.",
-  applicationName: "Backpack_",
+  title: "BackPACK_",
+  description: "Alles voor de Ardennen-meerdaagse van Sportkunde in je BackPACK_.",
+  applicationName: "BackPACK_",
   icons: { apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "Backpack", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "BackPACK_", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

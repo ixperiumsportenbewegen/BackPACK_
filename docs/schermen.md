@@ -13,7 +13,7 @@ Onderste balk met vier knoppen, voor elk account gelijk van vorm:
 | **Stuurgroep** / **Budget** | Budget (eigen aanvragen) | Werkpagina's | Werkpagina's | – (knop verborgen) |
 | **Meer** | rolverdeling, Teams-knop, uitloggen | materialenlijst, thema instellen, Teams-knop, uitloggen | beheer, materialenlijst, thema, uitloggen | Teams-knop, uitloggen |
 
-Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "Backpack_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
+Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
 
 ## Schermen opdracht 1–5
 

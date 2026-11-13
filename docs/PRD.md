@@ -1,10 +1,10 @@
-# PRD Backpack_
+# PRD BackPACK_
 
 Versie 3.0 | 4 november 2026 | Eigenaar en bouwer: Bart
 
-**Backpack_** is de app voor de Ardennen-meerdaagse van Sportkunde: alles wat je nodig hebt voor de meerdaagse zit erin. De vier vakken heten PACK: Pleister, Aansteker, Camera en Kompas (zie 4.1).
+**BackPACK_** is de app voor de Ardennen-meerdaagse van Sportkunde: alles wat je nodig hebt voor de meerdaagse zit erin. De vier vakken heten PACK: Pleister, Aansteker, Camera en Kompas (zie 4.1).
 
-Deze PRD beschrijft wat versie 1 van Backpack_ moet kunnen, in welke volgorde het gebouwd wordt en wat bewust later komt. Hij bouwt voort op het achtergronddocument (v1.0) en verwerkt de besluiten van 4 november 2026. De kern: elk cluster krijgt overzicht over zijn eigen meerdaagse, met het zelfgekozen meerdaagsethema centraal in uitstraling en inhoud.
+Deze PRD beschrijft wat versie 1 van BackPACK_ moet kunnen, in welke volgorde het gebouwd wordt en wat bewust later komt. Hij bouwt voort op het achtergronddocument (v1.0) en verwerkt de besluiten van 4 november 2026. De kern: elk cluster krijgt overzicht over zijn eigen meerdaagse, met het zelfgekozen meerdaagsethema centraal in uitstraling en inhoud.
 
 ### Leidende documenten
 
@@ -122,9 +122,9 @@ De stuurgroep heeft zes coördinerende rollen met twee studenten per rol. Samen 
 
 Automatische signaleringen (regelgebaseerd, geen AI): risicoanalyse ontbreekt, weerafweging ontbreekt, verantwoordelijke ontbreekt, aanvraag overschrijdt budgetruimte, materiaalbehoefte groter dan voorraad, deadline verstreken, belevenis nog niet goedgekeurd.
 
-### 4.1 PACK: de vier vakken van je Backpack_
+### 4.1 PACK: de vier vakken van je BackPACK_
 
-Elke letter is een voorwerp dat je echt in je backpack meeneemt en dat staat voor een deel van de organisatie. De app groepeert de werkpagina's van de stuurgroep en de rollen in de projectgroepen in deze vier vakken. Ondertitel van de app: "Pleister, Aansteker, Camera en Kompas: alles in je Backpack_".
+Elke letter is een voorwerp dat je echt in je backpack meeneemt en dat staat voor een deel van de organisatie. De app groepeert de werkpagina's van de stuurgroep en de rollen in de projectgroepen in deze vier vakken. Ondertitel van de app: "Pleister, Aansteker, Camera en Kompas: alles in je BackPACK_".
 
 | Vak | Voorwerp en betekenis | Stuurgroeprollen | Projectgroeprollen | Inhoud in de app |
 | --- | --- | --- | --- | --- |

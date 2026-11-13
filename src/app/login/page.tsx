@@ -2,7 +2,7 @@ import Image from "next/image";
 import { LoginForm } from "./LoginForm";
 import { Woordmerk } from "@/components/Woordmerk";
 
-export const metadata = { title: "Inloggen · Backpack_" };
+export const metadata = { title: "Inloggen · BackPACK_" };
 
 export default function LoginPage() {
   return (
@@ -21,7 +21,7 @@ export default function LoginPage() {
             <Woordmerk />
           </h1>
           <p className="mt-2 text-zacht">
-            Pleister, Aansteker, Camera en Kompas: alles in je Backpack_
+            Pleister, Aansteker, Camera en Kompas: alles in je BackPACK_
           </p>
         </div>
       </div>

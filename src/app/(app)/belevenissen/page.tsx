@@ -1,4 +1,4 @@
-export const metadata = { title: "Belevenissen · Backpack_" };
+export const metadata = { title: "Belevenissen · BackPACK_" };
 
 export default function Belevenissen() {
   return (

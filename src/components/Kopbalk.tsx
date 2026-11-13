@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Woordmerk } from "@/components/Woordmerk";
 import type { Profiel } from "@/lib/profiel";
 
-/** Witte kopbalk: HAN-logo links, thema of Backpack_ en accountlabel rechts, accentbalk onderaan. */
+/** Witte kopbalk: HAN-logo links, thema of BackPACK_ en accountlabel rechts, accentbalk onderaan. */
 export function Kopbalk({ profiel }: { profiel: Profiel }) {
   const themaNaam = profiel.thema?.naam;
   return (

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getProfiel } from "@/lib/profiel";
 
-export const metadata = { title: "Budget · Backpack_" };
+export const metadata = { title: "Budget · BackPACK_" };
 
 export default async function Budget() {
   const profiel = (await getProfiel())!;

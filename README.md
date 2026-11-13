@@ -1,4 +1,4 @@
-# Backpack_
+# BackPACK_
 
 Mobiele webapp (PWA) voor de Ardennen-meerdaagse van Sportkunde (HAN), 28–30 juni 2027. Zie `CLAUDE.md` en `docs/`.
 

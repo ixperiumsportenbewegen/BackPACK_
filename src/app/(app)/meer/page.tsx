@@ -1,7 +1,7 @@
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
-export const metadata = { title: "Meer · Backpack_" };
+export const metadata = { title: "Meer · BackPACK_" };
 
 export default async function Meer() {
   const profiel = (await getProfiel())!;

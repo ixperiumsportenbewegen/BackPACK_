@@ -68,7 +68,7 @@ export default async function OnzeMeerdaagse() {
       <section className="rounded-han border border-rand bg-vlak p-4">
         <h2 className="text-xl">Belevenissen</h2>
         <p className="mt-1 text-zacht">
-          Jullie backpack is nog leeg. Hier komen straks de zes belevenissen van {profiel.cluster?.naam ?? "jullie cluster"}.
+          Jullie BackPACK_ is nog leeg. Hier komen straks de zes belevenissen van {profiel.cluster?.naam ?? "jullie cluster"}.
         </p>
       </section>
     </div>

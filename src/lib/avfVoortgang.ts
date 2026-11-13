@@ -48,6 +48,9 @@ export interface AvfInhoud {
   onderdelen: OnderdeelInhoud[];
   /** Aantal van de zes projectgroeprollen met een naam. */
   rollenIngevuld: number;
+  /** Gekozen materialen uit de lijst en eigen materialen (sectie F). */
+  materialenAantal?: number;
+  eigenMaterialenAantal?: number;
 }
 
 export type VoortgangStatus = "niet_gestart" | "onvolledig" | "compleet" | "nvt";
@@ -194,7 +197,8 @@ function sectieE(inhoud: AvfInhoud): { ontbrekend: Ontbrekend[]; gevuldAny: bool
 }
 
 export function sectieVoortgang(sectie: SectieCode, inhoud: AvfInhoud): SectieVoortgang {
-  if (sectie === "F") return { sectie, status: "nvt", ontbrekend: [] };
+  // Sectie F is niet verplicht: leeg is "optioneel", met materialen is het compleet
+  if (sectie === "F") return { sectie, status: (inhoud.materialenAantal ?? 0) + (inhoud.eigenMaterialenAantal ?? 0) > 0 ? "compleet" : "nvt", ontbrekend: [] };
   const { ontbrekend, gevuldAny } =
     sectie === "D" ? sectieD(inhoud) : sectie === "E" ? sectieE(inhoud) : sectieA_B_C_G_H(sectie, inhoud);
   const status: VoortgangStatus = ontbrekend.length === 0 ? "compleet" : gevuldAny ? "onvolledig" : "niet_gestart";

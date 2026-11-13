@@ -21,7 +21,8 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | projectgroep_rol (rolverdeling) | L S | L | L S | L | – |
 | account | L S (via beheerfunctie) | L eigen | L eigen | – | L eigen |
 | avf – volledige inhoud | L S | L (wijzigen alleen via verbeterverzoek) | L, S zolang status niet `ingediend` is | – | – |
-| avf.programma_regel_id (tijdvak) en locatie_tekst | L, wijzigen via F | F (`avf_planning_toewijzen`, `avf_planning_wisselen`) | L (nooit wijzigen) | tijdvak via `avf_publiek`, locatie – | tijdvak via `avf_publiek`, locatie – |
+| avf.programma_regel_id (tijdvak) | L, wijzigen via F | F (`avf_planning_toewijzen`, `avf_planning_wisselen`) | L (nooit wijzigen) | tijdvak via `avf_publiek` | tijdvak via `avf_publiek` |
+| avf.locatie_keuze (camping of bivak) en locatie_detail | L S | L, corrigeren via F (`avf_planning_toewijzen`) | L, S zolang status niet `ingediend` is; kan niet leeg worden zolang er materialen zijn | – (niet publiek) | – |
 | programma_regel (vast programma per cluster) | L, wijzigen via F | L, wijzigen via F (`programma_regel_wijzigen`) | L | L | L |
 | avf – publieke velden (view `avf_publiek`: titel, verschijningsvorm, publieke_samenvatting, tijdvak met dag en tijden, status) | L | L | L | L | L |
 | avf.status, versie, goedkeuring | F | F (`aanpassing_vragen`, `goedkeuren`) | F (`indienen`) | – | – |
@@ -30,8 +31,9 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | avf_versie | L | L | L | – | – |
 | verbeterverzoek | L S | L S | L, status naar `aangepast` | – | – |
 | themacheck | L S | L S | L | – | – |
-| materiaal (basislijst) | L S | L, S voor rol `logistiek_facilitair` | L | L | – |
-| view `materiaal_behoefte` | L | L | L (alleen eigen behoefte en beschikbare voorraad) | – | – |
+| materiaal (gedeelde basislijst voor VD en VC) | L S | Als concept: alleen Logistiek & Facilitair van VD (en TEST) leest en schrijft. Als definitief: alle stuurgroepen lezen; Logistiek & Facilitair van VD schrijft; Logistiek & Facilitair van VC alleen toevoegen | L zodra de lijst definitief is | L zodra de lijst definitief is | – |
+| materiaallijst_status (concept of definitief) | L, terugzetten via F | L, definitief maken via F (`materiaallijst_definitief_maken`, alleen Logistiek & Facilitair van VD) | L | L | – |
+| functies `materiaal_beschikbaar` en `materiaal_context` (voorraad en gebruik door anderen op dezelfde locatie en hetzelfde moment) | L | L (eigen cluster, per belevenis) | L (alleen voor het eigen AVF: voorraad en aantal dat anderen tegelijk gebruiken, zonder namen) | – | – |
 | budgetaanvraag | L S | L, besluit via F (`budget_besluit`) | L S zolang `concept` of `teruggegeven`; indienen via F. Na goedkeuring van het AVF is het financieel plan vast; extra kosten via een losse aanvraag | – | – |
 | wijziging (logboek) | L | L (eigen cluster) | L (eigen avf) | – | – |
 | Storage `avf` | L S | L | L S (onder dezelfde voorwaarde als avf) | – | – |
@@ -58,6 +60,10 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.
 
+| `materiaallijst_definitief_maken(naam)` | Logistiek & Facilitair van VD (en TEST), docent | Zet de gedeelde lijst van concept op definitief; daarna kunnen projectgroepen kiezen en ziet VC de lijst |
+| `materiaallijst_terugzetten(naam)` | Docent | Zet de lijst weer op concept |
+| `avf_materiaal_corrigeren(id, aantal, naam)` | Stuurgroep, docent | Corrigeert het aantal van een gekozen materiaal; de projectgroep ziet de correctie |
+
 ## Verplichte afschermingstests (minimaal)
 
 1. `vd-groep-1` kan het AVF van `vd-groep-2` niet lezen, ook niet via directe query, Storage-pad of `avf_versie`.
@@ -68,5 +74,5 @@ Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijzi
 5. `vd-groep-1` kan `avf.status` niet rechtstreeks wijzigen en geen budget toekennen.
 6. `vd-groep-1` kan de budgetaanvragen van andere groepen niet lezen, wel `budget_resterend`.
 7. `vd-student` kan niets schrijven.
-8. Alleen `vd-stuur-logistiek` en `docent` kunnen de materialenlijst wijzigen.
+8. Alleen `vd-stuur-logistiek` en `docent` kunnen de materialenlijst wijzigen; `vc-stuur-logistiek` kan alleen toevoegen (en pas als de lijst definitief is); zolang de lijst concept is, leest niemand anders hem.
 9. Een niet-ingelogde bezoeker kan niets lezen.

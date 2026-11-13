@@ -43,7 +43,7 @@ function Afbeelding({ pad, bijschrift }: { pad: string | null; bijschrift: strin
 
 /** Het volledige AVF als leesbare pagina die goed afdrukt (opslaan als PDF via de browser). */
 export function AvfLeesweergave({ avf, verzoeken }: { avf: AvfGegevens; verzoeken?: VerzoekContext }) {
-  const onder = (sectie: "A" | "B" | "C" | "D" | "E" | "G" | "H") => (verzoeken ? <VerzoekSectie ctx={verzoeken} sectie={sectie} /> : null);
+  const onder = (sectie: "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H") => (verzoeken ? <VerzoekSectie ctx={verzoeken} sectie={sectie} /> : null);
   const i = avf.inhoud;
   const bs = i.beginsituatie as Json;
   const dl = i.doelen as Json;
@@ -203,7 +203,25 @@ export function AvfLeesweergave({ avf, verzoeken }: { avf: AvfGegevens; verzoeke
         </dl>
       </Blok>
 
-      <p className="text-sm text-zacht">Sectie F (materialen en financiën) volgt in een latere versie van BackPACK_.</p>
+      <Blok code="F" onder={onder("F")}>
+        <dl className="flex flex-col gap-3">
+          <Rij
+            label="Materialen"
+            waarde={avf.materialen.length ? (
+              <ul className="list-disc pl-5">
+                {avf.materialen.map((m) => (
+                  <li key={m.id}>
+                    {m.naam}: {m.aantalGecorrigeerd ?? m.aantal}
+                    {m.aantalGecorrigeerd !== null && ` (gecorrigeerd van ${m.aantal})`}
+                    {m.fase ? ` · ${m.fase}` : ""}{m.eigen ? " · eigen materiaal" : ""}
+                  </li>
+                ))}
+              </ul>
+            ) : ""}
+          />
+          <p className="text-sm text-zacht">Het financieel plan volgt in een latere versie van BackPACK_.</p>
+        </dl>
+      </Blok>
     </div>
   );
 }

@@ -40,13 +40,13 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 5. Alleen stuurgroep en docent: per stuurgroeprol één regel stand van zaken (bijv. "Budget: € 180 van € 250 vrij", "2 materiaaltekorten", "3 AVF's wachten op beoordeling").
 
 ### AVF bewerken (projectgroep) – AVF-01 t/m AVF-05, PGR-01
-- Dag, tijd en locatie staan bovenaan als alleen-lezen (toegewezen door de stuurgroep; "nog niet ingepland" zolang leeg).
+- Dag en tijd staan bovenaan als alleen-lezen (toegewezen door de stuurgroep; "nog niet ingepland" zolang leeg). De locatie kiest de projectgroep zelf in sectie A: camping of bivak (geen "anders"), plus een tekstveld voor waar precies.
 - Overzicht met secties A–H als lijst met voortgangslabel (niet gestart, onvolledig, compleet) en de eigenaar-rol (projectgroeprol) van elke sectie. De stuurgroepkoppeling is hier niet zichtbaar.
 - Per sectie een eigen scherm met velden die automatisch opslaan (melding "Opgeslagen" of "Iemand anders heeft dit net gewijzigd – herladen?").
 - Sectie D: drie tabbladen Kop, Romp, Staart. Per fase de fasevelden en een lijst onderdelen (toevoegen, verschuiven, verwijderen). Een onderdeel opent in een eigen scherm.
 - Sectie E: risicotabel, vier weerscenario's als kaarten met schakelaar "relevant" en de vraag "Zijn aanvullende EHBO-maatregelen nodig?" (ja → velden; nee → verwijzing naar het algemene EHBO-plan).
 - Sectie H: drie blokken Voor, Tijdens en Na.
-- Sectie F: materialen kiezen per fase uit de basislijst (met beschikbare voorraad), aanvullend materiaal, financieel plan met regels en totaal.
+- Sectie F: eerst de locatie (anders een melding met link naar sectie A) en de lijst (anders de melding dat de materialenlijst nog niet klaar is). Daarna materiaal kiezen uit de lijst met aantal en fase (kop, romp, staart of hele belevenis) en de beschikbare voorraad op de locatie en op dit moment; een tekort is een waarschuwing en blokkeert niets. Eigen materiaal (zonder voorraad). Het financieel plan volgt in deel B.
 - Rolverdeling (onder "Meer" en als controle bij indienen).
 - Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting.
 - Knop **Afdrukken / PDF**: printvriendelijke weergave van het volledige AVF (PDF-01).
@@ -84,8 +84,11 @@ Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen 
 ### Budget (projectgroep) – BUD-02, BUD-03, BUD-06
 Eigen aanvragen met status en besluit, resterende ruimte van het cluster, knop "Losse aanvraag" (alleen na goedkeuring van het AVF).
 
-### Materialenlijst – MAT-00
-Lijst met zoekveld en filter op categorie; toevoegen, wijzigen, op inactief zetten (alleen Logistiek & Facilitair en docent).
+### Materialenlijst – MAT-00 (`/stuurgroep/materialen`)
+Lijst met zoekveld en filter op categorie; toevoegen, wijzigen, op inactief zetten (Logistiek & Facilitair van VD en de docent). Als concept ziet alleen Logistiek & Facilitair van VD hem, met de knop "Lijst definitief maken". Daarna kiezen projectgroepen en ziet VC hem; Logistiek & Facilitair van VC kan alleen toevoegen. Onder Meer voor stuurgroep en docent.
+
+### Behoefte en tekorten (`/stuurgroep/materialen/behoefte`)
+Per belevenis van het cluster de gekozen materialen met voorraad, wat anderen tegelijk gebruiken en het tekort, met een veld voor een correctie van de stuurgroep. Bovenaan wie nog geen locatie heeft gekozen.
 
 ### Beheer (docent)
 Accounts per cluster met knop "Wachtwoord resetten"; clustergegevens (budget, Teams-link, Forms-link); knop "Alles exporteren" (JSON en Excel).

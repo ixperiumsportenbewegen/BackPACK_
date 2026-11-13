@@ -5,7 +5,7 @@ const LABELS: Record<VoortgangStatus, { tekst: string; klasse: string; icoon: ty
   niet_gestart: { tekst: "Niet gestart", klasse: "bg-rand text-kop", icoon: CircleDashed },
   onvolledig: { tekst: "Onvolledig", klasse: "bg-actie text-black", icoon: CircleDot },
   compleet: { tekst: "Compleet", klasse: "bg-goedgekeurd text-black", icoon: CheckCircle2 },
-  nvt: { tekst: "Komt later", klasse: "bg-rand text-kop", icoon: Minus },
+  nvt: { tekst: "Optioneel", klasse: "bg-rand text-kop", icoon: Minus },
 };
 
 /** Voortgangslabel met icoon en tekst (nooit alleen kleur). */

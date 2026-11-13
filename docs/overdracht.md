@@ -25,7 +25,9 @@ Voor een nieuwe sessie of een nieuwe collega. Lees eerst `CLAUDE.md` (leidende d
 
 - **Opdracht 4** Indienen en beoordelen: `/avf/indienen` (controlelijst, naam, samenvatting vanaf versie 2, waarschuwing bij open verzoeken zonder aanpassing), beoordelen op `/belevenissen/[id]` (verbeterverzoeken per sectie en onderdeel, themachecks, aanpassing vragen, goedkeuren, tabblad Versies), label "Opnieuw te controleren" via triggers, stuurgroepdashboard met rolweergave op `/stuurgroep/rol/[code]` (opent op de eigen rol, overzicht via `/stuurgroep?alle=1`). Migraties 12 en 13.
 
-**Volgende stap: opdracht 5 (materialen en budget).** Zie `docs/bouwvolgorde.md`. Daarbij ook `avf_indienen` laten doorzetten naar de budgetaanvraag en materialen meenemen in de wezenlijke-wijzigingstrigger.
+- **Opdracht 5, deel A (materialen)**: de projectgroep kiest zelf de locatie (camping of bivak, plus waar precies) in sectie A. Eén gedeelde materialenlijst voor VD en VC met voorraad per locatie: Logistiek & Facilitair van VD bouwt hem als concept en maakt hem definitief (`/stuurgroep/materialen`); daarna kiezen projectgroepen in sectie F en ziet VC de lijst (VC mag alleen toevoegen). Voorraad per locatie en moment (hergebruik): `/stuurgroep/materialen/behoefte` met tekorten en correcties. Migraties 14 tot en met 17. Zie de beslissingen van 13 november.
+
+**Volgende stap: opdracht 5, deel B (budget) en deel C (beheer, export, blijf-actief, livegang).** Zie `docs/bouwvolgorde.md` en het plan in het gesprek. `avf_indienen` moet dan ook de budgetaanvraag doorzetten.
 
 ## Hoe je werkt
 
@@ -35,13 +37,13 @@ Op deze Windows-machine blokkeert PowerShell `npx` en `npm`: gebruik `npx.cmd` e
 |---|---|
 | Ontwikkelserver | `npm run dev` (http://localhost:3000). Na een wijziging in `globals.css` of de Tailwind-instellingen de server herstarten |
 | Controle | `npm run lint`, `npm run build` (draai build niet terwijl de ontwikkelserver loopt en je tegelijk test) |
-| Database-tests | `npm test` (Vitest, tegen het echte Supabase-project) |
+| Database-tests | `npm test` (Vitest, tegen het echte Supabase-project; de bestanden draaien achter elkaar omdat ze één database delen) |
 | End-to-endtests | `npx playwright test e2e/<bestand>` (telefoonformaat); tegen de live site: `BASE_URL=https://back-pack-one.vercel.app npx playwright test ...` |
 | Migraties toepassen | `npm run db:push -- --yes` (leest het databasewachtwoord uit `.env.local`) |
 | Testdata laden | `npm run seed`; een programma terugzetten: `npm run seed -- --programma-opnieuw=VC` |
 | Iconen opnieuw maken | `node scripts/maak-iconen.mjs` |
 
-Migraties staan in `supabase/migrations/` (nu 1 t/m 13). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
+Migraties staan in `supabase/migrations/` (nu 1 t/m 17). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
 
 ## Valkuilen uit de vorige sessie
 

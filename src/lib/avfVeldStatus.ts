@@ -47,6 +47,8 @@ export function veldStand(avf: AvfGegevens, v: AvfVeld): VeldStand {
 
   switch (v.sleutel) {
     case "tijdvak": return avf.tijdvak ? "ingevuld" : "leeg";
+    case "avf_materiaal": return (inhoud.materialenAantal ?? 0) > 0 ? "ingevuld" : "leeg";
+    case "avf_materiaal.aanvullend": return (inhoud.eigenMaterialenAantal ?? 0) > 0 ? "ingevuld" : "leeg";
     case "projectgroep_rol": return samen(inhoud.rollenIngevuld, 6);
     case "veiligheid.weer.*": {
       const weer = (inhoud.veiligheid.weer ?? {}) as Record<string, Json>;

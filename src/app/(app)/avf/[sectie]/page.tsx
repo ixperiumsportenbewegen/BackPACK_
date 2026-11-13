@@ -10,6 +10,8 @@ import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { VerzoekenLijst } from "@/components/avf/Verzoeken";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
+import { MaterialenEditor } from "@/components/avf/MaterialenEditor";
+import { laadAvfMaterialen, laadBeschikbaarheid, laadLijstStatus, laadMaterialen } from "@/lib/materialen";
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
 import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
@@ -181,10 +183,18 @@ export default async function SectiePagina({
       </>
     );
   } else if (code === "F") {
+    const locatie = (avf.inhoud.locatie_keuze === "camping" || avf.inhoud.locatie_keuze === "bivak") ? avf.inhoud.locatie_keuze : null;
+    const [lijstStatus, materialen, regels, beschikbaar] = await Promise.all([
+      laadLijstStatus(), laadMaterialen(), laadAvfMaterialen(avf.id), locatie ? laadBeschikbaarheid(avf.id) : Promise.resolve({}),
+    ]);
     inhoudBlok = (
-      <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">
-        Materialen en het financieel plan komen later. Leeg laten mag dus gewoon.
-      </p>
+      <>
+        <MaterialenEditor
+          locatie={locatie} tijdvak={avf.tijdvak ? formatTijdvak(avf.tijdvak) : null} lijstDefinitief={lijstStatus.status === "definitief"}
+          materialen={materialen} regels={regels} beschikbaar={beschikbaar}
+        />
+        <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">Het financieel plan volgt in een latere versie. Leeg laten mag.</p>
+      </>
     );
   } else if (code === "G") {
     const velden = AVF_VELDEN.filter((v) => v.sectie === "G" && EENVOUDIG.has(v.veldtype));

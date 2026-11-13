@@ -23,9 +23,6 @@ async function avfId(cluster: string, nummer: number): Promise<string> {
   return data!.id;
 }
 
-const zetStatus = (status: "concept" | "definitief") =>
-  admin.from("materiaallijst_status").update({ status, definitief_op: status === "definitief" ? new Date().toISOString() : null, definitief_door_naam: status === "definitief" ? NAAM : null }).eq("id", true);
-
 async function regel(avf: string, materiaal: string, aantal: number, fase: string | null = null) {
   const { data, error } = await admin.from("avf_materiaal").insert({ avf_id: avf, materiaal_id: materiaal, aantal, fase }).select("id").single();
   if (error) throw new Error(error.message);
@@ -327,6 +324,14 @@ describe("Voorraad per locatie en moment", () => {
     expect(((await (await inloggenAls("vc-stuur-programma")).rpc("avf_materiaal_corrigeren", { p_id: rij!.id, p_aantal: 4, p_naam: NAAM })).data as R).ok).toBe(true);
     const { data } = await (await inloggenAls("vd-groep-1")).rpc("materiaal_beschikbaar", { p_avf_id: avfVd1 });
     expect((data as { materiaal_id: string; anderen: number }[]).find((x) => x.materiaal_id === touw)?.anderen).toBe(4);
+  });
+
+  it("de fasen volgen op elkaar: de grootste fase telt, plus wat voor de hele belevenis is gekozen", async () => {
+    const extra = [await regel(avfVc1, touw, 3, "kop"), await regel(avfVc1, touw, 1, "romp")];
+    const { data } = await (await inloggenAls("vd-groep-1")).rpc("materiaal_beschikbaar", { p_avf_id: avfVd1 });
+    // hele belevenis 4 (gecorrigeerd) + grootste fase 3
+    expect((data as { materiaal_id: string; anderen: number }[]).find((x) => x.materiaal_id === touw)?.anderen).toBe(7);
+    await admin.from("avf_materiaal").delete().in("id", extra);
   });
 
   it("de stuurgroep ziet de context van het eigen cluster, anderen niet", async () => {

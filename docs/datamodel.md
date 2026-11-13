@@ -200,7 +200,7 @@ PK (`avf_id`, `stuurgroeprol_code`).
 ## Materialen en budget
 
 ### materiaal
-Eén lijst voor beide clusters.
+Eén lijst voor beide clusters, met de voorraad per locatie (op basis van ervaring van vorige jaren). Logistiek & Facilitair van VD bouwt de lijst; VC kan zodra hij definitief is materialen toevoegen.
 | veld | type | opmerking |
 |---|---|---|
 | naam | text | |
@@ -208,18 +208,23 @@ Eén lijst voor beide clusters.
 | voorraad_camping, voorraad_bivak | int | |
 | opmerking | text | |
 | actief | boolean | inactief = niet meer kiesbaar; bestaande keuzes krijgen een melding |
+| toegevoegd_door_cluster, bijgewerkt_door_naam | uuid, text | wie het materiaal toevoegde of het laatst wijzigde |
+
+### materiaallijst_status
+Eén rij: `status` (`concept` of `definitief`), `definitief_op`, `definitief_door_naam`, `definitief_door_cluster`. Projectgroepen kunnen pas materiaal kiezen als de lijst definitief is.
 
 ### avf_materiaal
+Materialen in sectie F. De locatie (camping of bivak) staat in het AVF (`avf.locatie_keuze`), dus er is één aantal.
 | veld | type | opmerking |
 |---|---|---|
 | avf_id | uuid → avf | |
-| fase | enum `fase` | optioneel |
-| materiaal_id | uuid → materiaal | leeg bij aanvullend materiaal |
-| omschrijving | text | alleen bij aanvullend materiaal |
-| aantal_camping, aantal_bivak | int | |
-| aantal_gecorrigeerd_camping, aantal_gecorrigeerd_bivak | int | door stuurgroep, optioneel |
+| fase | enum `fase` | optioneel; leeg = hele belevenis |
+| materiaal_id | uuid → materiaal | leeg bij eigen materiaal |
+| omschrijving | text | alleen bij eigen materiaal (telt niet mee voor de voorraad) |
+| aantal | int | minstens 1 |
+| aantal_gecorrigeerd | int | door de stuurgroep, optioneel; telt dan in plaats van `aantal` |
 
-View `materiaal_behoefte` (per cluster, per materiaal): voorraad, totale behoefte per locatie, tekort.
+Materiaal kiezen kan pas als de locatie bekend is en de lijst definitief is. Materialen worden hergebruikt: de behoefte van een belevenis op één moment is het grootste aantal van kop, romp en staart plus wat voor de hele belevenis is gekozen. Een tekort is er alleen als belevenissen op dezelfde locatie met overlappende tijd (VD en VC samen) meer nodig hebben dan er ligt. De functies `materiaal_beschikbaar(avf_id)` (voor de projectgroep) en `materiaal_context(cluster_id)` (voor de stuurgroep) rekenen dat uit. TEST telt apart van VD en VC.
 
 ### budgetaanvraag
 | veld | type | opmerking |

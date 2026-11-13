@@ -27,6 +27,15 @@ export function useNaam(sleutel: string = SLEUTEL): [string, (n: string) => void
   return [naam, wijzig];
 }
 
+/** De opgeslagen naam op dit moment lezen (voor knoppen die niet bij het naamveld zelf horen). */
+export function leesOpgeslagenNaam(sleutel: string = SLEUTEL): string {
+  try {
+    return localStorage.getItem(sleutel) ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export const AVF_NAAM_SLEUTEL = "backpack_avfnaam";
 
 export function NaamVeld({ naam, setNaam, label = "Jouw naam" }: { naam: string; setNaam: (n: string) => void; label?: string }) {

@@ -133,6 +133,6 @@ test("startscherm: zes belevenissenkaarten; stand per rol alleen voor stuurgroep
   const stuur = await nieuweSessie(browser, "vd-stuur-veiligheid");
   await expect(stuur.page.locator("main article")).toHaveCount(6);
   await expect(stuur.page.getByRole("heading", { name: "Stand van zaken per rol" })).toBeVisible();
-  await expect(stuur.page.getByText("Nog niets te melden")).toHaveCount(4);
+  await expect(stuur.page.getByText("Nog niets te melden")).toHaveCount(3);
   await stuur.ctx.close();
 });

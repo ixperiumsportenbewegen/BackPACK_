@@ -155,8 +155,8 @@ export const AVF_VELDEN: AvfVeld[] = [
   veld({ sleutel: "veiligheid.ehbo.maatregelen", sectie: "E", label: "Welke EHBO-maatregelen? (wie, waar, middelen)", veldtype: "lang", v: "voorwaardelijk", pg: "veiligheid_ehbo", sg: "veiligheid_welzijn", pack: "P", wezenlijk: true, maxLengte: 1000 }),
 
   // F Materialen en financiën: volgt in opdracht 5
-  veld({ sleutel: "avf_materiaal", sectie: "F", label: "Materialen per fase en locatie", veldtype: "later", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
-  veld({ sleutel: "avf_materiaal.aanvullend", docSleutels: [], sectie: "F", label: "Aanvullende materialen", veldtype: "later", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
+  veld({ sleutel: "avf_materiaal", sectie: "F", label: "Materialen uit de lijst", veldtype: "lijst", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
+  veld({ sleutel: "avf_materiaal.aanvullend", docSleutels: [], sectie: "F", label: "Eigen materialen", veldtype: "lijst", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
   veld({ sleutel: "budgetaanvraag", sectie: "F", label: "Financieel plan (regels en totaal)", veldtype: "later", v: "nee", pg: "projectleider", sg: "communicatie_financien", pack: "C" }),
 
   // G Thema en organisatie

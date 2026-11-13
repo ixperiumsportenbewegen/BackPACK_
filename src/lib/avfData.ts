@@ -24,6 +24,16 @@ export interface OnderdeelRij extends OnderdeelInhoud {
   afbeelding_bijschrift: string | null;
 }
 
+export interface MateriaalRegel {
+  id: string;
+  naam: string;
+  /** true bij eigen materiaal dat niet in de lijst staat */
+  eigen: boolean;
+  fase: "kop" | "romp" | "staart" | null;
+  aantal: number;
+  aantalGecorrigeerd: number | null;
+}
+
 export interface AvfGegevens {
   id: string;
   projectgroepId: string;
@@ -38,6 +48,7 @@ export interface AvfGegevens {
   sectieBijgewerkt: Record<string, { updated_at: string; naam: string }>;
   inhoud: AvfInhoud;
   rolverdeling: { rol: string; namen: string | null }[];
+  materialen: MateriaalRegel[];
   fasen: FaseRij[];
   onderdelen: OnderdeelRij[];
 }
@@ -61,14 +72,19 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     .maybeSingle();
   if (!a) return null;
 
-  const [{ data: fasenRaw }, { data: onderdelenRaw }, { data: rollen }, regel] = await Promise.all([
+  const [{ data: fasenRaw }, { data: onderdelenRaw }, { data: rollen }, regel, { data: matRaw }] = await Promise.all([
     supabase.from("avf_fase").select("*").eq("avf_id", avfId),
     supabase.from("avf_onderdeel").select("*").eq("avf_id", avfId).order("fase").order("volgorde"),
     supabase.from("projectgroep_rol").select("rol, namen").eq("projectgroep_id", a.projectgroep_id),
     a.programma_regel_id
       ? supabase.from("programma_regel").select("id, dag, starttijd, eindtijd, titel, locatie").eq("id", a.programma_regel_id).maybeSingle()
       : Promise.resolve({ data: null }),
+    supabase.from("avf_materiaal").select("id, fase, materiaal_id, omschrijving, aantal, aantal_gecorrigeerd, materiaal:materiaal_id(naam)").eq("avf_id", avfId).order("created_at"),
   ]);
+  const materialen: MateriaalRegel[] = (matRaw ?? []).map((m) => ({
+    id: m.id, naam: m.materiaal_id ? ((m.materiaal as unknown as { naam: string } | null)?.naam ?? "Materiaal") : (m.omschrijving ?? "Materiaal"),
+    eigen: !m.materiaal_id, fase: m.fase, aantal: m.aantal, aantalGecorrigeerd: m.aantal_gecorrigeerd,
+  }));
 
   const fasen: FaseRij[] = FASEN.map((fase) => {
     const f = (fasenRaw ?? []).find((x) => x.fase === fase);
@@ -92,6 +108,8 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     organisatie: a.organisatie ?? {}, communicatie: a.communicatie ?? {},
     fasen, onderdelen,
     rollenIngevuld: (rollen ?? []).filter((r) => isGevuld(r.namen)).length,
+    materialenAantal: materialen.filter((m) => !m.eigen).length,
+    eigenMaterialenAantal: materialen.filter((m) => m.eigen).length,
   };
 
   const pg = a.projectgroep as unknown as { naam: string; nummer: number };
@@ -109,6 +127,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     sectieBijgewerkt: (a.sectie_bijgewerkt ?? {}) as AvfGegevens["sectieBijgewerkt"],
     inhoud, fasen, onderdelen,
     rolverdeling: (rollen ?? []) as { rol: string; namen: string | null }[],
+    materialen,
   };
 }
 

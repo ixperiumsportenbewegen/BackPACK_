@@ -265,7 +265,6 @@ async function main() {
 
   console.log(`Klaar. Accounts nieuw: ${nieuw}, al aanwezig: ${overgeslagen}.`);
   console.log(`Wachtwoorden staan in ${wachtwoordPad} (niet in git).`);
-  console.log("Materialen volgen in opdracht 5 (tabel bestaat nog niet).");
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

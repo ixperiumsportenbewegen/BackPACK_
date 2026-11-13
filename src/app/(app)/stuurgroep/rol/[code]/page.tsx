@@ -129,8 +129,20 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
       )}
       {rolCode === "logistiek_facilitair" && (
         <>
-          <LinkKaart href="/stuurgroep/programma" titel="Locatie per belevenis toewijzen" uitleg="Kies Camping, Bivak of Anders voor elke belevenis." />
-          <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">Materiaalbehoefte en tekorten per locatie komen in een volgende stap.</p>
+          <LinkKaart href="/stuurgroep/materialen" titel="Materialenlijst" uitleg="De gedeelde lijst met voorraad op de camping en het bivak. Bouwen, definitief maken en aanvullen." />
+          <LinkKaart href="/stuurgroep/materialen/behoefte" titel="Behoefte en tekorten" uitleg="Wat de belevenissen nodig hebben per locatie en moment, en correcties." />
+          <section className="rounded-han border border-rand bg-vlak p-4">
+            <h2 className="text-xl">Locatie per belevenis</h2>
+            <p className="text-sm text-zacht">De projectgroepen kiezen zelf camping of bivak in sectie A. Hier zie je wie dat nog moet doen.</p>
+            <ul className="mt-2 divide-y divide-rand">
+              {avfs.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-3 py-2">
+                  <span className="font-medium text-kop">{a.projectgroepNaam}</span>
+                  <span className={`text-sm ${a.locatie ? "text-zacht" : "font-bold text-kop"}`}>{a.locatie ?? "Nog niet gekozen"}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </>
       )}
       {rolCode === "communicatie_financien" && (

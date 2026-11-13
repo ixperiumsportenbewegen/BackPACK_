@@ -4,14 +4,14 @@ import { AvfStatusLabel, OpnieuwLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
 import { SECTIES } from "@/config/avf-velden";
 import type { AvfGegevens } from "@/lib/avfData";
-import { laadVerzoeken } from "@/lib/beoordeling";
+import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { formatTijdvak } from "@/lib/tijd";
 
 /** Het blok "Jullie AVF": status, voortgang per sectie en open verbeterverzoeken. */
 export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop?: "h2" | "h3" }) {
   const Kop = kop;
-  const open = (await laadVerzoeken(avf.id)).filter((v) => v.status === "open").length;
+  const open = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status === "open").length;
   const voortgang = voortgangPerSectie(avf.inhoud);
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");

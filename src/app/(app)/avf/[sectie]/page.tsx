@@ -9,7 +9,7 @@ import { EhboBlok, WeerEditor } from "@/components/avf/WeerEditor";
 import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { VerzoekenLijst } from "@/components/avf/Verzoeken";
-import { laadVerzoeken } from "@/lib/beoordeling";
+import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
 import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
@@ -76,7 +76,7 @@ export default async function SectiePagina({
 
   const voortgang = sectieVoortgang(code, avf.inhoud);
   const vergrendeld = avf.status === "ingediend";
-  const verzoeken = (await laadVerzoeken(avf.id)).filter((v) => v.sectie === code);
+  const verzoeken = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.sectie === code);
   const onderdeelNamen = Object.fromEntries(
     avf.onderdelen.map((o, n) => [o.id, { naam: o.naam?.trim() || `Onderdeel ${n + 1}`, href: `/avf/onderdeel/${o.id}` }]),
   );

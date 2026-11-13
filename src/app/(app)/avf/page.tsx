@@ -8,7 +8,7 @@ import { PaginaKop } from "@/components/PaginaKop";
 import { SECTIES, eigenarenVanSectie } from "@/config/avf-velden";
 import { rolNaam } from "@/components/avf/Sectie";
 import { laadEigenAvf } from "@/lib/avfData";
-import { laadVerzoeken } from "@/lib/beoordeling";
+import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { getProfiel } from "@/lib/profiel";
 import { formatMoment, formatTijdvak } from "@/lib/tijd";
@@ -22,7 +22,7 @@ export default async function AvfOverzicht() {
   if (!avf) redirect("/");
 
   const voortgang = voortgangPerSectie(avf.inhoud);
-  const verzoeken = (await laadVerzoeken(avf.id)).filter((v) => v.status !== "afgehandeld");
+  const verzoeken = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status !== "afgehandeld");
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
 

@@ -76,6 +76,15 @@ export async function laadVerzoekenCluster(clusterId: string): Promise<Verzoek[]
   return ((data ?? []) as unknown as Rij[]).map(naarVerzoek);
 }
 
+/**
+ * Verbeterverzoeken zoals de projectgroep ze ziet. De stuurgroep verzamelt verzoeken eerst als concept; pas bij
+ * "Aanpassing vragen" gaan ze naar de groep. Zolang het AVF is ingediend of goedgekeurd zijn ze voor de groep verborgen.
+ */
+export async function laadVerzoekenVoorGroep(avfId: string, status: string): Promise<Verzoek[]> {
+  if (status !== "aanpassing_gevraagd") return [];
+  return laadVerzoeken(avfId);
+}
+
 export async function laadVersies(avfId: string): Promise<Versie[]> {
   const supabase = await maakServerClient();
   const { data } = await supabase

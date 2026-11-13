@@ -5,7 +5,7 @@ import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { SECTIES } from "@/config/avf-velden";
 import { laadEigenAvf } from "@/lib/avfData";
 import { voortgangPerSectie } from "@/lib/avfVoortgang";
-import { laadVerzoeken } from "@/lib/beoordeling";
+import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { getProfiel } from "@/lib/profiel";
 import { IndienenFormulier } from "./IndienenFormulier";
 
@@ -19,7 +19,7 @@ export default async function IndienenPagina() {
 
   const voortgang = voortgangPerSectie(avf.inhoud);
   const problemen = voortgang.filter((v) => v.ontbrekend.length > 0);
-  const verzoeken = await laadVerzoeken(avf.id);
+  const verzoeken = await laadVerzoekenVoorGroep(avf.id, avf.status);
   const open = verzoeken.filter((v) => v.status === "open").map((v) => ({ id: v.id, sectie: v.sectie, tekst: v.tekst }));
   const kanIndienen = avf.status === "in_ontwikkeling" || avf.status === "aanpassing_gevraagd";
 

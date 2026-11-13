@@ -101,6 +101,7 @@ export function BeoordelingsPaneel({
               </button>
             )}
           </div>
+          {kanVragen && open > 0 && <p className="text-sm text-zacht">De groep ziet de verbeterverzoeken pas nadat je op Aanpassing vragen hebt getikt.</p>}
           {kanVragen && open === 0 && <p className="text-sm text-zacht">Aanpassing vragen kan zodra je minstens één verbeterverzoek hebt geplaatst bij een sectie of onderdeel.</p>}
         </>
       )}

@@ -25,3 +25,6 @@
 | 2026-11-13 | PACK is een speelse indeling, niet te zwaar maken | Besluit Bart |
 | 2026-11-13 | Eén Supabase-project (gratis); testdata tot livegang, daarna oefencluster TEST in hetzelfde project | Ruimte voor één gratis project |
 | 2026-11-13 | Blijf-actief: dagelijkse Vercel Cron naar /api/blijf-actief met kleine Supabase-query, plus wekelijkse export via GitHub Actions | Voorkomt pauze na een week inactiviteit |
+| 2026-11-13 | `budget_totaal` staat in aparte tabel `cluster_budget` (docent en stuurgroep van het cluster) in plaats van op `cluster` | Row Level Security werkt per rij; projectgroepen en studenten mogen het totaalbedrag niet lezen |
+| 2026-11-13 | `wijziging` krijgt extra kolommen `cluster_id` en `projectgroep_id` | Nodig om het logboek per cluster en per groep af te schermen |
+| 2026-11-13 | Afschermingstests draaien met Vitest tegen het Supabase-project (geen Docker) | Eenvoudiger voor Bart; testaccounts bestaan al in het project |

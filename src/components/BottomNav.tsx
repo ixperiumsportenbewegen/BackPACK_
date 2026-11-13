@@ -22,6 +22,16 @@ function itemsVoor(soort: Accountsoort): Item[] {
   return items;
 }
 
+/**
+ * Welke knop hoort bij het huidige scherm. Onderliggende schermen markeren hun hoofdknop:
+ * het AVF en de belevenissen horen bij Belevenissen, het programma bij Onze meerdaagse.
+ */
+function isActief(href: string, pad: string): boolean {
+  if (href === "/") return pad === "/" || pad.startsWith("/programma");
+  if (href === "/belevenissen") return pad.startsWith("/belevenissen") || pad.startsWith("/avf");
+  return pad.startsWith(href);
+}
+
 /** Onderste balk op telefoon, zijbalk op laptop. Studenten zien geen derde knop. */
 export function BottomNav({ soort }: { soort: Accountsoort }) {
   const pad = usePathname();
@@ -34,7 +44,7 @@ export function BottomNav({ soort }: { soort: Accountsoort }) {
     >
       <ul className="grid auto-cols-fr grid-flow-col md:flex md:flex-col md:gap-1 md:p-3">
         {items.map(({ href, label, icoon: Icoon }) => {
-          const actief = href === "/" ? pad === "/" : pad.startsWith(href);
+          const actief = isActief(href, pad);
           return (
             <li key={href}>
               <Link

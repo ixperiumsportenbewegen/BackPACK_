@@ -161,7 +161,7 @@ export function JaNeeVeld({ doel, begin, label, hulp, eigenaar, uitgeschakeld, b
   );
 }
 
-interface KeuzeProps {
+interface MeerKeuzeProps {
   doel: VeldDoel;
   begin: string | null;
   label: string;
@@ -170,27 +170,39 @@ interface KeuzeProps {
   eigenaar?: string | null;
 }
 
-export function KeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: KeuzeProps) {
+/** Een of meer opties kiezen. De keuze wordt opgeslagen als tekst, in de vaste volgorde van de opties. */
+export function MeerKeuzeVeld({ doel, begin, label, opties, hulp, eigenaar }: MeerKeuzeProps) {
   const { vergrendeld } = useAvfEditor();
   const v = useVeld(doel, begin);
+  const gekozen = typeof v.opgeslagen === "string" && v.opgeslagen ? v.opgeslagen.split(", ") : [];
+
+  function wissel(optie: string) {
+    const nieuw = gekozen.includes(optie) ? gekozen.filter((g) => g !== optie) : [...gekozen, optie];
+    const tekst = opties.filter((o) => nieuw.includes(o)).join(", ");
+    void v.opslaan(tekst === "" ? null : tekst);
+  }
+
   return (
     <div>
       <p className="font-bold text-kop">{label}</p>
       <Eigenaar rol={eigenaar} />
       {hulp && <p className="text-sm text-zacht">{hulp}</p>}
-      <div role="radiogroup" aria-label={label} className="mt-2 grid grid-cols-2 gap-2">
-        {opties.map((o) => (
-          <button
-            key={o} type="button" role="radio" aria-checked={v.opgeslagen === o} disabled={vergrendeld}
-            onClick={() => { if (o !== v.opgeslagen) void v.opslaan(o); }}
-            className={`flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 px-3 font-bold disabled:opacity-60 ${
-              v.opgeslagen === o ? "border-kop bg-kop text-white" : "border-zacht bg-vlak text-kop"
-            }`}
-          >
-            {v.opgeslagen === o && <Check aria-hidden className="size-5" />}
-            {o}
-          </button>
-        ))}
+      <div role="group" aria-label={label} className="mt-2 grid grid-cols-2 gap-2">
+        {opties.map((o) => {
+          const aan = gekozen.includes(o);
+          return (
+            <button
+              key={o} type="button" aria-pressed={aan} disabled={vergrendeld}
+              onClick={() => wissel(o)}
+              className={`flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 px-3 font-bold disabled:opacity-60 ${
+                aan ? "border-kop bg-kop text-white" : "border-zacht bg-vlak text-kop"
+              }`}
+            >
+              {aan && <Check aria-hidden className="size-5" />}
+              {o}
+            </button>
+          );
+        })}
       </div>
       <ConflictBlok
         conflict={v.conflict}

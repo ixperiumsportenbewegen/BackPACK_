@@ -320,10 +320,20 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
   // Locatie aanpassen
   await p.reload();
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
-  const locatie = p.locator(`#toewijzen-${regel[1]}`).locator("xpath=..").getByLabel("Locatie");
-  await locatie.fill("Grote wei bij de camping");
-  await locatie.blur();
-  await expect(p.getByText("Locatie opgeslagen")).toBeVisible();
+  // Het voorbeeld heeft een eigen naam: dat staat als "Anders" met de naam ingevuld
+  await expect(p.locator(`#locatie-${regel[1]}`)).toHaveValue("Anders");
+  await expect(p.locator(`#locatie-anders-${regel[1]}`)).toHaveValue("Veld naast de camping");
+  await p.locator(`#locatie-${regel[1]}`).selectOption("Bivak");
+  await expect(p.getByText("Locatie opgeslagen", { exact: true }).first()).toBeVisible();
+  await expect.poll(async () => (await admin.from("avf").select("locatie_tekst").eq("id", avf[1]).single()).data?.locatie_tekst).toBe("Bivak");
+  await groep.page.goto("/avf");
+  await expect(groep.page.getByText("Bivak", { exact: true }).first()).toBeVisible();
+  // Anders: met een eigen naam
+  await p.locator(`#locatie-${regel[1]}`).selectOption("Anders");
+  const naamVeld = p.locator(`#locatie-anders-${regel[1]}`);
+  await naamVeld.fill("Grote wei bij de camping");
+  await naamVeld.blur();
+  await expect.poll(async () => (await admin.from("avf").select("locatie_tekst").eq("id", avf[1]).single()).data?.locatie_tekst).toBe("Grote wei bij de camping");
   await groep.page.goto("/avf");
   await expect(groep.page.getByText("Grote wei bij de camping").first()).toBeVisible();
 
@@ -342,6 +352,34 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
   await expect(groep.page.getByText("20:00–")).toBeVisible();
 
   await Promise.all([stuur.ctx.close(), groep.ctx.close()]);
+});
+
+test("de verschijningsvorm heeft meerdere keuzes", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "vd-groep-1");
+  const p = s.page;
+  await p.goto("/avf/A");
+  await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
+  const groep = p.getByRole("group", { name: "Verschijningsvorm" });
+  for (const vorm of ["Spel", "Wedstrijd", "Avontuur", "Gezondheid", "Recreatie", "Show"]) {
+    await expect(groep.getByRole("button", { name: vorm })).toBeVisible();
+  }
+  await expect(groep.getByRole("button", { name: "Tocht" })).toHaveCount(0);
+  await expect(groep.getByRole("button", { name: "Spel" })).toHaveAttribute("aria-pressed", "true");
+
+  await groep.getByRole("button", { name: "Show" }).click();
+  await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Spel, Show");
+  await groep.getByRole("button", { name: "Avontuur" }).click();
+  await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Spel, Avontuur, Show");
+  await groep.getByRole("button", { name: "Spel" }).click();
+  await expect.poll(async () => (await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single()).data?.verschijningsvorm).toBe("Avontuur, Show");
+
+  // Andere groepen zien de gekozen vormen op de publieke kaart
+  const groep2 = await nieuweSessie(browser, "vd-groep-2");
+  await groep2.page.goto("/belevenissen");
+  await expect(groep2.page.getByText("Avontuur, Show")).toBeVisible();
+
+  await admin.from("avf").update({ verschijningsvorm: voorbeeld.verschijningsvorm }).eq("id", avf[1]);
+  await Promise.all([s.ctx.close(), groep2.ctx.close()]);
 });
 
 test("VC heeft een eigen, gespiegeld programma", async ({ browser }) => {

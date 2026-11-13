@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
 import { PaginaKop } from "@/components/PaginaKop";
 import { ProgrammaWeergave } from "@/components/ProgrammaWeergave";
 import { getProfiel } from "@/lib/profiel";
@@ -15,6 +15,9 @@ export default async function ProgrammaPagina() {
 
   return (
     <div className="flex flex-col gap-4">
+      <Link href="/" className="flex min-h-aanraak items-center gap-1 font-medium text-kop">
+        <ChevronLeft aria-hidden className="size-5" /> Onze meerdaagse
+      </Link>
       <PaginaKop titel="Programma" foto="ochtend-tentterrein" />
       <p className="text-zacht">
         Het vaste programma van de meerdaagse (28–30 juni 2027). Zes tijdvakken zijn voor de belevenissen van de projectgroepen.

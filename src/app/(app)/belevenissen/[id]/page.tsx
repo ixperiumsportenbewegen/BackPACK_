@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { AfdrukKnop } from "@/components/avf/AfdrukKnop";
+import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { AvfLeesweergave } from "@/components/avf/AvfLeesweergave";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
-import { laadAvf } from "@/lib/avfData";
+import { laadAvf, laadKaarten } from "@/lib/avfData";
+import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { formatTijdvak } from "@/lib/tijd";
 import { themaBeeldUrl } from "@/lib/themaBeeld";
@@ -27,6 +29,13 @@ export default async function AvfLezen({ params }: { params: Promise<{ id: strin
     supabase.from("meerdaagsethema").select("naam, slogan, sfeerbeeld_pad, logo_pad").eq("cluster_id", avf.clusterId).maybeSingle(),
     supabase.from("cluster").select("naam, code").eq("id", avf.clusterId).maybeSingle(),
   ]);
+  // Stuurgroep en docent kunnen van belevenis naar belevenis bladeren
+  const profiel = await getProfiel();
+  const kanBladeren = profiel?.soort === "stuurgroep" || profiel?.soort === "docent";
+  const kaarten = kanBladeren ? await laadKaarten(avf.clusterId) : [];
+  const nr = kaarten.findIndex((k) => k.id === avf.id);
+  const buur = (k: (typeof kaarten)[number] | undefined) =>
+    k ? { href: `/belevenissen/${k.id}`, label: `${k.groepNaam}${k.titel ? ` · ${k.titel}` : ""}` } : null;
   const sfeer = themaBeeldUrl(thema?.sfeerbeeld_pad ?? "fotos/vallei-viaduct", 1600);
   const logo = themaBeeldUrl(thema?.logo_pad);
 
@@ -60,6 +69,11 @@ export default async function AvfLezen({ params }: { params: Promise<{ id: strin
       </header>
 
       <AvfLeesweergave avf={avf} />
+
+      <StapNavigatie
+        vorige={buur(kaarten[nr - 1])} volgende={buur(kaarten[nr + 1])}
+        terug={{ href: "/belevenissen", label: "Terug naar alle belevenissen" }} laatsteLabel="Klaar: naar alle belevenissen"
+      />
     </article>
   );
 }

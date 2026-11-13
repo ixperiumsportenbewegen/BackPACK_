@@ -4,12 +4,14 @@ import { AvfEditor } from "@/components/avf/AvfEditor";
 import { FaseEditor } from "@/components/avf/FaseEditor";
 import { LijstEditor, type LijstItem } from "@/components/avf/Lijsten";
 import { SectieKop, rolNaam } from "@/components/avf/Sectie";
-import { JaNeeVeld, KeuzeVeld, TekstVeld } from "@/components/avf/Velden";
+import { JaNeeVeld, MeerKeuzeVeld, TekstVeld } from "@/components/avf/Velden";
 import { EhboBlok, WeerEditor } from "@/components/avf/WeerEditor";
+import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
 import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
+import { buren } from "@/lib/avfNavigatie";
 import { getProfiel } from "@/lib/profiel";
 import { formatTijdvak } from "@/lib/tijd";
 import type { JsonSectie, VeldDoel } from "../actions";
@@ -32,8 +34,8 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
         if (v.veldtype === "jaNee") {
           return <JaNeeVeld key={v.sleutel} doel={doelVoor(v)} begin={typeof w === "boolean" ? w : null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} />;
         }
-        if (v.veldtype === "keuze") {
-          return <KeuzeVeld key={v.sleutel} doel={doelVoor(v)} begin={(w as string | null) ?? null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} opties={v.opties ?? []} />;
+        if (v.veldtype === "meerkeuze") {
+          return <MeerKeuzeVeld key={v.sleutel} doel={doelVoor(v)} begin={(w as string | null) ?? null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} opties={v.opties ?? []} />;
         }
         return (
           <TekstVeld
@@ -53,7 +55,7 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
   );
 }
 
-const EENVOUDIG = new Set(["tekst", "lang", "getal", "keuze", "jaNee"]);
+const EENVOUDIG = new Set(["tekst", "lang", "getal", "keuze", "meerkeuze", "jaNee"]);
 
 export default async function SectiePagina({
   params, searchParams,
@@ -72,6 +74,8 @@ export default async function SectiePagina({
 
   const voortgang = sectieVoortgang(code, avf.inhoud);
   const vergrendeld = avf.status === "ingediend";
+  const faseParam = (await searchParams).fase;
+  const fase = (["kop", "romp", "staart"] as const).find((f) => f === faseParam) ?? "kop";
   const kop = <SectieKop sectie={code} status={voortgang.status} ontbrekend={voortgang.ontbrekend.map((o) => o.melding)} />;
   const inhoud = avf.inhoud;
 
@@ -129,8 +133,6 @@ export default async function SectiePagina({
       </>
     );
   } else if (code === "D") {
-    const faseParam = (await searchParams).fase;
-    const fase = (["kop", "romp", "staart"] as const).find((f) => f === faseParam) ?? "kop";
     inhoudBlok = <FaseEditor key={fase} fase={fase} avf={avf} />;
   } else if (code === "E") {
     const weer = ((inhoud.veiligheid.weer as Record<string, never>) ?? {});
@@ -191,6 +193,7 @@ export default async function SectiePagina({
     <div className="flex flex-col gap-4">
       {kop}
       <AvfEditor vergrendeld={vergrendeld}>{inhoudBlok}</AvfEditor>
+      <StapNavigatie {...buren(code === "D" ? `D-${fase}` : code)} />
     </div>
   );
 }

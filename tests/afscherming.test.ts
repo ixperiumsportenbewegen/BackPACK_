@@ -168,7 +168,8 @@ describe("Rechten binnen het eigen cluster", () => {
 describe("Test 7: studentaccount kan niets schrijven", () => {
   it("vd-student kan in geen enkele tabel aanmaken, wijzigen of verwijderen", async () => {
     const client = await inloggenAls("vd-student");
-    const voor = await Promise.all(TABELLEN.map(async (t) => (await admin.from(t).select("*", { count: "exact", head: true })).count));
+    const GETELD = TABELLEN.filter((t) => t !== "wijziging");
+    const voor = await Promise.all(GETELD.map(async (t) => (await admin.from(t).select("*", { count: "exact", head: true })).count));
 
     const pogingen = [
       client.from("editie").insert({ naam: "x", startdatum: "2027-01-01", einddatum: "2027-01-02" }),
@@ -189,7 +190,9 @@ describe("Test 7: studentaccount kan niets schrijven", () => {
       expect(geenEffect).toBe(true);
     }
 
-    const na = await Promise.all(TABELLEN.map(async (t) => (await admin.from(t).select("*", { count: "exact", head: true })).count));
+    const na = await Promise.all(GETELD.map(async (t) => (await admin.from(t).select("*", { count: "exact", head: true })).count));
+    const logboek = await admin.from("wijziging").select("id", { count: "exact", head: true }).eq("tabel", "x");
+    expect(logboek.count).toBe(0);
     expect(na).toEqual(voor);
 
     const { data: acc } = await admin.from("account").select("soort").eq("gebruikersnaam", "vd-student").single();

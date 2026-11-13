@@ -638,3 +638,20 @@ describe("Programma per cluster", () => {
     }
   });
 });
+
+describe("Verschijningsvorm", () => {
+  it("alleen de zes opties zijn toegestaan, meerdere gescheiden door een komma", async () => {
+    const client = await inloggenAls("vd-groep-1");
+    const { data: voor } = await admin.from("avf").select("verschijningsvorm").eq("id", avf[1]).single();
+    const zet = (w: string | null) => client.from("avf").update({ verschijningsvorm: w }).eq("id", avf[1]).select("verschijningsvorm");
+
+    expect((await zet("Spel, Show")).data?.[0]?.verschijningsvorm).toBe("Spel, Show");
+    expect((await zet("Avontuur")).data?.[0]?.verschijningsvorm).toBe("Avontuur");
+    expect((await zet(null)).error).toBeNull();
+    for (const fout of ["Tocht", "Workshop", "Anders", "Spel, Tocht", "spel", ""]) {
+      const res = await zet(fout);
+      expect(res.error, fout).not.toBeNull();
+    }
+    await admin.from("avf").update({ verschijningsvorm: voor!.verschijningsvorm }).eq("id", avf[1]);
+  });
+});

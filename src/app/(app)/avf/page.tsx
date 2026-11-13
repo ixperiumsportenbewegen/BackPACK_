@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Clock, FileText, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FileText, MapPin } from "lucide-react";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
 import { PaginaKop } from "@/components/PaginaKop";
@@ -25,6 +25,9 @@ export default async function AvfOverzicht() {
 
   return (
     <div className="flex flex-col gap-4">
+      <Link href="/belevenissen" className="flex min-h-aanraak items-center gap-1 font-medium text-kop">
+        <ChevronLeft aria-hidden className="size-5" /> Belevenissen
+      </Link>
       <PaginaKop titel="Jullie AVF" foto="klimmen-staand" />
 
       <section className="rounded-han border border-rand bg-vlak p-4">

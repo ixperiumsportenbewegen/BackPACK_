@@ -113,7 +113,7 @@ Eén per projectgroep (`projectgroep_id` uniek). Velden van sectie A staan als k
 | opnieuw_te_controleren | boolean | true na wezenlijke wijziging na goedkeuring; status blijft `goedgekeurd` |
 | versie | int | ophogen bij elke indiening |
 | **A** titel | text | |
-| verschijningsvorm | text | bijv. spel, wedstrijd, tocht, workshop |
+| verschijningsvorm | text | één of meer van Spel, Wedstrijd, Avontuur, Gezondheid, Recreatie, Show, gescheiden door ", " (afgedwongen met een check) |
 | publieke_samenvatting | text | zonder spoilers |
 | organiserende_studenten | text | namen |
 | doelgroep | text | |

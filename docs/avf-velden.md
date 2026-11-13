@@ -15,7 +15,7 @@ Afkortingen SG-rol: PRL Projectleiding · P&K Programma & Kwaliteit · B&T Belev
 | Sleutel | Label | Verplicht | PG-rol | SG-rol | PACK | W |
 |---|---|---|---|---|---|---|
 | `titel` | Titel van de belevenis | ✔ | PL | PRL | K | |
-| `verschijningsvorm` | Verschijningsvorm (spel, wedstrijd, tocht, workshop, anders) | ✔ | PB | P&K | A | ✔ |
+| `verschijningsvorm` | Verschijningsvorm (één of meer van: Spel, Wedstrijd, Avontuur, Gezondheid, Recreatie, Show) | ✔ | PB | P&K | A | ✔ |
 | `publieke_samenvatting` | Publieke samenvatting (zonder spoilers) | ✔ | PB | B&T | A | |
 | `organiserende_studenten` | Organiserende studenten | ✔ | PL | PRL | K | |
 | `doelgroep` | Doelgroep | ✔ | PB | P&K | A | |

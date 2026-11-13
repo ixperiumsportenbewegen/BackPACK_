@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
-import { AVF_VELDEN, ONDERDEEL_NVT_MOGELIJK, OPRUIMEN_VELDEN, type SectieCode } from "@/config/avf-velden";
+import { AVF_VELDEN, ONDERDEEL_NVT_MOGELIJK, OPRUIMEN_VELDEN, VERSCHIJNINGSVORMEN, type SectieCode } from "@/config/avf-velden";
 
 export type Waarde = string | number | boolean | null;
 export type FaseCode = "kop" | "romp" | "staart";
@@ -107,6 +107,12 @@ export async function slaVeldOp(doel: VeldDoel, oudRuw: Waarde, nieuwRuw: Waarde
   const oud = schoon(oudRuw, kolomNaam);
   const nieuw = schoon(nieuwRuw, kolomNaam);
   if (typeof nieuw === "number" && !Number.isFinite(nieuw)) return { status: "fout", melding: "Vul een getal in." };
+  if (doel.soort === "kolom" && doel.kolom === "verschijningsvorm" && nieuw !== null) {
+    const gekozen = typeof nieuw === "string" ? nieuw.split(", ") : [];
+    if (gekozen.length === 0 || !gekozen.every((g) => (VERSCHIJNINGSVORMEN as readonly string[]).includes(g))) {
+      return { status: "fout", melding: "Kies uit de genoemde vormen." };
+    }
+  }
   if (typeof nieuw === "string" && nieuw.length > maxLengteVoor(doel)) return { status: "fout", melding: "Deze tekst is te lang." };
   if (doel.soort === "fase" && doel.kolom === "overzichtstekening_pad" && typeof nieuw === "string"
       && !nieuw.startsWith(`cluster/${ctx.clusterId}/avf/${ctx.avfId}/`)) return { status: "fout", melding: "Dit bestand hoort niet bij jullie AVF." };

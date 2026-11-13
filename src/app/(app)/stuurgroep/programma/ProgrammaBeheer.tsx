@@ -39,6 +39,17 @@ function Tijdvak({ r }: { r: ProgrammaRegel }) {
   );
 }
 
+const LOCATIES = ["Camping", "Bivak"] as const;
+type LocatieKeuze = "" | (typeof LOCATIES)[number] | "Anders";
+
+/** Een bewaarde locatie terugvertalen naar de keuze: camping, bivak of anders (met de ingevulde naam). */
+function leesLocatie(w: string | null): { keuze: LocatieKeuze; anders: string } {
+  const t = (w ?? "").trim();
+  if (!t) return { keuze: "", anders: "" };
+  const bekend = LOCATIES.find((l) => l.toLowerCase() === t.toLowerCase());
+  return bekend ? { keuze: bekend, anders: "" } : { keuze: "Anders", anders: t };
+}
+
 /** Eén tijdvak voor een belevenis: kies de projectgroep en de locatie. */
 function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen: GroepRij[]; naam: string }) {
   const router = useRouter();
@@ -46,7 +57,9 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
   const [keuze, setKeuze] = useState(bezetter?.avfId ?? "");
   const [melding, setMelding] = useState<Melding | null>(null);
   const [bezet, setBezet] = useState<{ avfId: string; door: string; kanWisselen: boolean } | null>(null);
-  const [locatie, setLocatie] = useState(bezetter?.locatie ?? "");
+  const startLocatie = leesLocatie(bezetter?.locatie ?? null);
+  const [locKeuze, setLocKeuze] = useState<LocatieKeuze>(startLocatie.keuze);
+  const [locAnders, setLocAnders] = useState(startLocatie.anders);
 
   async function kies(avfId: string, wissel = false) {
     setKeuze(avfId);
@@ -66,10 +79,10 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
     }
   }
 
-  async function bewaarLocatie() {
-    if (!bezetter || locatie.trim() === (bezetter.locatie ?? "")) return;
+  async function bewaarLocatie(waarde: string) {
+    if (!bezetter || waarde === (bezetter.locatie ?? "")) return;
     setMelding({ soort: "bezig", tekst: "Bezig met opslaan…" });
-    const res = await locatieOpslaan(bezetter.avfId, locatie, naam);
+    const res = await locatieOpslaan(bezetter.avfId, waarde, naam);
     if (res.status === "ok") { setMelding({ soort: "ok", tekst: "Locatie opgeslagen" }); router.refresh(); }
     else setMelding({ soort: "fout", tekst: res.melding });
   }
@@ -109,17 +122,35 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
         </div>
       )}
 
-      <label className="mt-3 block font-bold text-kop">
-        Locatie
-        <span className="block text-sm font-normal text-zacht">
-          {regel.locatie ? `Programma: ${regel.locatie}. ` : ""}Vul hier de precieze plek in. Projectgroepen kunnen dit niet wijzigen.
-        </span>
-        <input
-          value={locatie} onChange={(e) => setLocatie(e.target.value)} onBlur={() => void bewaarLocatie()}
-          disabled={!bezetter || !naam.trim()} maxLength={120} placeholder={bezetter ? "Bijvoorbeeld: veld naast de camping" : "Wijs eerst een groep toe"}
-          className={`${INVOER} mt-1 min-h-aanraak`}
-        />
-      </label>
+      <label htmlFor={`locatie-${regel.id}`} className="mt-3 block font-bold text-kop">Locatie</label>
+      <p className="text-sm text-zacht">
+        {regel.locatie ? `Programma: ${regel.locatie}. ` : ""}Kies camping, bivak of anders. Projectgroepen kunnen dit niet wijzigen.
+      </p>
+      <select
+        id={`locatie-${regel.id}`} value={locKeuze} disabled={!bezetter || !naam.trim()}
+        onChange={(e) => {
+          const k = e.target.value as LocatieKeuze;
+          setLocKeuze(k);
+          if (k !== "Anders") void bewaarLocatie(k);
+        }}
+        className={`${INVOER} min-h-aanraak`}
+      >
+        <option value="">{bezetter ? "Nog niet gekozen" : "Wijs eerst een groep toe"}</option>
+        <option value="Camping">Camping</option>
+        <option value="Bivak">Bivak</option>
+        <option value="Anders">Anders, namelijk…</option>
+      </select>
+      {locKeuze === "Anders" && (
+        <label className="mt-2 block font-bold text-kop">
+          Naam van de locatie
+          <input
+            id={`locatie-anders-${regel.id}`} value={locAnders} onChange={(e) => setLocAnders(e.target.value)}
+            onBlur={() => { if (locAnders.trim()) void bewaarLocatie(locAnders.trim()); }}
+            disabled={!bezetter || !naam.trim()} maxLength={120} placeholder="Bijvoorbeeld: veld naast de camping"
+            className={`${INVOER} mt-1 min-h-aanraak`}
+          />
+        </label>
+      )}
       <Melding m={melding} />
     </div>
   );

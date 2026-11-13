@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Image from "next/image";
+import Link from "next/link";
 import { Woordmerk } from "@/components/Woordmerk";
 import type { Profiel } from "@/lib/profiel";
 import { themaBeeldUrl } from "@/lib/themaBeeld";
@@ -11,14 +12,16 @@ export function Kopbalk({ profiel }: { profiel: Profiel }) {
   return (
     <header className="print:hidden sticky top-0 z-10 border-b-4 border-thema bg-vlak">
       <div className="mx-auto flex min-h-16 max-w-3xl items-center justify-between gap-3 px-4 py-2">
+        <Link href="/" aria-label="Naar Onze meerdaagse" className="md:hidden">
         <Image
           src="/logo/han-woordmerk-descriptor-400.png"
           alt="HAN University of Applied Sciences"
           width={400}
           height={88}
           priority
-          className="h-6 w-auto md:hidden"
+          className="h-6 w-auto"
         />
+        </Link>
         <div className="flex min-w-0 items-center gap-2 md:ml-auto">
           {logo && <img src={logo} alt="" className="h-9 w-auto max-w-16 shrink-0 object-contain" />}
           <div className="min-w-0 text-right">

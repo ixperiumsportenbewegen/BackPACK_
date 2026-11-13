@@ -1,6 +1,6 @@
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { CalendarDays, FileText, Users } from "lucide-react";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -18,6 +18,24 @@ export default async function Meer() {
         <p className="text-sm font-medium text-zacht">Ingelogd als</p>
         <p className="font-heading text-2xl font-bold text-kop">{profiel.label}</p>
       </section>
+
+      <Link
+        href="/programma"
+        className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"
+      >
+        <CalendarDays aria-hidden className="size-5" strokeWidth={1.75} />
+        Programma van de meerdaagse
+      </Link>
+
+      {profiel.soort === "projectgroep" && (
+        <Link
+          href="/avf"
+          className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"
+        >
+          <FileText aria-hidden className="size-5" strokeWidth={1.75} />
+          Jullie AVF
+        </Link>
+      )}
 
       {profiel.soort === "projectgroep" && (
         <Link

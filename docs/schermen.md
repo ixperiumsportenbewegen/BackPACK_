@@ -15,6 +15,13 @@ Onderste balk met vier knoppen, voor elk account gelijk van vorm:
 
 Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
 
+## Navigatie binnen het AVF
+
+- **Sectiebalk** bovenaan elk AVF-scherm (blijft staan bij scrollen): Overzicht en A t/m H, met de huidige sectie gemarkeerd en een icoon voor compleet of onvolledig. Ook op de onderdeelschermen van sectie D.
+- **Vorige en volgende** onderaan elk AVF-scherm, in de volgorde A, B, C, D (kop, romp, staart), E, F, G, H. Na de laatste sectie staat "Klaar" met een link naar het overzicht. Op een onderdeelscherm bladeren de knoppen door de onderdelen van de fase.
+- Stuurgroep en docent bladeren onderaan een gelezen AVF van belevenis naar belevenis.
+- Het hoofdmenu markeert bij onderliggende schermen de hoofdknop: het AVF hoort bij Belevenissen, het programma bij Onze meerdaagse. Het logo in de kopbalk brengt je naar het startscherm. Elk onderliggend scherm heeft een terugknop bovenaan.
+
 ## Schermen opdracht 1–5
 
 ### Inloggen

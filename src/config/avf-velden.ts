@@ -21,7 +21,7 @@ export type StuurgroepRolCode =
 
 export type Verplicht = "ja" | "voorwaardelijk" | "nee";
 export type Niveau = "avf" | "fase" | "onderdeel";
-export type Veldtype = "tekst" | "lang" | "getal" | "keuze" | "jaNee" | "lijst" | "weer" | "opruimen" | "afbeelding" | "toegewezen" | "later";
+export type Veldtype = "tekst" | "lang" | "getal" | "keuze" | "meerkeuze" | "jaNee" | "lijst" | "weer" | "opruimen" | "afbeelding" | "toegewezen" | "later";
 
 export interface AvfVeld {
   /** Pad in de database, zoals in docs/datamodel.md. */
@@ -55,7 +55,7 @@ export const SECTIES: { code: SectieCode; naam: string; uitleg: string }[] = [
   { code: "H", naam: "Communicatie", uitleg: "Wat deelnemers vooraf, tijdens en na de belevenis horen." },
 ];
 
-export const VERSCHIJNINGSVORMEN = ["Spel", "Wedstrijd", "Tocht", "Workshop", "Anders"];
+export const VERSCHIJNINGSVORMEN = ["Spel", "Wedstrijd", "Avontuur", "Gezondheid", "Recreatie", "Show"];
 
 export const WEER_SCENARIOS = [
   { sleutel: "zeer_warm", label: "Zeer warm", hulp: "Bijvoorbeeld boven 32 °C. Dit is een voorbeeldgrens en geen automatische norm." },
@@ -103,7 +103,7 @@ export const AVF_VELDEN: AvfVeld[] = [
   // A Basisgegevens
   veld({ sleutel: "titel", sectie: "A", label: "Titel van de belevenis", veldtype: "tekst", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K", maxLengte: 80,
     hulp: "Andere groepen zien deze titel." }),
-  veld({ sleutel: "verschijningsvorm", sectie: "A", label: "Verschijningsvorm", veldtype: "keuze", v: "ja", pg: "programma_beleving", sg: "programma_kwaliteit", pack: "A", wezenlijk: true, opties: VERSCHIJNINGSVORMEN, maxLengte: 60 }),
+  veld({ sleutel: "verschijningsvorm", sectie: "A", label: "Verschijningsvorm", hulp: "Kies één of meer vormen die bij jullie belevenis passen.", veldtype: "meerkeuze", v: "ja", pg: "programma_beleving", sg: "programma_kwaliteit", pack: "A", wezenlijk: true, opties: VERSCHIJNINGSVORMEN, maxLengte: 60 }),
   veld({ sleutel: "publieke_samenvatting", sectie: "A", label: "Korte omschrijving voor andere groepen (zonder spoilers)", veldtype: "lang", v: "ja", pg: "programma_beleving", sg: "beleving_thema", pack: "A", maxLengte: 280,
     hulp: "Andere groepen en studenten zien alleen de titel en deze omschrijving. Verklap niet te veel." }),
   veld({ sleutel: "organiserende_studenten", sectie: "A", label: "Organiserende studenten", veldtype: "lang", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K", maxLengte: 300 }),

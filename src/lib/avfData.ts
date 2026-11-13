@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { maakServerClient } from "@/lib/supabase/server";
 import type { AvfInhoud, FaseInhoud, Json, OnderdeelInhoud } from "@/lib/avfVoortgang";
 import { isGevuld } from "@/lib/avfVoortgang";
@@ -105,13 +106,13 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
 }
 
 /** Het AVF van de ingelogde projectgroep. */
-export async function laadEigenAvf(): Promise<AvfGegevens | null> {
+export const laadEigenAvf = cache(async (): Promise<AvfGegevens | null> => {
   const supabase = await maakServerClient();
   const { data: account } = await supabase.from("account").select("projectgroep_id").maybeSingle();
   if (!account?.projectgroep_id) return null;
   const { data: a } = await supabase.from("avf").select("id").eq("projectgroep_id", account.projectgroep_id).maybeSingle();
   return a ? laadAvf(a.id) : null;
-}
+});
 
 export interface PubliekeKaart {
   id: string;

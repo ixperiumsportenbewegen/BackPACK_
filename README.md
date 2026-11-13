@@ -39,3 +39,7 @@ De wachtwoorden staan na `npm run seed` in `seed/wachtwoorden.local.json` (niet 
 - `npm run test:e2e`: inloggen met alle accounts op een telefoonscherm. Eenmalig `npx.cmd playwright install chromium`.
 
 - Tegen de Vercel-site: `BASE_URL=https://back-pack-one.vercel.app npm run test:e2e` (in PowerShell: `$env:BASE_URL="https://back-pack-one.vercel.app"; npm.cmd run test:e2e`).
+
+## Let op bij tests
+
+Supabase remt inloggen af op ca. 30 pogingen per 5 minuten per IP-adres (zie `docs/open-punten.md`, punt 8). Draai `npm test` en `npm run test:e2e` daarom niet vlak achter elkaar; de inlogtest voor alle accounts (`e2e/inloggen.spec.ts`) gebruikt er in één keer 31.

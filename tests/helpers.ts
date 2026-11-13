@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 
 export const URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 export const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -24,19 +24,38 @@ function wachtwoorden(): Record<string, string> {
 }
 
 const cache = new Map<string, SupabaseClient>();
+const CACHE_MAP = ".auth-cache";
+const GELDIG_MS = 30 * 60 * 1000;
 
-/** Ingelogd als het testaccount met deze gebruikersnaam. */
+/**
+ * Ingelogd als het testaccount met deze gebruikersnaam. De sessie wordt ook tussen testbestanden en
+ * testruns hergebruikt (30 minuten), zodat we onder de inloglimiet van Supabase blijven
+ * (ca. 30 pogingen per 5 minuten per IP-adres).
+ */
 export async function inloggenAls(gebruikersnaam: string): Promise<SupabaseClient> {
   const bestaand = cache.get(gebruikersnaam);
   if (bestaand) return bestaand;
+  const client = createClient(URL, ANON, opties);
+  const bestand = `${CACHE_MAP}/vitest-${gebruikersnaam}.json`;
+
+  if (existsSync(bestand) && Date.now() - statSync(bestand).mtimeMs < GELDIG_MS) {
+    const sessie = JSON.parse(readFileSync(bestand, "utf8")) as { access_token: string; refresh_token: string };
+    const { error } = await client.auth.setSession(sessie);
+    if (!error) {
+      cache.set(gebruikersnaam, client);
+      return client;
+    }
+  }
+
   const wachtwoord = wachtwoorden()[gebruikersnaam];
   if (!wachtwoord) throw new Error(`Geen wachtwoord voor ${gebruikersnaam}`);
-  const client = createClient(URL, ANON, opties);
-  const { error } = await client.auth.signInWithPassword({
+  const { data, error } = await client.auth.signInWithPassword({
     email: `${gebruikersnaam}@ardennen.invalid`,
     password: wachtwoord,
   });
-  if (error) throw new Error(`Inloggen als ${gebruikersnaam} mislukt: ${error.message}`);
+  if (error || !data.session) throw new Error(`Inloggen als ${gebruikersnaam} mislukt: ${error?.message}`);
+  mkdirSync(CACHE_MAP, { recursive: true });
+  writeFileSync(bestand, JSON.stringify({ access_token: data.session.access_token, refresh_token: data.session.refresh_token }));
   cache.set(gebruikersnaam, client);
   return client;
 }

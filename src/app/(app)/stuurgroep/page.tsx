@@ -23,7 +23,7 @@ const PACK = [
     letter: "A", naam: "Aansteker", icoon: Flame,
     rollen: [
       { code: "beleving_thema", naam: "Beleving & Thema", href: "/stuurgroep/beleving-thema" },
-      { code: "programma_kwaliteit", naam: "Programma & Kwaliteit" },
+      { code: "programma_kwaliteit", naam: "Programma & Kwaliteit", href: "/stuurgroep/programma" },
     ],
   },
   { letter: "C", naam: "Camera", icoon: Camera, rollen: [{ code: "communicatie_financien", naam: "Communicatie & Financiën" }] },

@@ -2,24 +2,11 @@
  * Rolverdeling (PGR-01), namen per stuurgroeprol en het startscherm (OVZ-01, OVZ-02).
  * Draait tegen het echte Supabase-project en zet de namen daarna terug.
  */
-import { expect, test, type Browser, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { expect, test, type Page } from "@playwright/test";
 import { admin, clusterId } from "../tests/helpers";
+import { nieuweSessie } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
-
-const wachtwoorden: Record<string, string> = JSON.parse(readFileSync("seed/wachtwoorden.local.json", "utf8"));
-
-async function nieuweSessie(browser: Browser, gebruiker: string) {
-  const ctx = await browser.newContext({ viewport: { width: 412, height: 915 } });
-  const page = await ctx.newPage();
-  await page.goto("/login");
-  await page.getByLabel("Gebruikersnaam").fill(gebruiker);
-  await page.getByLabel("Wachtwoord").fill(wachtwoorden[gebruiker]);
-  await page.getByRole("button", { name: "Inloggen" }).click();
-  await expect(page).toHaveURL("/");
-  return { ctx, page };
-}
 
 async function groepId(nummer: number) {
   const VD = await clusterId("VD");
@@ -61,7 +48,7 @@ test("een projectgroep vult de rolverdeling in en ziet die terug na verversen", 
   const catering = await veld(s.page, "Catering");
   await catering.fill("Mila en Daan");
   await catering.blur();
-  await expect(s.page.getByText("Opgeslagen").first()).toBeVisible();
+  await expect(s.page.getByText("Opgeslagen", { exact: true }).first()).toBeVisible();
 
   await s.page.reload();
   await expect(await veld(s.page, "Catering")).toHaveValue("Mila en Daan");
@@ -82,7 +69,7 @@ test("gelijktijdig dezelfde rol wijzigen geeft een waarschuwing", async ({ brows
   const vB = await veld(b.page, "Projectleider");
   await vB.fill("Fleur");
   await vB.blur();
-  await expect(b.page.getByText("Opgeslagen").first()).toBeVisible();
+  await expect(b.page.getByText("Opgeslagen", { exact: true }).first()).toBeVisible();
 
   const vA = await veld(a.page, "Projectleider");
   await vA.fill("Jesse");
@@ -115,7 +102,7 @@ test("de stuurgroep past alleen de namen bij de eigen rol aan", async ({ browser
   const eigen = await veld(s.page, "Programma & Kwaliteit");
   await eigen.fill("Anna en Bram");
   await eigen.blur();
-  await expect(s.page.getByText("Opgeslagen").first()).toBeVisible();
+  await expect(s.page.getByText("Opgeslagen", { exact: true }).first()).toBeVisible();
   await s.page.reload();
   await expect(await veld(s.page, "Programma & Kwaliteit")).toHaveValue("Anna en Bram");
 
@@ -133,18 +120,18 @@ test("de stuurgroep past alleen de namen bij de eigen rol aan", async ({ browser
 
 test("startscherm: zes belevenissenkaarten; stand per rol alleen voor stuurgroep en docent", async ({ browser }) => {
   const groep = await nieuweSessie(browser, "vd-groep-1");
-  await expect(groep.page.getByRole("link", { name: /Projectgroep \d.*Nog geen belevenis/ })).toHaveCount(6);
+  await expect(groep.page.locator("main article")).toHaveCount(6);
   await expect(groep.page.getByRole("heading", { name: "Stand van zaken per rol" })).toHaveCount(0);
   await expect(groep.page.getByRole("link", { name: /Rolverdeling invullen/ })).toBeVisible();
   await groep.ctx.close();
 
   const student = await nieuweSessie(browser, "vd-student");
-  await expect(student.page.getByRole("link", { name: /Projectgroep \d.*Nog geen belevenis/ })).toHaveCount(6);
+  await expect(student.page.locator("main article")).toHaveCount(6);
   await expect(student.page.getByRole("heading", { name: "Stand van zaken per rol" })).toHaveCount(0);
   await student.ctx.close();
 
   const stuur = await nieuweSessie(browser, "vd-stuur-veiligheid");
-  await expect(stuur.page.getByRole("link", { name: /Projectgroep \d.*Nog geen belevenis/ })).toHaveCount(6);
+  await expect(stuur.page.locator("main article")).toHaveCount(6);
   await expect(stuur.page.getByRole("heading", { name: "Stand van zaken per rol" })).toBeVisible();
   await expect(stuur.page.getByText("Nog niets te melden")).toHaveCount(6);
   await stuur.ctx.close();

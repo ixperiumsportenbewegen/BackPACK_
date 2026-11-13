@@ -36,6 +36,7 @@ export interface AvfGegevens {
   tijdvak: Tijdvak | null;
   sectieBijgewerkt: Record<string, { updated_at: string; naam: string }>;
   inhoud: AvfInhoud;
+  rolverdeling: { rol: string; namen: string | null }[];
   fasen: FaseRij[];
   onderdelen: OnderdeelRij[];
 }
@@ -55,7 +56,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
   const [{ data: fasenRaw }, { data: onderdelenRaw }, { data: rollen }, regel] = await Promise.all([
     supabase.from("avf_fase").select("*").eq("avf_id", avfId),
     supabase.from("avf_onderdeel").select("*").eq("avf_id", avfId).order("fase").order("volgorde"),
-    supabase.from("projectgroep_rol").select("namen").eq("projectgroep_id", a.projectgroep_id),
+    supabase.from("projectgroep_rol").select("rol, namen").eq("projectgroep_id", a.projectgroep_id),
     a.programma_regel_id
       ? supabase.from("programma_regel").select("id, dag, starttijd, eindtijd, titel, locatie").eq("id", a.programma_regel_id).maybeSingle()
       : Promise.resolve({ data: null }),
@@ -99,6 +100,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     tijdvak: (regel.data as Tijdvak | null) ?? null,
     sectieBijgewerkt: (a.sectie_bijgewerkt ?? {}) as AvfGegevens["sectieBijgewerkt"],
     inhoud, fasen, onderdelen,
+    rolverdeling: (rollen ?? []) as { rol: string; namen: string | null }[],
   };
 }
 
@@ -109,4 +111,35 @@ export async function laadEigenAvf(): Promise<AvfGegevens | null> {
   if (!account?.projectgroep_id) return null;
   const { data: a } = await supabase.from("avf").select("id").eq("projectgroep_id", account.projectgroep_id).maybeSingle();
   return a ? laadAvf(a.id) : null;
+}
+
+export interface PubliekeKaart {
+  id: string;
+  projectgroepNummer: number;
+  groepNaam: string;
+  titel: string | null;
+  verschijningsvorm: string | null;
+  samenvatting: string | null;
+  tijdvak: { dag: string; starttijd: string; eindtijd: string } | null;
+  status: "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
+}
+
+/** De publieke kaarten van alle belevenissen in een cluster (alleen wat avf_publiek toont). */
+export async function laadKaarten(clusterId: string): Promise<PubliekeKaart[]> {
+  const supabase = await maakServerClient();
+  const { data } = await supabase
+    .from("avf_publiek")
+    .select("id, projectgroep_nummer, projectgroep_naam, titel, verschijningsvorm, publieke_samenvatting, status, dag, starttijd, eindtijd")
+    .eq("cluster_id", clusterId)
+    .order("projectgroep_nummer");
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    projectgroepNummer: r.projectgroep_nummer,
+    groepNaam: r.projectgroep_naam,
+    titel: r.titel,
+    verschijningsvorm: r.verschijningsvorm,
+    samenvatting: r.publieke_samenvatting,
+    tijdvak: r.dag ? { dag: r.dag, starttijd: r.starttijd, eindtijd: r.eindtijd } : null,
+    status: r.status,
+  }));
 }

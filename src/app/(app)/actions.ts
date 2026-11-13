@@ -7,7 +7,8 @@ import { maakServerClient } from "@/lib/supabase/server";
 
 export async function uitloggen() {
   const supabase = await maakServerClient();
-  await supabase.auth.signOut();
+  // Alleen dit apparaat uitloggen: het account wordt gedeeld, dus andere telefoons van de groep blijven ingelogd.
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/login");
 }
 

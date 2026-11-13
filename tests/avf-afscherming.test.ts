@@ -221,46 +221,47 @@ describe("Test 10: de stuurgroep wijzigt geen AVF-inhoud", () => {
 });
 
 describe("Opslaan per veld (jsonb-secties)", () => {
-  const sleutel = (pad: string[]) => ({ p_avf_id: avf[1], p_sectie: "veiligheid", p_pad: pad });
+  // Deze tests gebruiken het lege AVF van vd-groep-3, zodat het voorbeeld-AVF van vd-groep-1 intact blijft.
+  const sleutel = (pad: string[]) => ({ p_avf_id: avf[3], p_sectie: "veiligheid", p_pad: pad });
 
   afterAll(async () => {
-    await admin.from("avf").update({ veiligheid: {}, doelen: {} }).eq("id", avf[1]);
+    await admin.from("avf").update({ veiligheid: {}, doelen: {} }).eq("id", avf[3]);
   });
 
   it("twee velden in dezelfde sectie blijven allebei bewaard", async () => {
-    const a = await inloggenAls("vd-groep-1");
+    const a = await inloggenAls("vd-groep-3");
     const r1 = await a.rpc("avf_veld_opslaan", { ...sleutel(["weer", "onweer", "maatregel"]), p_oud: null, p_nieuw: "Naar binnen" });
     const r2 = await a.rpc("avf_veld_opslaan", { ...sleutel(["weer", "zeer_warm", "maatregel"]), p_oud: null, p_nieuw: "Drinkpauze" });
     expect((r1.data as Resultaat).ok).toBe(true);
     expect((r2.data as Resultaat).ok).toBe(true);
-    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[1]).single();
+    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[3]).single();
     expect(data?.veiligheid).toMatchObject({ weer: { onweer: { maatregel: "Naar binnen" }, zeer_warm: { maatregel: "Drinkpauze" } } });
   });
 
   it("een veld dat intussen is gewijzigd wordt niet overschreven", async () => {
-    const a = await inloggenAls("vd-groep-1");
+    const a = await inloggenAls("vd-groep-3");
     const res = await a.rpc("avf_veld_opslaan", { ...sleutel(["weer", "onweer", "maatregel"]), p_oud: "iets anders", p_nieuw: "Overschreven" });
     const r = res.data as Resultaat;
     expect(r.ok).toBe(false);
     expect(r.reden).toBe("gewijzigd");
     expect(r.huidig).toBe("Naar binnen");
-    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[1]).single();
+    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[3]).single();
     expect(JSON.stringify(data?.veiligheid)).toContain("Naar binnen");
   });
 
   it("lijstitems worden per id bijgewerkt, toegevoegd en verwijderd", async () => {
-    const a = await inloggenAls("vd-groep-1");
-    const t1 = (await a.rpc("avf_lijst_toevoegen", { p_avf_id: avf[1], p_sectie: "veiligheid", p_pad: ["risicos"], p_item: { risico: "Vallen" } })).data as Resultaat;
-    const t2 = (await a.rpc("avf_lijst_toevoegen", { p_avf_id: avf[1], p_sectie: "veiligheid", p_pad: ["risicos"], p_item: { risico: "Verbranden" } })).data as Resultaat;
+    const a = await inloggenAls("vd-groep-3");
+    const t1 = (await a.rpc("avf_lijst_toevoegen", { p_avf_id: avf[3], p_sectie: "veiligheid", p_pad: ["risicos"], p_item: { risico: "Vallen" } })).data as Resultaat;
+    const t2 = (await a.rpc("avf_lijst_toevoegen", { p_avf_id: avf[3], p_sectie: "veiligheid", p_pad: ["risicos"], p_item: { risico: "Verbranden" } })).data as Resultaat;
     expect(t1.ok && t2.ok).toBe(true);
     expect(t1.item?.id).not.toBe(t2.item?.id);
 
     const upd = (await a.rpc("avf_veld_opslaan", { ...sleutel(["risicos", t2.item!.id, "maatregel"]), p_oud: null, p_nieuw: "Blusdeken" })).data as Resultaat;
     expect(upd.ok).toBe(true);
 
-    const del = (await a.rpc("avf_lijst_verwijderen", { p_avf_id: avf[1], p_sectie: "veiligheid", p_pad: ["risicos"], p_item_id: t1.item!.id })).data as Resultaat;
+    const del = (await a.rpc("avf_lijst_verwijderen", { p_avf_id: avf[3], p_sectie: "veiligheid", p_pad: ["risicos"], p_item_id: t1.item!.id })).data as Resultaat;
     expect(del.ok).toBe(true);
-    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[1]).single();
+    const { data } = await admin.from("avf").select("veiligheid").eq("id", avf[3]).single();
     const risicos = (data?.veiligheid as { risicos: { id: string; risico: string; maatregel?: string }[] }).risicos;
     expect(risicos).toHaveLength(1);
     expect(risicos[0]).toMatchObject({ risico: "Verbranden", maatregel: "Blusdeken" });
@@ -272,14 +273,16 @@ describe("Opslaan per veld (jsonb-secties)", () => {
   });
 
   it("een onbekende sectie wordt geweigerd", async () => {
-    const res = await (await inloggenAls("vd-groep-1")).rpc("avf_veld_opslaan", { p_avf_id: avf[1], p_sectie: "status", p_pad: [], p_oud: null, p_nieuw: "goedgekeurd" });
+    const res = await (await inloggenAls("vd-groep-3")).rpc("avf_veld_opslaan", { p_avf_id: avf[3], p_sectie: "status", p_pad: [], p_oud: null, p_nieuw: "goedgekeurd" });
     expect(res.error).not.toBeNull();
   });
 });
 
 describe("Onderdelen", () => {
+  const aangemaakt: string[] = [];
   afterAll(async () => {
-    await admin.from("avf_onderdeel").delete().eq("avf_id", avf[1]);
+    // alleen wat deze test zelf heeft aangemaakt; het voorbeeld-AVF blijft staan
+    if (aangemaakt.length) await admin.from("avf_onderdeel").delete().in("id", aangemaakt);
   });
 
   it("toevoegen aan het einde, verschuiven en verwijderen", async () => {
@@ -287,13 +290,15 @@ describe("Onderdelen", () => {
     const o1 = await a.rpc("avf_onderdeel_toevoegen", { p_avf_id: avf[1], p_fase: "romp" });
     const o2 = await a.rpc("avf_onderdeel_toevoegen", { p_avf_id: avf[1], p_fase: "romp" });
     expect(o1.error).toBeNull();
-    expect(o1.data.volgorde).toBe(1);
-    expect(o2.data.volgorde).toBe(2);
+    aangemaakt.push(o1.data.id, o2.data.id);
+    // nieuwe onderdelen komen achter de bestaande onderdelen van de romp
+    expect(o2.data.volgorde).toBe(o1.data.volgorde + 1);
 
     const omhoog = await a.rpc("avf_onderdeel_verplaatsen", { p_onderdeel_id: o2.data.id, p_richting: -1 });
     expect(omhoog.data).toBe(true);
     const { data } = await a.from("avf_onderdeel").select("id, volgorde").eq("avf_id", avf[1]).eq("fase", "romp").order("volgorde");
-    expect(data?.map((r) => r.id)).toEqual([o2.data.id, o1.data.id]);
+    const ids = data?.map((r) => r.id) ?? [];
+    expect(ids.indexOf(o2.data.id)).toBe(ids.indexOf(o1.data.id) - 1);
 
     const del = await a.from("avf_onderdeel").delete().eq("id", o1.data.id).select();
     expect(del.data).toHaveLength(1);
@@ -561,5 +566,45 @@ describe("Storage avf", () => {
     const { error } = await (await inloggenAls("vd-groep-1")).storage.from("avf").remove([pad]);
     expect(error).toBeNull();
     expect((await admin.storage.from("avf").download(pad)).error).not.toBeNull();
+  });
+});
+
+describe("Opruimen en niet van toepassing", () => {
+  it("één W-veld van opruimen opslaan zonder de andere te overschrijven, met controle op eigenaar", async () => {
+    const a = await inloggenAls("vd-groep-1");
+    const { data: voor } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avf[1]).eq("fase", "romp").single();
+    const oudWie = (voor!.opruimen as Record<string, string>).wie;
+    const rpc = (client: typeof a, oud: string | null, nieuw: string, id = avf[1], sleutel = "wie") =>
+      client.rpc("avf_fase_opruimen_opslaan", { p_avf_id: id, p_fase: "romp", p_sleutel: sleutel, p_oud: oud, p_nieuw: nieuw });
+
+    expect(((await rpc(a, oudWie, "Test-wie")).data as Resultaat).ok).toBe(true);
+    const verouderd = (await rpc(a, oudWie, "Overschreven")).data as Resultaat;
+    expect(verouderd.ok).toBe(false);
+    expect(verouderd.reden).toBe("gewijzigd");
+    const { data: na } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avf[1]).eq("fase", "romp").single();
+    expect(na!.opruimen).toMatchObject({ wie: "Test-wie", wat: (voor!.opruimen as Record<string, string>).wat });
+
+    expect(((await rpc(await inloggenAls("vd-groep-2"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
+    expect(((await rpc(await inloggenAls("vd-stuur-programma"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
+    expect((await rpc(a, null, "x", avf[1], "onbekend")).error).not.toBeNull();
+    await admin.from("avf_fase").update({ opruimen: voor!.opruimen }).eq("avf_id", avf[1]).eq("fase", "romp");
+  });
+
+  it("een veld als niet van toepassing markeren en weer vrijgeven; de fysieke veiligheid kan dat niet", async () => {
+    const a = await inloggenAls("vd-groep-1");
+    const { data: o } = await admin.from("avf_onderdeel").select("id").eq("avf_id", avf[1]).eq("fase", "romp").limit(1).single();
+    const zet = (client: typeof a, veld: string, aan: boolean) => client.rpc("avf_onderdeel_nvt_zetten", { p_onderdeel_id: o!.id, p_veld: veld, p_aan: aan });
+
+    expect((await zet(a, "usv_uitdagend", true)).data).toBe(true);
+    expect((await zet(a, "usv_uitdagend", true)).data).toBe(true); // twee keer is niet dubbel
+    const { data: aan } = await admin.from("avf_onderdeel").select("niet_van_toepassing").eq("id", o!.id).single();
+    expect(aan!.niet_van_toepassing).toEqual(["usv_uitdagend"]);
+    expect((await zet(a, "usv_uitdagend", false)).data).toBe(true);
+    const { data: uit } = await admin.from("avf_onderdeel").select("niet_van_toepassing").eq("id", o!.id).single();
+    expect(uit!.niet_van_toepassing).toEqual([]);
+
+    expect((await zet(a, "fysieke_veiligheid", true)).error).not.toBeNull();
+    expect((await zet(await inloggenAls("vd-groep-2"), "usv_uitdagend", true)).data).toBe(false);
+    expect((await zet(await inloggenAls("vd-stuur-programma"), "usv_uitdagend", true)).data).toBe(false);
   });
 });

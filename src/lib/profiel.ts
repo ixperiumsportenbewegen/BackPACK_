@@ -11,6 +11,8 @@ export interface Profiel {
   cluster: { id: string; code: string; naam: string; teams_link: string | null } | null;
   alleClusters: { code: string; naam: string }[]; // alleen gevuld bij de docent
   stuurgroeprol: { code: string; naam: string; pack: string } | null;
+  /** Alleen bij een projectgroepaccount. */
+  projectgroep: { id: string; nummer: number; naam: string } | null;
   thema: {
     naam: string | null; verhaal: string | null; slogan: string | null; accentkleur: string | null;
     sfeerbeeld_pad: string | null; logo_pad: string | null; bijgewerkt_door_naam: string | null;
@@ -27,7 +29,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
     .from("account")
     .select(`gebruikersnaam, soort,
       cluster:cluster_id (id, code, naam, teams_link),
-      projectgroep:projectgroep_id (naam),
+      projectgroep:projectgroep_id (id, nummer, naam),
       stuurgroeprol:stuurgroeprol_id (code, naam, pack)`)
     .eq("id", user.id)
     .single();
@@ -36,7 +38,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
   const soort = a.soort as Accountsoort;
   const eigenCluster = a.cluster as unknown as Profiel["cluster"];
   const rol = a.stuurgroeprol as unknown as Profiel["stuurgroeprol"];
-  const groep = a.projectgroep as unknown as { naam: string } | null;
+  const groep = a.projectgroep as unknown as { id: string; nummer: number; naam: string } | null;
 
   let cluster = eigenCluster;
   let alleClusters: Profiel["alleClusters"] = [];
@@ -65,6 +67,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
     cluster,
     alleClusters,
     stuurgroeprol: rol,
+    projectgroep: groep,
     thema,
   };
 });

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Clock, MapPin } from "lucide-react";
+import { ChevronRight, Clock, FileText, MapPin } from "lucide-react";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
 import { PaginaKop } from "@/components/PaginaKop";
@@ -49,6 +49,10 @@ export default async function AvfOverzicht() {
         </div>
         {avf.status === "ingediend" && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd.</p>}
       </section>
+
+      <Link href={`/belevenissen/${avf.id}`} className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+        <FileText aria-hidden className="size-5" /> Het hele AVF lezen of afdrukken
+      </Link>
 
       <ul className="flex flex-col gap-2">
         {SECTIES.map((s) => {

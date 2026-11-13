@@ -9,7 +9,7 @@ export function Kopbalk({ profiel }: { profiel: Profiel }) {
   const themaNaam = profiel.thema?.naam;
   const logo = themaBeeldUrl(profiel.thema?.logo_pad);
   return (
-    <header className="sticky top-0 z-10 border-b-4 border-thema bg-vlak">
+    <header className="print:hidden sticky top-0 z-10 border-b-4 border-thema bg-vlak">
       <div className="mx-auto flex min-h-16 max-w-3xl items-center justify-between gap-3 px-4 py-2">
         <Image
           src="/logo/han-woordmerk-descriptor-400.png"

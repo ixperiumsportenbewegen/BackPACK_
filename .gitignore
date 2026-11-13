@@ -48,3 +48,5 @@ test-results/
 playwright-report/
 !.env.example
 .claude/
+
+.auth-cache/

@@ -1,7 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { ChevronRight, CircleDashed } from "lucide-react";
+import { CalendarDays, ChevronRight } from "lucide-react";
+import { BelevenisKaart } from "@/components/BelevenisKaart";
+import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
+import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
@@ -19,8 +22,8 @@ export default async function OnzeMeerdaagse() {
   const heeftThema = Boolean(thema?.naam);
   const dagen = dagenTot(STARTDATUM);
   const supabase = await maakServerClient();
-  const { data: groepen } = await supabase
-    .from("projectgroep").select("id, nummer, naam").eq("cluster_id", profiel.cluster?.id ?? "").order("nummer");
+  const kaarten = profiel.cluster ? await laadKaarten(profiel.cluster.id) : [];
+  const eigenAvf = profiel.soort === "projectgroep" ? await laadEigenAvf() : null;
   const toonStand = profiel.soort === "stuurgroep" || profiel.soort === "docent";
   const { data: rollen } = toonStand
     ? await supabase.from("stuurgroeprol").select("code, naam").eq("cluster_id", profiel.cluster?.id ?? "")
@@ -87,6 +90,8 @@ export default async function OnzeMeerdaagse() {
         </p>
       </section>
 
+      {eigenAvf && <JullieAvfBlok avf={eigenAvf} />}
+
       <section aria-labelledby="belevenissen-kop" className="flex flex-col gap-3">
         <div className="flex items-end justify-between">
           <h2 id="belevenissen-kop" className="text-xl">Belevenissen</h2>
@@ -94,28 +99,16 @@ export default async function OnzeMeerdaagse() {
             Alles bekijken
           </Link>
         </div>
-        <p className="text-zacht">
-          Jullie BackPACK_ is nog leeg. Zodra de projectgroepen hun belevenis invullen, verschijnt die hier.
-        </p>
         <ul className="grid gap-3 sm:grid-cols-2">
-          {(groepen ?? []).map((g) => (
-            <li key={g.id}>
-              <Link
-                href="/belevenissen"
-                className="flex min-h-aanraak items-center gap-3 rounded-han border border-rand bg-vlak p-4"
-              >
-                <span className="flex-1">
-                  <span className="block font-bold text-kop">{g.naam}</span>
-                  <span className="block text-sm text-zacht">Nog geen belevenis ingevuld</span>
-                  <span className="mt-1 inline-flex items-center gap-1 rounded-han bg-rand px-2 py-0.5 text-xs font-bold text-kop">
-                    <CircleDashed aria-hidden className="size-3.5" /> In ontwikkeling
-                  </span>
-                </span>
-                <ChevronRight aria-hidden className="size-5 text-kop" />
-              </Link>
+          {kaarten.map((k) => (
+            <li key={k.id}>
+              <BelevenisKaart k={k} />
             </li>
           ))}
         </ul>
+        <Link href="/programma" className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+          <CalendarDays aria-hidden className="size-5" /> Bekijk het programma
+        </Link>
       </section>
 
       {profiel.soort === "projectgroep" && (

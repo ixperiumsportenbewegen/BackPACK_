@@ -30,7 +30,7 @@ export function BottomNav({ soort }: { soort: Accountsoort }) {
   return (
     <nav
       aria-label="Hoofdmenu"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-rand bg-vlak pb-[env(safe-area-inset-bottom)] md:inset-y-0 md:right-auto md:w-60 md:border-r md:border-t-0 md:pt-24"
+      className="print:hidden fixed inset-x-0 bottom-0 z-20 border-t border-rand bg-vlak pb-[env(safe-area-inset-bottom)] md:inset-y-0 md:right-auto md:w-60 md:border-r md:border-t-0 md:pt-24"
     >
       <ul className="grid auto-cols-fr grid-flow-col md:flex md:flex-col md:gap-1 md:p-3">
         {items.map(({ href, label, icoon: Icoon }) => {

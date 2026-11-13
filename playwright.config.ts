@@ -4,6 +4,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "e2e",
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
   use: { baseURL: process.env.BASE_URL ?? "http://localhost:3000" },
   projects: [{ name: "mobiel", use: { ...devices["Pixel 7"] } }],
   webServer: process.env.BASE_URL

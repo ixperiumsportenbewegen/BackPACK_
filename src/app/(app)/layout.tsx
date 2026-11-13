@@ -21,12 +21,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div style={themaStijl} className="min-h-dvh">
       <BottomNav soort={profiel.soort} />
-      <div className="md:pl-60">
+      <div className="md:pl-60 print:pl-0">
         <Kopbalk profiel={profiel} />
-        <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4 md:pb-10">{children}</main>
+        <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4 md:pb-10 print:max-w-none print:p-0">{children}</main>
       </div>
       {/* Het HAN-logo staat op de laptop linksboven in de zijbalk */}
-      <div className="fixed left-0 top-0 z-30 hidden h-24 w-60 items-start bg-vlak p-4 md:flex">
+      <div className="fixed left-0 top-0 z-30 hidden h-24 w-60 items-start bg-vlak p-4 md:flex print:hidden">
         <Image
           src="/logo/han-woordmerk-descriptor-400.png"
           alt="HAN University of Applied Sciences"

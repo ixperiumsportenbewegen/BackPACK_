@@ -32,6 +32,7 @@ const wachtwoordPad = path.join("seed", "wachtwoorden.local.json");
 const basis = JSON.parse(readFileSync(basisPad, "utf8"));
 const programma = JSON.parse(readFileSync(path.join("seed", "programma.json"), "utf8"));
 const voorbeeld = JSON.parse(readFileSync(path.join("seed", "avf-voorbeeld.json"), "utf8"));
+const materialenSeed = JSON.parse(readFileSync(path.join("seed", "materialen.json"), "utf8"));
 
 const wachtwoorden: Record<string, string> = existsSync(wachtwoordPad)
   ? JSON.parse(readFileSync(wachtwoordPad, "utf8"))
@@ -136,13 +137,14 @@ async function main() {
     oorspronkelijke_starttijd: null, oorspronkelijke_eindtijd: null,
   });
 
-  // Basislijst met materialen (één lijst voor beide clusters). Bestaande materialen blijven zoals ze zijn.
+  // Startlijst met materialen (één lijst voor beide clusters), zonder voorraad: Logistiek & Facilitair schat die zelf in.
+  // Bestaande materialen blijven zoals ze zijn.
   {
     const { data: bestaand } = await admin.from("materiaal").select("naam");
     const namen = new Set((bestaand ?? []).map((m) => m.naam.trim().toLowerCase()));
-    const nieuw = (basis.materialen as { naam: string; categorie: string; voorraad_camping: number; voorraad_bivak: number }[])
+    const nieuw = (materialenSeed.materialen as { naam: string; categorie: string; opmerking?: string }[])
       .filter((m) => !namen.has(m.naam.trim().toLowerCase()))
-      .map((m) => ({ ...m, bijgewerkt_door_naam: "Seed" }));
+      .map((m) => ({ naam: m.naam, categorie: m.categorie, opmerking: m.opmerking ?? null, voorraad_camping: null, voorraad_bivak: null, bijgewerkt_door_naam: "Seed" }));
     if (nieuw.length) check(await admin.from("materiaal").insert(nieuw).select(), "materialen");
     console.log(`Materialen: ${nieuw.length} toegevoegd, ${namen.size} bestonden al.`);
   }

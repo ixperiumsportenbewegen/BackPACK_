@@ -5,14 +5,23 @@ export type Locatie = "camping" | "bivak";
 export interface Materiaal {
   id: string;
   naam: string;
-  categorie: string | null;
-  voorraadCamping: number;
-  voorraadBivak: number;
+  categorie: string;
+  /** leeg (null) = nog niet ingeschat door Logistiek & Facilitair */
+  voorraadCamping: number | null;
+  voorraadBivak: number | null;
   opmerking: string | null;
   actief: boolean;
   toegevoegdDoorCluster: string | null;
   bijgewerktDoorNaam: string | null;
   updatedAt: string;
+}
+
+export interface Categorie {
+  id: string;
+  naam: string;
+  volgorde: number;
+  /** aantal materialen in deze categorie (voor het beheer) */
+  aantal: number;
 }
 
 export interface LijstStatus {
@@ -59,6 +68,11 @@ export function vraagVan(regels: AvfMateriaal[]): number {
 /** Aantal dat tekortkomt: wat deze belevenis en andere tegelijk nodig hebben, min wat er ligt. */
 export function tekort(eigen: number, b: Beschikbaarheid): number {
   return Math.max(0, eigen + b.anderen - b.voorraad);
+}
+
+/** Is de voorraad van dit materiaal volledig ingeschat (camping en bivak)? */
+export function isIngeschat(m: { voorraadCamping: number | null; voorraadBivak: number | null }): boolean {
+  return m.voorraadCamping !== null && m.voorraadBivak !== null;
 }
 
 export function locatieNaam(l: string | null): string {

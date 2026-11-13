@@ -12,7 +12,8 @@ type R = { ok: boolean; reden?: string };
 const NAAM = "Testpersoon";
 let VD: string, VC: string, TEST: string;
 let avfVd1: string, avfVd2: string, avfVd3: string, avfVc1: string, avfTest1: string;
-let touw: string; // id van "Touw (10 m)": camping 6, bivak 4
+let touw: string; // eigen testmateriaal "TestMat Touw": camping 6, bivak 4
+let ingevuldeLeeg: { id: string; voorraad_camping: number | null; voorraad_bivak: number | null }[] = [];
 let beginStatus: Record<string, unknown>;
 const origineel: Record<string, { locatie_keuze: string | null; status: string; opnieuw_te_controleren: boolean }> = {};
 const aangemaakteRegels: string[] = [];
@@ -30,16 +31,32 @@ async function regel(avf: string, materiaal: string, aantal: number, fase: strin
   return data.id as string;
 }
 
+/** Materialen zonder voorraad (nog niet ingeschat) tijdelijk op 0 zetten, zodat de lijst definitief kan worden. */
+async function vulLeegAan() {
+  const { data } = await admin.from("materiaal").select("id, voorraad_camping, voorraad_bivak").or("voorraad_camping.is.null,voorraad_bivak.is.null");
+  ingevuldeLeeg = (data ?? []).filter((m) => !aangemaakteMaterialen.includes(m.id));
+  for (const m of ingevuldeLeeg) {
+    await admin.from("materiaal").update({ voorraad_camping: m.voorraad_camping ?? 0, voorraad_bivak: m.voorraad_bivak ?? 0 }).eq("id", m.id);
+  }
+}
+
+async function herstelLeeg() {
+  for (const m of ingevuldeLeeg) {
+    await admin.from("materiaal").update({ voorraad_camping: m.voorraad_camping, voorraad_bivak: m.voorraad_bivak }).eq("id", m.id);
+  }
+  ingevuldeLeeg = [];
+}
+
 async function opschonen() {
   if (aangemaakteRegels.length) await admin.from("avf_materiaal").delete().in("id", aangemaakteRegels);
   await admin.from("avf_materiaal").delete().in("avf_id", [avfTest1]).is("materiaal_id", null);
   if (aangemaakteMaterialen.length) await admin.from("materiaal").delete().in("id", aangemaakteMaterialen);
   await admin.from("materiaal").delete().ilike("naam", "TestMat%");
+  await admin.from("materiaal_categorie").delete().ilike("naam", "TestCat%");
   for (const [id, o] of Object.entries(origineel)) {
     await admin.from("avf").update({ locatie_keuze: o.locatie_keuze, status: o.status, opnieuw_te_controleren: o.opnieuw_te_controleren }).eq("id", id);
   }
   await admin.from("verbeterverzoek").delete().eq("avf_id", avfTest1);
-  await admin.from("materiaal").update({ actief: true }).eq("id", touw);
   await admin.from("wijziging").delete().eq("naam", NAAM).in("tabel", ["materiaal", "materiaallijst_status"]);
   await admin.from("wijziging").delete().eq("naam", NAAM).eq("record_id", avfTest1);
   if (beginStatus) {
@@ -59,21 +76,26 @@ beforeAll(async () => {
     const { data } = await admin.from("avf").select("locatie_keuze, status, opnieuw_te_controleren").eq("id", id).single();
     origineel[id] = data!;
   }
-  const { data: m } = await admin.from("materiaal").select("id").eq("naam", "Touw (10 m)").single();
-  touw = m!.id;
   const { data: s } = await admin.from("materiaallijst_status").select("*").eq("id", true).single();
   beginStatus = s!;
   await opschonen();
+  const { data: m } = await admin.from("materiaal").insert({ naam: "TestMat Touw", categorie: "Touwen en stokken", voorraad_camping: 6, voorraad_bivak: 4, bijgewerkt_door_naam: NAAM }).select("id").single();
+  touw = m!.id;
+  aangemaakteMaterialen.push(touw);
+  await vulLeegAan();
   await admin.from("materiaallijst_status").update({ status: "concept" }).eq("id", true);
 });
 
-afterAll(opschonen);
+afterAll(async () => {
+  await opschonen(); // zet eerst de status terug op concept (anders mag de voorraad niet meer leeg)
+  await herstelLeeg();
+});
 
 describe("De lijst is concept: alleen de bouwers zien hem", () => {
   it("Logistiek & Facilitair van VD en de docent lezen de lijst; anderen niet", async () => {
     for (const g of ["vd-stuur-logistiek", "docent"]) {
       const { data } = await (await inloggenAls(g)).from("materiaal").select("id");
-      expect((data ?? []).length, g).toBeGreaterThanOrEqual(13);
+      expect((data ?? []).length, g).toBeGreaterThanOrEqual(40);
     }
     for (const g of ["vd-groep-1", "vc-stuur-logistiek", "vd-stuur-programma", "vd-student", "test-groep-1", "vc-groep-1"]) {
       const { data } = await (await inloggenAls(g)).from("materiaal").select("id");
@@ -92,7 +114,7 @@ describe("De lijst is concept: alleen de bouwers zien hem", () => {
 describe("Test 8: alleen Logistiek & Facilitair en de docent wijzigen de lijst", () => {
   it("vd-stuur-logistiek en de docent voegen toe en wijzigen; anderen kunnen dat niet", async () => {
     const logistiek = await inloggenAls("vd-stuur-logistiek");
-    const ins = await logistiek.from("materiaal").insert({ naam: "TestMat A", categorie: "Test", voorraad_camping: 5, voorraad_bivak: 2, bijgewerkt_door_naam: NAAM }).select("id, toegevoegd_door_cluster").single();
+    const ins = await logistiek.from("materiaal").insert({ naam: "TestMat A", categorie: "Overig", voorraad_camping: 5, voorraad_bivak: 2, bijgewerkt_door_naam: NAAM }).select("id, toegevoegd_door_cluster").single();
     expect(ins.error).toBeNull();
     aangemaakteMaterialen.push(ins.data!.id);
     expect(ins.data!.toegevoegd_door_cluster).toBe(VD);
@@ -140,6 +162,15 @@ describe("Definitief maken", () => {
     expect((await anoniem().rpc("materiaallijst_definitief_maken", { p_naam: NAAM })).error).not.toBeNull();
     const logistiek = await inloggenAls("vd-stuur-logistiek");
     expect(((await logistiek.rpc("materiaallijst_definitief_maken", { p_naam: " " })).data as R).reden).toBe("naam");
+    // zolang een voorraad niet is ingeschat, kan de lijst niet definitief
+    await admin.from("materiaal").update({ voorraad_bivak: null }).eq("id", touw);
+    const onvolledig = (await logistiek.rpc("materiaallijst_definitief_maken", { p_naam: NAAM })).data as R & { aantal: number };
+    expect(onvolledig.reden).toBe("onvolledig");
+    expect(onvolledig.aantal).toBeGreaterThanOrEqual(1);
+    await admin.from("materiaal").update({ voorraad_bivak: 4 }).eq("id", touw);
+    // de testmaterialen die nog geen voorraad hebben (TestMat B) krijgen er een, zodat de lijst compleet is
+    await admin.from("materiaal").update({ voorraad_camping: 0 }).ilike("naam", "TestMat%").is("voorraad_camping", null);
+    await admin.from("materiaal").update({ voorraad_bivak: 0 }).ilike("naam", "TestMat%").is("voorraad_bivak", null);
     const { data: nog } = await admin.from("materiaallijst_status").select("status").eq("id", true).single();
     expect(nog?.status).toBe("concept");
 
@@ -147,6 +178,17 @@ describe("Definitief maken", () => {
     expect(((await logistiek.rpc("materiaallijst_definitief_maken", { p_naam: NAAM })).data as R).reden).toBe("al_definitief");
     const { data } = await admin.from("materiaallijst_status").select("status, definitief_door_naam, definitief_door_cluster").eq("id", true).single();
     expect(data).toEqual({ status: "definitief", definitief_door_naam: NAAM, definitief_door_cluster: VD });
+  });
+
+  it("na definitief maken moet de voorraad van elk materiaal ingevuld blijven", async () => {
+    const logistiek = await inloggenAls("vd-stuur-logistiek");
+    const leeg = await logistiek.from("materiaal").insert({ naam: "TestMat zonder voorraad", categorie: "Overig" });
+    expect(leeg.error).not.toBeNull();
+    const wis = await logistiek.from("materiaal").update({ voorraad_camping: null }).eq("id", aangemaakteMaterialen[0]).select();
+    expect(wis.error).not.toBeNull();
+    // een onbekende categorie bestaat niet
+    const fout = await logistiek.from("materiaal").insert({ naam: "TestMat categorie", categorie: "Bestaat niet", voorraad_camping: 1, voorraad_bivak: 1 });
+    expect(fout.error).not.toBeNull();
   });
 
   it("de status kan niet rechtstreeks worden gewijzigd; terugzetten kan alleen de docent", async () => {
@@ -163,7 +205,7 @@ describe("Definitief maken", () => {
   it("daarna lezen stuurgroepen en projectgroepen van alle clusters de lijst; studenten en anonieme bezoekers niet", async () => {
     for (const g of ["vd-groep-1", "vd-groep-2", "vc-groep-1", "vc-stuur-programma", "vd-stuur-programma", "test-groep-1", "vc-stuur-logistiek"]) {
       const { data } = await (await inloggenAls(g)).from("materiaal").select("id");
-      expect((data ?? []).length, g).toBeGreaterThanOrEqual(13);
+      expect((data ?? []).length, g).toBeGreaterThanOrEqual(40);
     }
     for (const g of ["vd-student", "vc-student", "test-student"]) {
       expect(((await (await inloggenAls(g)).from("materiaal").select("id")).data ?? []).length, g).toBe(0);
@@ -175,7 +217,7 @@ describe("Definitief maken", () => {
 describe("VC mag alleen materialen toevoegen", () => {
   it("vc-stuur-logistiek voegt toe, maar wijzigt niets en zet niets op inactief", async () => {
     const vc = await inloggenAls("vc-stuur-logistiek");
-    const ins = await vc.from("materiaal").insert({ naam: "TestMat VC", voorraad_camping: 3, bijgewerkt_door_naam: NAAM }).select("id, toegevoegd_door_cluster").single();
+    const ins = await vc.from("materiaal").insert({ naam: "TestMat VC", voorraad_camping: 3, voorraad_bivak: 0, bijgewerkt_door_naam: NAAM }).select("id, toegevoegd_door_cluster").single();
     expect(ins.error).toBeNull();
     aangemaakteMaterialen.push(ins.data!.id);
     expect(ins.data!.toegevoegd_door_cluster).toBe(VC);
@@ -224,7 +266,7 @@ describe("Materialen in het AVF", () => {
     expect(zonder.error?.message).toContain("locatie");
 
     await admin.from("avf").update({ locatie_keuze: "bivak" }).eq("id", avfVd3);
-    const { data: m } = await admin.from("materiaal").insert({ naam: "TestMat inactief", actief: false }).select("id").single();
+    const { data: m } = await admin.from("materiaal").insert({ naam: "TestMat inactief", actief: false, voorraad_camping: 1, voorraad_bivak: 1 }).select("id").single();
     aangemaakteMaterialen.push(m!.id);
     expect((await g3.from("avf_materiaal").insert({ avf_id: avfVd3, materiaal_id: m!.id, aantal: 1 })).error).not.toBeNull();
   });
@@ -393,5 +435,50 @@ describe("Gevolgen voor beoordeling", () => {
     expect(res.data).toContain("Locatie: camping of bivak");
     await admin.from("avf").update({ locatie_keuze: "camping" }).eq("id", avfTest1);
     expect((await admin.rpc("avf_ontbrekend", { p_avf_id: avfTest1 })).data).toEqual([]);
+  });
+});
+
+describe("De vaste categorielijst", () => {
+  it("de startlijst met negen categorieën plus Overig staat erin; groepen lezen hem zodra de lijst definitief is", async () => {
+    const { data } = await admin.from("materiaal_categorie").select("naam").order("volgorde");
+    expect(data?.map((c) => c.naam)).toEqual(expect.arrayContaining([
+      "Afbakening en markering", "Teamherkenning", "Ballen", "Sport- en spelmateriaal", "Touwen en stokken", "Archery tag",
+      "Veiligheid en communicatie", "Organisatie en schrijfmateriaal", "Opslag", "Overig",
+    ]));
+    for (const g of ["vd-groep-1", "vc-groep-1", "vc-stuur-logistiek"]) {
+      expect(((await (await inloggenAls(g)).from("materiaal_categorie").select("id")).data ?? []).length, g).toBeGreaterThanOrEqual(10);
+    }
+    for (const g of ["vd-student"]) expect(((await (await inloggenAls(g)).from("materiaal_categorie").select("id")).data ?? []), g).toHaveLength(0);
+    expect((await anoniem().from("materiaal_categorie").select("id")).data ?? []).toHaveLength(0);
+  });
+
+  it("Logistiek & Facilitair van VD en de docent beheren de lijst; VC en anderen niet", async () => {
+    const logistiek = await inloggenAls("vd-stuur-logistiek");
+    const nieuw = await logistiek.from("materiaal_categorie").insert({ naam: "TestCat A", volgorde: 999 }).select("id").single();
+    expect(nieuw.error).toBeNull();
+    const hernoemd = await logistiek.from("materiaal_categorie").update({ naam: "TestCat B" }).eq("id", nieuw.data!.id).select("naam");
+    expect(hernoemd.data?.[0]?.naam).toBe("TestCat B");
+
+    // een categorie in gebruik hernoemen werkt door bij de materialen; verwijderen kan dan niet
+    const { data: m } = await admin.from("materiaal").insert({ naam: "TestMat categorie", categorie: "TestCat B", voorraad_camping: 1, voorraad_bivak: 1 }).select("id").single();
+    aangemaakteMaterialen.push(m!.id);
+    await logistiek.from("materiaal_categorie").update({ naam: "TestCat C" }).eq("id", nieuw.data!.id);
+    expect(((await admin.from("materiaal").select("categorie").eq("id", m!.id).single()).data)?.categorie).toBe("TestCat C");
+    const verwijderMetInhoud = await logistiek.from("materiaal_categorie").delete().eq("id", nieuw.data!.id).select();
+    expect(verwijderMetInhoud.error).not.toBeNull();
+    await admin.from("materiaal").delete().eq("id", m!.id);
+    expect(((await logistiek.from("materiaal_categorie").delete().eq("id", nieuw.data!.id).select()).data ?? [])).toHaveLength(1);
+
+    for (const g of ["vc-stuur-logistiek", "vd-stuur-programma", "vd-groep-1", "vd-student", "test-stuur"]) {
+      const c = await inloggenAls(g);
+      expect((await c.from("materiaal_categorie").insert({ naam: `TestCat ${g}` })).error, `${g} insert`).not.toBeNull();
+      const u = await c.from("materiaal_categorie").update({ naam: "TestCat gehackt" }).eq("naam", "Overig").select();
+      expect(u.error !== null || (u.data ?? []).length === 0, `${g} update`).toBe(true);
+      const d = await c.from("materiaal_categorie").delete().eq("naam", "Overig").select();
+      expect(d.error !== null || (d.data ?? []).length === 0, `${g} delete`).toBe(true);
+    }
+    expect((await (await inloggenAls("docent")).from("materiaal_categorie").insert({ naam: "TestCat docent" })).error).toBeNull();
+    const { data: overig } = await admin.from("materiaal_categorie").select("naam").eq("naam", "Overig");
+    expect(overig).toHaveLength(1);
   });
 });

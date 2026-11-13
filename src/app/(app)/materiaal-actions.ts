@@ -102,17 +102,19 @@ async function stuurgroepOfDocent() {
 export interface MateriaalVelden {
   naam: string;
   categorie: string;
-  voorraadCamping: number;
-  voorraadBivak: number;
+  /** leeg = nog niet ingeschat */
+  voorraadCamping: number | null;
+  voorraadBivak: number | null;
   opmerking: string;
 }
 
 function checkVelden(v: MateriaalVelden): string | null {
   if (!v.naam.trim() || v.naam.trim().length > 100) return "Geef het materiaal een naam (maximaal 100 tekens).";
   for (const n of [v.voorraadCamping, v.voorraadBivak]) {
-    if (!Number.isInteger(n) || n < 0 || n > 99999) return "De voorraad moet een getal van 0 of meer zijn.";
+    if (n !== null && (!Number.isInteger(n) || n < 0 || n > 99999)) return "De voorraad moet een getal van 0 of meer zijn.";
   }
-  if (v.categorie.length > 60 || v.opmerking.length > 300) return "Categorie of opmerking is te lang.";
+  if (!v.categorie.trim()) return "Kies een categorie.";
+  if (v.opmerking.length > 300) return "De opmerking is te lang.";
   return null;
 }
 
@@ -123,10 +125,12 @@ export async function materiaalToevoegen(v: MateriaalVelden, naam: string): Prom
   const fout = checkVelden(v);
   if (fout) return { status: "fout", melding: fout };
   const { error } = await supabase.from("materiaal").insert({
-    naam: v.naam.trim(), categorie: v.categorie.trim() || null, voorraad_camping: v.voorraadCamping, voorraad_bivak: v.voorraadBivak,
+    naam: v.naam.trim(), categorie: v.categorie.trim(), voorraad_camping: v.voorraadCamping, voorraad_bivak: v.voorraadBivak,
     opmerking: v.opmerking.trim() || null, bijgewerkt_door_naam: naam.trim().slice(0, 60),
   });
   if (error) {
+    if (error.code === "23514") return { status: "fout", melding: "Vul de voorraad op de camping en het bivak in: de lijst is al definitief." };
+    if (error.code === "23503") return { status: "fout", melding: "Deze categorie bestaat niet." };
     if (error.code === "23505") return { status: "fout", melding: "Dit materiaal staat al in de lijst." };
     if (error.code === "42501") return { status: "fout", melding: "Jouw rol mag geen materialen toevoegen." };
     return { status: "fout", melding: FOUT };
@@ -142,10 +146,14 @@ export async function materiaalWijzigen(id: string, v: MateriaalVelden & { actie
   const fout = checkVelden(v);
   if (fout) return { status: "fout", melding: fout };
   const { data, error } = await supabase.from("materiaal").update({
-    naam: v.naam.trim(), categorie: v.categorie.trim() || null, voorraad_camping: v.voorraadCamping, voorraad_bivak: v.voorraadBivak,
+    naam: v.naam.trim(), categorie: v.categorie.trim(), voorraad_camping: v.voorraadCamping, voorraad_bivak: v.voorraadBivak,
     opmerking: v.opmerking.trim() || null, actief: v.actief, bijgewerkt_door_naam: naam.trim().slice(0, 60),
   }).eq("id", id).eq("updated_at", verwachtUpdatedAt).select("id");
-  if (error) return { status: "fout", melding: error.code === "23505" ? "Er is al een materiaal met deze naam." : FOUT };
+  if (error) {
+    if (error.code === "23514") return { status: "fout", melding: "Vul de voorraad op de camping en het bivak in: de lijst is al definitief." };
+    if (error.code === "23503") return { status: "fout", melding: "Deze categorie bestaat niet." };
+    return { status: "fout", melding: error.code === "23505" ? "Er is al een materiaal met deze naam." : FOUT };
+  }
   if (!data?.length) {
     const { data: bestaat } = await supabase.from("materiaal").select("id").eq("id", id).maybeSingle();
     return { status: "fout", melding: bestaat ? "Iemand anders heeft dit materiaal net gewijzigd. Ververs de pagina en probeer het opnieuw." : "Jouw rol mag de lijst niet wijzigen. Je kunt wel materialen toevoegen." };
@@ -160,12 +168,13 @@ export async function lijstDefinitiefMaken(naam: string): Promise<Resultaat> {
   if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
   const { data, error } = await supabase.rpc("materiaallijst_definitief_maken", { p_naam: naam.trim().slice(0, 60) });
   if (error) return { status: "fout", melding: "Jouw rol mag de lijst niet definitief maken." };
-  const res = data as { ok: boolean; reden?: string };
+  const res = data as { ok: boolean; reden?: string; aantal?: number };
   if (res.ok) {
     ververs();
     return { status: "ok" };
   }
   if (res.reden === "leeg") return { status: "fout", melding: "Er staan nog geen actieve materialen in de lijst." };
+  if (res.reden === "onvolledig") return { status: "fout", melding: `Bij ${res.aantal} ${res.aantal === 1 ? "materiaal" : "materialen"} is de voorraad op de camping of het bivak nog niet ingeschat. Vul die eerst in (0 is ook een antwoord).` };
   if (res.reden === "al_definitief") return { status: "fout", melding: "De lijst is al definitief." };
   return { status: "fout", melding: FOUT };
 }
@@ -188,6 +197,63 @@ export async function materiaalCorrigeren(id: string, aantal: number | null, naa
   if (aantal !== null && (!Number.isInteger(aantal) || aantal < 0 || aantal > 9999)) return { status: "fout", melding: "Vul een geldig aantal in." };
   const { data, error } = await supabase.rpc("avf_materiaal_corrigeren", { p_id: id, p_aantal: aantal as number, p_naam: naam.trim().slice(0, 60) });
   if (error || !(data as { ok: boolean }).ok) return { status: "fout", melding: FOUT };
+  ververs();
+  return { status: "ok" };
+}
+
+/** Eén voorraadcel (camping of bivak) opslaan. Leeg = nog niet ingeschat. Geeft het nieuwe tijdstip terug voor de volgende keer. */
+export async function materiaalVoorraadZetten(
+  id: string, locatie: "camping" | "bivak", waarde: number | null, naam: string, verwachtUpdatedAt: string,
+): Promise<{ status: "ok"; updatedAt: string } | { status: "fout"; melding: string }> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan de voorraad invullen." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  if (waarde !== null && (!Number.isInteger(waarde) || waarde < 0 || waarde > 99999)) return { status: "fout", melding: "Vul een getal van 0 of meer in." };
+  const kolom = locatie === "camping" ? "voorraad_camping" : "voorraad_bivak";
+  const { data, error } = await supabase.from("materiaal")
+    .update({ [kolom]: waarde, bijgewerkt_door_naam: naam.trim().slice(0, 60) })
+    .eq("id", id).eq("updated_at", verwachtUpdatedAt).select("updated_at");
+  if (error) return { status: "fout", melding: error.code === "23514" ? "De lijst is definitief: vul een getal in (0 mag)." : FOUT };
+  if (!data?.length) {
+    const { data: bestaat } = await supabase.from("materiaal").select("id").eq("id", id).maybeSingle();
+    return { status: "fout", melding: bestaat ? "Iemand anders heeft dit materiaal net gewijzigd. Ververs de pagina." : "Jouw rol mag de voorraad niet wijzigen." };
+  }
+  ververs();
+  return { status: "ok", updatedAt: data[0].updated_at };
+}
+
+// -------------------------------------------------------------- categorieën
+
+export async function categorieToevoegen(naam: string): Promise<Resultaat> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan categorieën beheren." };
+  const n = naam.trim();
+  if (!n || n.length > 60) return { status: "fout", melding: "Geef de categorie een naam (maximaal 60 tekens)." };
+  const { data: laatste } = await supabase.from("materiaal_categorie").select("volgorde").order("volgorde", { ascending: false }).limit(1).maybeSingle();
+  const { error } = await supabase.from("materiaal_categorie").insert({ naam: n, volgorde: (laatste?.volgorde ?? 0) + 10 });
+  if (error) return { status: "fout", melding: error.code === "23505" ? "Deze categorie bestaat al." : "Alleen Logistiek & Facilitair van VD en de docent beheren de categorieën." };
+  ververs();
+  return { status: "ok" };
+}
+
+export async function categorieHernoemen(id: string, naam: string): Promise<Resultaat> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan categorieën beheren." };
+  const n = naam.trim();
+  if (!n || n.length > 60) return { status: "fout", melding: "Geef de categorie een naam (maximaal 60 tekens)." };
+  const { data, error } = await supabase.from("materiaal_categorie").update({ naam: n }).eq("id", id).select("id");
+  if (error) return { status: "fout", melding: error.code === "23505" ? "Deze categorie bestaat al." : FOUT };
+  if (!data?.length) return { status: "fout", melding: "Alleen Logistiek & Facilitair van VD en de docent beheren de categorieën." };
+  ververs();
+  return { status: "ok" };
+}
+
+export async function categorieVerwijderen(id: string): Promise<Resultaat> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan categorieën beheren." };
+  const { data, error } = await supabase.from("materiaal_categorie").delete().eq("id", id).select("id");
+  if (error) return { status: "fout", melding: error.code === "23503" ? "Er zitten nog materialen in deze categorie. Verplaats of verwijder die eerst." : FOUT };
+  if (!data?.length) return { status: "fout", melding: "Alleen Logistiek & Facilitair van VD en de docent beheren de categorieën." };
   ververs();
   return { status: "ok" };
 }

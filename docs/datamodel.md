@@ -204,11 +204,14 @@ Eén lijst voor beide clusters, met de voorraad per locatie (op basis van ervari
 | veld | type | opmerking |
 |---|---|---|
 | naam | text | |
-| categorie | text | |
-| voorraad_camping, voorraad_bivak | int | |
+| categorie | text | naam uit de vaste lijst `materiaal_categorie` (standaard `Overig`) |
+| voorraad_camping, voorraad_bivak | int | leeg = nog niet ingeschat; Logistiek & Facilitair schat ze zelf in; de lijst kan pas definitief als ze bij elk actief materiaal zijn ingevuld (0 mag) |
 | opmerking | text | |
 | actief | boolean | inactief = niet meer kiesbaar; bestaande keuzes krijgen een melding |
 | toegevoegd_door_cluster, bijgewerkt_door_naam | uuid, text | wie het materiaal toevoegde of het laatst wijzigde |
+
+### materiaal_categorie
+Vaste lijst van categorieën (`naam`, `volgorde`), beheerd door de docent en Logistiek & Facilitair van VD; VC kiest alleen. Startlijst: Afbakening en markering, Teamherkenning, Ballen, Sport- en spelmateriaal, Touwen en stokken, Archery tag, Veiligheid en communicatie, Organisatie en schrijfmateriaal, Opslag en Overig. Een categorie hernoemen werkt door bij alle materialen; verwijderen kan alleen als er geen materialen in zitten.
 
 ### materiaallijst_status
 Eén rij: `status` (`concept` of `definitief`), `definitief_op`, `definitief_door_naam`, `definitief_door_cluster`. Projectgroepen kunnen pas materiaal kiezen als de lijst definitief is.

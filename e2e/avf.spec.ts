@@ -30,6 +30,9 @@ test.beforeAll(async () => {
   // Beginwaarden komen uit het voorbeeldbestand, niet uit wat er toevallig in de database staat: zo herstelt de test zichzelf.
   await admin.from("avf").update({
     titel: voorbeeld.titel, doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, locatie_keuze: voorbeeld.locatie_keuze, locatie_detail: voorbeeld.locatie_detail,
+    // ook de velden die een eerder afgebroken run kan hebben laten staan
+    verschijningsvorm: voorbeeld.verschijningsvorm, publieke_samenvatting: voorbeeld.publieke_samenvatting,
+    organiserende_studenten: voorbeeld.organiserende_studenten, aantal_deelnemers: voorbeeld.aantal_deelnemers,
   }).eq("id", avf[1]);
   const { data: a } = await admin.from("avf").select("veiligheid").eq("id", avf[1]).single();
   oorspronkelijk = { doelgroep: voorbeeld.doelgroep, contactpersoon: voorbeeld.contactpersoon, titel: voorbeeld.titel, veiligheid: a!.veiligheid, locatie: voorbeeld.locatie_keuze };

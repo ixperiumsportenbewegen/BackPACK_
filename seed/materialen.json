@@ -1,0 +1,63 @@
+{
+  "_toelichting": "Startlijst met materialen, gebaseerd op de materialenlijst van de meerdaagse van vorig jaar (materialenlijst_kamp_ardennen_v4.xlsx, totaaloverzicht). De aantallen uit dat bestand zijn bewust NIET overgenomen: Logistiek & Facilitair schat zelf in hoeveel er op de camping en op het bivak aanwezig moet zijn. De voorraad blijft dus leeg ('nog niet ingeschat'). Weggelaten: rode bakken, water (jerrycans en emmers) en persoonlijke spullen. EHBO-kit en EHBO-koffer zijn hetzelfde. Hoedjes tellen altijd per stapel. De categorieën staan in de database (materiaal_categorie).",
+  "materialen": [
+    { "categorie": "Afbakening en markering", "naam": "Grote pylonen (gekleurd)" },
+    { "categorie": "Afbakening en markering", "naam": "Kleine pionnen" },
+    { "categorie": "Afbakening en markering", "naam": "Pionnen gemengd", "opmerking": "Middelgroot en gekleurd." },
+    { "categorie": "Afbakening en markering", "naam": "Hoedjes (stapel)", "opmerking": "Altijd per stapel tellen, niet per los hoedje." },
+    { "categorie": "Afbakening en markering", "naam": "Hoepels" },
+    { "categorie": "Afbakening en markering", "naam": "Pittenzakken" },
+
+    { "categorie": "Teamherkenning", "naam": "Hesjes blauw" },
+    { "categorie": "Teamherkenning", "naam": "Hesjes oranje/rood" },
+    { "categorie": "Teamherkenning", "naam": "Hesjes geel" },
+    { "categorie": "Teamherkenning", "naam": "Hesjes groen" },
+    { "categorie": "Teamherkenning", "naam": "Lintjes rood" },
+    { "categorie": "Teamherkenning", "naam": "Lintjes groen" },
+    { "categorie": "Teamherkenning", "naam": "Lintjes gemixt" },
+
+    { "categorie": "Ballen", "naam": "Voetballen" },
+    { "categorie": "Ballen", "naam": "Volleyballen" },
+    { "categorie": "Ballen", "naam": "Trefballen" },
+    { "categorie": "Ballen", "naam": "Foamballen roze" },
+    { "categorie": "Ballen", "naam": "Handballen" },
+    { "categorie": "Ballen", "naam": "Tennisballen" },
+    { "categorie": "Ballen", "naam": "Softballen geel" },
+    { "categorie": "Ballen", "naam": "Pingpongballen" },
+
+    { "categorie": "Sport- en spelmateriaal", "naam": "Unihockeysticks" },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Kubb-spel", "opmerking": "Per complete set." },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Frisbees" },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Ringen" },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Rubberen ringen" },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Houten blokken groot", "opmerking": "Per stuk." },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Houten blokken klein", "opmerking": "Per stuk." },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Foamblok geel" },
+    { "categorie": "Sport- en spelmateriaal", "naam": "Blindbrillen" },
+
+    { "categorie": "Touwen en stokken", "naam": "Kleine gekleurde touwen", "opmerking": "Dunne, kortere touwen." },
+    { "categorie": "Touwen en stokken", "naam": "Dunne zandkleurige touwen" },
+    { "categorie": "Touwen en stokken", "naam": "Groot dik touw" },
+    { "categorie": "Touwen en stokken", "naam": "Grote lange touwen" },
+    { "categorie": "Touwen en stokken", "naam": "Stokken" },
+
+    { "categorie": "Archery tag", "naam": "Bogen (archery en regulier)" },
+    { "categorie": "Archery tag", "naam": "Pijlen (archery)" },
+    { "categorie": "Archery tag", "naam": "Maskers blauw" },
+    { "categorie": "Archery tag", "naam": "Maskers rood" },
+    { "categorie": "Archery tag", "naam": "Archery tag-zak met attributen" },
+
+    { "categorie": "Veiligheid en communicatie", "naam": "EHBO-koffer", "opmerking": "EHBO-kit en EHBO-koffer zijn hetzelfde." },
+    { "categorie": "Veiligheid en communicatie", "naam": "Portofoons (walkietalkies)" },
+    { "categorie": "Veiligheid en communicatie", "naam": "Fluitjes" },
+
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "Scorebord" },
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "Whiteboard" },
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "Pennen (doos)" },
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "A4-papier (pak)" },
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "A3-vellen" },
+    { "categorie": "Organisatie en schrijfmateriaal", "naam": "Scharen" },
+
+    { "categorie": "Opslag", "naam": "Bakken met kampmaterialen" }
+  ]
+}

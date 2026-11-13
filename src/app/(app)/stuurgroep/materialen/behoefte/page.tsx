@@ -115,24 +115,33 @@ export default async function BehoeftePagina() {
                 {b.tijdvak ? ` · ${formatTijdvak(b.tijdvak)}` : " · nog niet ingepland"}
               </p>
               {perMateriaal.length === 0 && eigenMateriaal.length === 0 && <p className="mt-2 text-zacht">Nog geen materialen gekozen.</p>}
-              <ul className="mt-2 flex flex-col gap-2">
-                {perMateriaal.map((p) => (
-                  <li key={p.mid} className={`rounded-han border-2 p-3 ${p.tk > 0 ? "border-actie" : "border-rand"}`}>
-                    <p className="font-bold text-kop">{p.naam}</p>
-                    <p className="text-sm text-zacht">
-                      Voorraad {p.c?.voorraad ?? "?"}{p.c && p.c.anderen > 0 ? ` · anderen tegelijk ${p.c.anderen}` : ""}{p.tk > 0 ? ` · tekort ${p.tk}` : ""}
-                    </p>
-                    <ul className="mt-1 flex flex-col gap-2">
-                      {p.rijen.map((r) => (
-                        <li key={r.id} className="flex items-center justify-between gap-3">
-                          <span className="text-tekst">{r.fase ? FASE_NAAM[r.fase] : "hele belevenis"}</span>
-                          <CorrectieVeld id={r.id} aantal={r.aantal} gecorrigeerd={r.aantalGecorrigeerd} titel={`${p.naam} ${r.fase ?? "hele belevenis"}`} />
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
+              {perMateriaal.length > 0 && (
+                <div className="mt-2 overflow-hidden rounded-han border border-rand">
+                  <table className="w-full table-fixed text-left">
+                    <thead className="bg-achtergrond text-xs font-bold uppercase text-zacht">
+                      <tr>
+                        <th scope="col" className="py-1 pl-3 pr-2">Materiaal</th>
+                        <th scope="col" className="w-24 px-1 text-center">Nodig</th>
+                        <th scope="col" className="w-16 px-1 text-center">Ligt er</th>
+                        <th scope="col" className="w-16 px-1 text-center">Tekort</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {perMateriaal.flatMap((p) => p.rijen.map((r, i) => (
+                        <tr key={r.id} className={`border-t border-rand ${p.tk > 0 ? "bg-actie/20" : ""}`}>
+                          <td className="py-2 pl-3 pr-2 align-middle">
+                            <span className="block font-medium text-kop">{p.naam}</span>
+                            <span className="block text-xs text-zacht">{r.fase ? FASE_NAAM[r.fase] : "hele belevenis"}{i === 0 && p.c && p.c.anderen > 0 ? ` · anderen tegelijk: ${p.c.anderen}` : ""}</span>
+                          </td>
+                          <td className="px-1 py-1 align-middle"><CorrectieVeld id={r.id} aantal={r.aantal} gecorrigeerd={r.aantalGecorrigeerd} titel={`${p.naam} ${r.fase ?? "hele belevenis"}`} /></td>
+                          <td className="px-1 text-center align-middle">{p.c?.voorraad ?? "?"}</td>
+                          <td className="px-1 text-center align-middle font-bold text-kop">{i === 0 && p.tk > 0 ? p.tk : ""}</td>
+                        </tr>
+                      )))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               {eigenMateriaal.length > 0 && (
                 <div className="mt-2">
                   <p className="font-bold text-kop">Eigen materiaal (telt niet mee voor de voorraad)</p>

@@ -85,10 +85,10 @@ Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen 
 Eigen aanvragen met status en besluit, resterende ruimte van het cluster, knop "Losse aanvraag" (alleen na goedkeuring van het AVF).
 
 ### Materialenlijst – MAT-00 (`/stuurgroep/materialen`)
-Lijst met zoekveld en filter op categorie; toevoegen, wijzigen, op inactief zetten (Logistiek & Facilitair van VD en de docent). Als concept ziet alleen Logistiek & Facilitair van VD hem, met de knop "Lijst definitief maken". Daarna kiezen projectgroepen en ziet VC hem; Logistiek & Facilitair van VC kan alleen toevoegen. Onder Meer voor stuurgroep en docent.
+Een tabel per categorie met de kolommen Materiaal, Camping en Bivak; de voorraad is direct in de tabel invulbaar (leeg = nog niet ingeschat) en een potlood opent naam, categorie, opmerking en beschikbaarheid. Bovenaan de voortgang ("x van y ingeschat"), zoeken, filter op categorie en een knop "Alleen nog in te vullen". Beheer van de categorieën en materiaal toevoegen zitten in uitklapblokken. Knop "Afdrukken / PDF" naar `/stuurgroep/materialen/afdrukken`: de totale lijst per categorie als schoon overzicht (concept of definitief) om af te drukken of als PDF op te slaan. Wijzigen: Logistiek & Facilitair van VD en de docent. Als concept ziet alleen Logistiek & Facilitair van VD hem, met de knop "Lijst definitief maken". Daarna kiezen projectgroepen en ziet VC hem; Logistiek & Facilitair van VC kan alleen toevoegen. Onder Meer voor stuurgroep en docent.
 
 ### Behoefte en tekorten (`/stuurgroep/materialen/behoefte`)
-Per belevenis van het cluster de gekozen materialen met voorraad, wat anderen tegelijk gebruiken en het tekort, met een veld voor een correctie van de stuurgroep. Bovenaan wie nog geen locatie heeft gekozen.
+Per belevenis van het cluster een tabel met de gekozen materialen: nodig (met een veld voor een correctie van de stuurgroep), wat er ligt en het tekort; wat anderen tegelijk gebruiken staat bij het materiaal. Bovenaan wie nog geen locatie heeft gekozen.
 
 ### Beheer (docent)
 Accounts per cluster met knop "Wachtwoord resetten"; clustergegevens (budget, Teams-link, Forms-link); knop "Alles exporteren" (JSON en Excel).

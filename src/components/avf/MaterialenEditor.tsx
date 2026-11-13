@@ -52,50 +52,56 @@ function Regel({
 
   const tk = b ? tekort(eigenVraag, b) : 0;
   const titel = materiaal?.naam ?? r.omschrijving ?? "Materiaal";
+  const melding = (soort: "tekort" | "inactief" | "correctie", tekst: React.ReactNode) => (
+    <tr>
+      <td colSpan={3} role={soort === "correctie" ? undefined : "alert"} className="px-3 pb-2 text-sm font-medium text-kop">
+        {soort !== "correctie" && <TriangleAlert aria-hidden className="mr-1 inline size-4" />}{tekst}
+      </td>
+    </tr>
+  );
   return (
-    <li className="rounded-han border-2 border-rand bg-vlak p-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="min-w-0 flex-1 font-bold text-kop">{titel}{!materiaal && " (eigen materiaal)"}</span>
-        <label className="flex items-center gap-2 text-sm font-medium text-kop">
-          Aantal
+    <>
+      <tr className="border-t border-rand">
+        <td className="py-2 pl-3 pr-2 align-middle">
+          <span className="block font-medium text-kop">{titel}</span>
+          {!materiaal && <span className="block text-xs text-zacht">Eigen materiaal</span>}
+        </td>
+        <td className="w-24 px-1 py-1 text-center align-middle">
           <input
             type="number" inputMode="numeric" min={1} max={9999} value={aantal} disabled={vergrendeld || bezig}
             onChange={(e) => setAantal(e.target.value)} onBlur={() => void bewaarAantal()}
-            className={`${INVOER} w-24`} aria-label={`Aantal ${titel}`}
+            className={`${INVOER} w-20 px-2 text-center`} aria-label={`Aantal ${titel}`}
           />
-        </label>
-      </div>
-      {materiaal && !materiaal.actief && (
-        <p role="alert" className="mt-2 flex items-start gap-2 font-medium text-kop">
-          <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0" /> Dit materiaal is niet meer beschikbaar. Kies iets anders of overleg met de stuurgroep.
-        </p>
-      )}
-      {r.aantalGecorrigeerd !== null && (
-        <p className="mt-2 text-sm font-medium text-kop">De stuurgroep heeft dit aantal aangepast naar {r.aantalGecorrigeerd}.</p>
-      )}
-      {tk > 0 && (
-        <p role="alert" className="mt-2 flex items-start gap-2 font-medium text-kop">
-          <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0" />
-          Tekort van {tk}. Op de {locatie.toLowerCase()} ligt {b!.voorraad}
-          {b!.anderen > 0 ? ` en een andere belevenis gebruikt op hetzelfde moment ${b!.anderen}` : ""}. Jullie hebben {eigenVraag} nodig.
-        </p>
-      )}
-      {!vergrendeld && (
-        bevestig ? (
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="font-medium text-kop">Zeker weten?</span>
-            <button type="button" onClick={() => void verwijder()} disabled={bezig} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">
-              {bezig ? "Bezig…" : "Ja, verwijderen"}
+        </td>
+        <td className="w-12 pr-2 text-right align-middle">
+          {!vergrendeld && (
+            <button type="button" onClick={() => setBevestig((x) => !x)} aria-label={`Verwijder ${titel}`} aria-expanded={bevestig} className="flex size-aanraak items-center justify-center rounded-han text-kop">
+              <Trash2 aria-hidden className="size-5" />
             </button>
+          )}
+        </td>
+      </tr>
+      {materiaal && !materiaal.actief && melding("inactief", "Dit materiaal is niet meer beschikbaar. Kies iets anders of overleg met de stuurgroep.")}
+      {r.aantalGecorrigeerd !== null && melding("correctie", `De stuurgroep heeft dit aantal aangepast naar ${r.aantalGecorrigeerd}.`)}
+      {tk > 0 && melding("tekort", `Tekort van ${tk}. Op de ${locatie.toLowerCase()} ligt ${b!.voorraad}${b!.anderen > 0 ? ` en een andere belevenis gebruikt op hetzelfde moment ${b!.anderen}` : ""}. Jullie hebben ${eigenVraag} nodig.`)}
+      {bevestig && !vergrendeld && (
+        <tr>
+          <td colSpan={3} className="px-3 pb-2">
+            <span className="mr-2 font-medium text-kop">Zeker weten?</span>
+            <button type="button" onClick={() => void verwijder()} disabled={bezig} className="mr-2 min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">{bezig ? "Bezig…" : "Ja, verwijderen"}</button>
             <button type="button" onClick={() => setBevestig(false)} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">Nee</button>
-          </div>
-        ) : (
-          <button type="button" onClick={() => setBevestig(true)} className="mt-1 flex min-h-aanraak items-center gap-2 text-sm font-bold text-kop underline">
-            <Trash2 aria-hidden className="size-4" /> Verwijderen
-          </button>
-        )
+          </td>
+        </tr>
       )}
-    </li>
+    </>
+  );
+}
+
+function Tabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-han border border-rand bg-vlak">
+      <table className="w-full table-fixed text-left"><tbody>{children}</tbody></table>
+    </div>
   );
 }
 
@@ -104,7 +110,7 @@ function Regel({
  * andere belevenissen op hetzelfde moment gebruiken. Een tekort is een waarschuwing en blokkeert niets.
  */
 export function MaterialenEditor({
-  locatie, tijdvak, lijstDefinitief, materialen, regels, beschikbaar,
+  locatie, tijdvak, lijstDefinitief, materialen, regels, beschikbaar, categorieVolgorde,
 }: {
   locatie: "camping" | "bivak" | null;
   tijdvak: string | null;
@@ -112,6 +118,7 @@ export function MaterialenEditor({
   materialen: Materiaal[];
   regels: AvfMateriaal[];
   beschikbaar: Record<string, Beschikbaarheid>;
+  categorieVolgorde: string[];
 }) {
   const router = useRouter();
   const { naam, vergrendeld } = useAvfEditor();
@@ -166,7 +173,7 @@ export function MaterialenEditor({
     vraagPerMateriaal.set(id, vraagVan(lijstRegels.filter((r) => r.materiaalId === id)));
   }
   const keuzes = materialen.filter((m) => m.actief);
-  const categorieen = [...new Set(keuzes.map((m) => m.categorie ?? "Overig"))];
+  const categorieen = [...new Set(keuzes.map((m) => m.categorie))].sort((x, y) => categorieVolgorde.indexOf(x) - categorieVolgorde.indexOf(y));
 
   return (
     <div className="flex flex-col gap-5">
@@ -193,7 +200,7 @@ export function MaterialenEditor({
                 <option value="">Kies een materiaal</option>
                 {categorieen.map((c) => (
                   <optgroup key={c} label={c}>
-                    {keuzes.filter((m) => (m.categorie ?? "Overig") === c).map((m) => {
+                    {keuzes.filter((m) => m.categorie === c).map((m) => {
                       const b = beschikbaar[m.id];
                       const vrij = b ? Math.max(0, b.voorraad - b.anderen) : null;
                       return <option key={m.id} value={m.id}>{m.naam}{vrij !== null ? ` (${vrij} beschikbaar)` : ""}</option>;
@@ -239,7 +246,7 @@ export function MaterialenEditor({
           return (
             <div key={f.code || "alle"}>
               <h3 className="mb-1 text-lg">{f.naam}</h3>
-              <ul className="flex flex-col gap-2">
+              <Tabel>
                 {hier.map((r) => (
                   <Regel
                     key={r.id} r={r} materiaal={perId.get(r.materiaalId!)} b={beschikbaar[r.materiaalId!]}
@@ -247,7 +254,7 @@ export function MaterialenEditor({
                     vergrendeld={vergrendeld} onFout={setFout}
                   />
                 ))}
-              </ul>
+              </Tabel>
             </div>
           );
         })}
@@ -256,11 +263,13 @@ export function MaterialenEditor({
       <section className="flex flex-col gap-3">
         <h2 className="text-xl">Eigen materiaal</h2>
         <p className="text-sm text-zacht">Dingen die niet in de lijst staan, bijvoorbeeld zelfgemaakte spullen of iets wat jullie zelf meenemen. Dit telt niet mee voor de voorraad.</p>
-        <ul className="flex flex-col gap-2">
-          {eigenRegels.map((r) => (
-            <Regel key={r.id} r={r} materiaal={undefined} b={undefined} eigenVraag={r.aantal} locatie={locatieTekst} naam={naam} vergrendeld={vergrendeld} onFout={setFout} />
-          ))}
-        </ul>
+        {eigenRegels.length > 0 && (
+          <Tabel>
+            {eigenRegels.map((r) => (
+              <Regel key={r.id} r={r} materiaal={undefined} b={undefined} eigenVraag={r.aantal} locatie={locatieTekst} naam={naam} vergrendeld={vergrendeld} onFout={setFout} />
+            ))}
+          </Tabel>
+        )}
         {!vergrendeld && (
           <form onSubmit={voegEigenToe} className="flex flex-col gap-3 rounded-han border border-rand bg-vlak p-4">
             <label className="flex flex-col gap-1 font-medium text-kop">

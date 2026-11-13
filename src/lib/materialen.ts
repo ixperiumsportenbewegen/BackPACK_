@@ -1,5 +1,5 @@
 import { maakServerClient } from "@/lib/supabase/server";
-import type { AvfMateriaal, Beschikbaarheid, LijstStatus, Materiaal } from "@/lib/materialenTypes";
+import type { AvfMateriaal, Beschikbaarheid, Categorie, LijstStatus, Materiaal } from "@/lib/materialenTypes";
 
 export * from "@/lib/materialenTypes";
 
@@ -14,15 +14,26 @@ export async function laadLijstStatus(): Promise<LijstStatus> {
 }
 
 /** De materialenlijst zoals de ingelogde gebruiker hem mag zien (de database bepaalt dat). */
+/** De vaste categorielijst, met het aantal materialen per categorie. */
+export async function laadCategorieen(): Promise<Categorie[]> {
+  const supabase = await maakServerClient();
+  const [{ data: cats }, { data: mats }] = await Promise.all([
+    supabase.from("materiaal_categorie").select("id, naam, volgorde").order("volgorde").order("naam"),
+    supabase.from("materiaal").select("categorie"),
+  ]);
+  const aantal = new Map<string, number>();
+  for (const m of mats ?? []) aantal.set(m.categorie, (aantal.get(m.categorie) ?? 0) + 1);
+  return (cats ?? []).map((c) => ({ id: c.id, naam: c.naam, volgorde: c.volgorde, aantal: aantal.get(c.naam) ?? 0 }));
+}
+
 export async function laadMaterialen(): Promise<Materiaal[]> {
   const supabase = await maakServerClient();
   const { data } = await supabase
     .from("materiaal")
     .select("id, naam, categorie, voorraad_camping, voorraad_bivak, opmerking, actief, toegevoegd_door_cluster, bijgewerkt_door_naam, updated_at")
-    .order("categorie", { nullsFirst: false })
     .order("naam");
   return (data ?? []).map((m) => ({
-    id: m.id, naam: m.naam, categorie: m.categorie, voorraadCamping: m.voorraad_camping, voorraadBivak: m.voorraad_bivak,
+    id: m.id, naam: m.naam, categorie: m.categorie ?? "Overig", voorraadCamping: m.voorraad_camping, voorraadBivak: m.voorraad_bivak,
     opmerking: m.opmerking, actief: m.actief, toegevoegdDoorCluster: m.toegevoegd_door_cluster,
     bijgewerktDoorNaam: m.bijgewerkt_door_naam, updatedAt: m.updated_at,
   }));

@@ -1,0 +1,196 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { AvfEditor } from "@/components/avf/AvfEditor";
+import { FaseEditor } from "@/components/avf/FaseEditor";
+import { LijstEditor, type LijstItem } from "@/components/avf/Lijsten";
+import { SectieKop, rolNaam } from "@/components/avf/Sectie";
+import { JaNeeVeld, KeuzeVeld, TekstVeld } from "@/components/avf/Velden";
+import { EhboBlok, WeerEditor } from "@/components/avf/WeerEditor";
+import { BelevenisKaart } from "@/components/BelevenisKaart";
+import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
+import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
+import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
+import { getProfiel } from "@/lib/profiel";
+import { formatTijdvak } from "@/lib/tijd";
+import type { JsonSectie, VeldDoel } from "../actions";
+
+export const metadata = { title: "AVF · BackPACK_" };
+
+function doelVoor(v: AvfVeld): VeldDoel {
+  const delen = v.sleutel.split(".");
+  if (delen.length === 1) return { soort: "kolom", kolom: delen[0] as never };
+  return { soort: "json", sectie: delen[0] as JsonSectie, pad: delen.slice(1) };
+}
+
+/** Eenvoudige velden van een sectie, gegenereerd uit de veldenlijst. */
+function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
+  return (
+    <div className="flex flex-col gap-5">
+      {velden.map((v) => {
+        const w = leesWaarde(avf.inhoud, v.sleutel);
+        const eigenaar = rolNaam(v.pgRol);
+        if (v.veldtype === "jaNee") {
+          return <JaNeeVeld key={v.sleutel} doel={doelVoor(v)} begin={typeof w === "boolean" ? w : null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} />;
+        }
+        if (v.veldtype === "keuze") {
+          return <KeuzeVeld key={v.sleutel} doel={doelVoor(v)} begin={(w as string | null) ?? null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} opties={v.opties ?? []} />;
+        }
+        return (
+          <TekstVeld
+            key={v.sleutel}
+            doel={doelVoor(v)}
+            begin={(w as string | number | null | undefined) ?? null}
+            label={v.label}
+            hulp={v.hulp}
+            eigenaar={eigenaar}
+            maxLengte={v.maxLengte}
+            meerRegels={v.veldtype === "lang"}
+            getal={v.veldtype === "getal"}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+const EENVOUDIG = new Set(["tekst", "lang", "getal", "keuze", "jaNee"]);
+
+export default async function SectiePagina({
+  params, searchParams,
+}: {
+  params: Promise<{ sectie: string }>;
+  searchParams: Promise<{ fase?: string }>;
+}) {
+  const { sectie } = await params;
+  const code = sectie.toUpperCase() as SectieCode;
+  if (!SECTIES.some((s) => s.code === code)) notFound();
+
+  const profiel = (await getProfiel())!;
+  if (profiel.soort !== "projectgroep") redirect("/belevenissen");
+  const avf = await laadEigenAvf();
+  if (!avf) redirect("/");
+
+  const voortgang = sectieVoortgang(code, avf.inhoud);
+  const vergrendeld = avf.status === "ingediend";
+  const kop = <SectieKop sectie={code} status={voortgang.status} ontbrekend={voortgang.ontbrekend.map((o) => o.melding)} />;
+  const inhoud = avf.inhoud;
+
+  let inhoudBlok: React.ReactNode = null;
+
+  if (code === "A") {
+    const eenvoudig = veldenVanSectie("A", "avf").filter((v) => EENVOUDIG.has(v.veldtype));
+    inhoudBlok = (
+      <>
+        <section className="rounded-han border border-rand bg-vlak p-4">
+          <h2 className="text-xl">Jullie tijdvak</h2>
+          {avf.tijdvak ? (
+            <>
+              <p className="mt-1 font-bold text-kop">{formatTijdvak(avf.tijdvak)}</p>
+              <p className="text-tekst">{avf.tijdvak.titel}</p>
+            </>
+          ) : (
+            <p className="mt-1 font-bold text-kop">Nog niet ingepland</p>
+          )}
+          <p className="mt-1 text-tekst">Locatie: {avf.locatie ?? <span className="text-zacht">nog niet bekend</span>}</p>
+          <p className="mt-2 text-sm text-zacht">
+            Tijdvak en locatie worden door de stuurgroep bepaald. Jullie kunnen dit zelf niet wijzigen.
+          </p>
+        </section>
+        <Velden velden={eenvoudig} avf={avf} />
+        <section aria-label="Zo zien andere groepen jullie belevenis" className="flex flex-col gap-2">
+          <h2 className="text-xl">Zo zien andere groepen jullie belevenis</h2>
+          <p className="text-sm text-zacht">Dit zijn de enige gegevens die andere projectgroepen en studenten van jullie AVF zien.</p>
+          <BelevenisKaart
+            k={{
+              groepNaam: avf.projectgroepNaam, titel: inhoud.titel, verschijningsvorm: inhoud.verschijningsvorm,
+              samenvatting: inhoud.publieke_samenvatting, tijdvak: avf.tijdvak, status: avf.status,
+            }}
+          />
+        </section>
+      </>
+    );
+  } else if (code === "B" || code === "H") {
+    inhoudBlok = <Velden velden={veldenVanSectie(code, "avf").filter((v) => EENVOUDIG.has(v.veldtype))} avf={avf} />;
+  } else if (code === "C") {
+    const doelen = (inhoud.doelen.persoonlijk as LijstItem[] | undefined) ?? [];
+    inhoudBlok = (
+      <>
+        <Velden velden={veldenVanSectie("C", "avf").filter((v) => EENVOUDIG.has(v.veldtype))} avf={avf} />
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xl">Persoonlijke leerdoelen</h2>
+          <p className="text-sm text-zacht">Per organiserende student één doel. Mag leeg.</p>
+          <LijstEditor
+            sectie="doelen" pad={["persoonlijk"]} begin={doelen} itemNaam="Leerdoel" toevoegenLabel="Leerdoel toevoegen"
+            leegTekst="Nog geen persoonlijke leerdoelen."
+            eigenaar={rolNaam("projectleider")}
+            velden={[{ sleutel: "naam", label: "Naam van de student", maxLengte: 60 }, { sleutel: "doel", label: "Leerdoel", meerRegels: true, maxLengte: 400 }]}
+          />
+        </section>
+      </>
+    );
+  } else if (code === "D") {
+    const faseParam = (await searchParams).fase;
+    const fase = (["kop", "romp", "staart"] as const).find((f) => f === faseParam) ?? "kop";
+    inhoudBlok = <FaseEditor key={fase} fase={fase} avf={avf} />;
+  } else if (code === "E") {
+    const weer = ((inhoud.veiligheid.weer as Record<string, never>) ?? {});
+    const ehbo = ((inhoud.veiligheid.ehbo as Record<string, unknown>) ?? {});
+    const risicos = (inhoud.veiligheid.risicos as LijstItem[] | undefined) ?? [];
+    const eigenaar = rolNaam("veiligheid_ehbo");
+    inhoudBlok = (
+      <>
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xl">Risico&apos;s</h2>
+          <p className="text-sm text-zacht">Overkoepelende risico&apos;s van de hele belevenis, met de maatregel en wie die uitvoert.</p>
+          <LijstEditor
+            sectie="veiligheid" pad={["risicos"]} begin={risicos} itemNaam="Risico" toevoegenLabel="Risico toevoegen"
+            leegTekst="Nog geen risico's. Minstens één risico is nodig."
+            eigenaar={eigenaar}
+            velden={[
+              { sleutel: "risico", label: "Risico", meerRegels: true, maxLengte: 300 },
+              { sleutel: "maatregel", label: "Maatregel", meerRegels: true, maxLengte: 300 },
+              { sleutel: "wie", label: "Wie voert de maatregel uit?", maxLengte: 100 },
+            ]}
+          />
+        </section>
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xl">Weer</h2>
+          <p className="text-sm text-zacht">Weeg alle vier de scenario&apos;s af. Niet relevant is ook een antwoord.</p>
+          <WeerEditor begin={weer} />
+        </section>
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xl">EHBO</h2>
+          <EhboBlok aanvullend={typeof ehbo.aanvullend === "boolean" ? ehbo.aanvullend : null} maatregelen={(ehbo.maatregelen as string | null) ?? null} />
+        </section>
+      </>
+    );
+  } else if (code === "F") {
+    inhoudBlok = (
+      <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">
+        Materialen en het financieel plan komen later. Leeg laten mag dus gewoon.
+      </p>
+    );
+  } else if (code === "G") {
+    const velden = AVF_VELDEN.filter((v) => v.sectie === "G" && EENVOUDIG.has(v.veldtype));
+    inhoudBlok = (
+      <>
+        <section className="rounded-han border border-rand bg-vlak p-4">
+          <h2 className="text-xl">Rolverdeling</h2>
+          <p className="mt-1 text-tekst">{inhoud.rollenIngevuld} van de 6 rollen hebben een naam.</p>
+          <p className="text-sm text-zacht">Eigenaar: {rolNaam("projectleider")}. Voor indienen moeten alle zes rollen een naam hebben.</p>
+          <Link href="/meer/rolverdeling" className="mt-2 flex min-h-aanraak items-center font-bold text-kop underline">
+            Rolverdeling invullen
+          </Link>
+        </section>
+        <Velden velden={velden} avf={avf} />
+      </>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {kop}
+      <AvfEditor vergrendeld={vergrendeld}>{inhoudBlok}</AvfEditor>
+    </div>
+  );
+}

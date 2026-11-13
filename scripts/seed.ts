@@ -10,7 +10,7 @@
  */
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
-import { randomInt } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -31,6 +31,7 @@ const basisPad = path.join("seed", "basis.json");
 const wachtwoordPad = path.join("seed", "wachtwoorden.local.json");
 const basis = JSON.parse(readFileSync(basisPad, "utf8"));
 const programma = JSON.parse(readFileSync(path.join("seed", "programma.json"), "utf8"));
+const voorbeeld = JSON.parse(readFileSync(path.join("seed", "avf-voorbeeld.json"), "utf8"));
 
 const wachtwoorden: Record<string, string> = existsSync(wachtwoordPad)
   ? JSON.parse(readFileSync(wachtwoordPad, "utf8"))
@@ -143,6 +144,41 @@ async function main() {
       if (!pgId) continue;
       await admin.from("avf").update({ programma_regel_id: regel.id })
         .eq("projectgroep_id", pgId).is("programma_regel_id", null);
+    }
+  }
+
+  // Voorbeeld-AVF bij projectgroep 1 van VD (tot de livegang) en van TEST (blijvend). Alleen als het AVF nog leeg is.
+  for (const code of ["VD", "TEST"]) {
+    const pgId = groepId[`${code}:1`];
+    const { data: leegAvf } = await admin.from("avf").select("id, titel").eq("projectgroep_id", pgId).single();
+    const { count } = await admin.from("avf_onderdeel").select("id", { count: "exact", head: true }).eq("avf_id", leegAvf!.id);
+    if (leegAvf!.titel || (count ?? 0) > 0) continue;
+    const metId = (lijst: Record<string, unknown>[]) => lijst.map((x) => ({ ...x, id: randomUUID() }));
+    const doelen = { ...voorbeeld.doelen, persoonlijk: metId(voorbeeld.doelen.persoonlijk) };
+    const veiligheid = { ...voorbeeld.veiligheid, risicos: metId(voorbeeld.veiligheid.risicos) };
+    check(await admin.from("avf").update({
+      titel: voorbeeld.titel, verschijningsvorm: voorbeeld.verschijningsvorm, publieke_samenvatting: voorbeeld.publieke_samenvatting,
+      organiserende_studenten: voorbeeld.organiserende_studenten, doelgroep: voorbeeld.doelgroep,
+      aantal_deelnemers: voorbeeld.aantal_deelnemers, contactpersoon: voorbeeld.contactpersoon,
+      locatie_tekst: voorbeeld.locatie_tekst,
+      beginsituatie: voorbeeld.beginsituatie, doelen, veiligheid, organisatie: voorbeeld.organisatie, communicatie: voorbeeld.communicatie,
+    }).eq("id", leegAvf!.id).select(), `voorbeeld-avf ${code}`);
+    for (const f of voorbeeld.fasen) {
+      check(await admin.from("avf_fase").update({
+        organisatievorm: f.organisatievorm, coachen_instructies: f.coachen_instructies,
+        stemgebruik_houding: f.stemgebruik_houding, opruimen: f.opruimen,
+      }).eq("avf_id", leegAvf!.id).eq("fase", f.fase).select(), `voorbeeld-fase ${f.fase}`);
+    }
+    for (const o of voorbeeld.onderdelen) {
+      const { fase, volgorde, naam, duur_minuten, beschrijving, sociale_veiligheid, fysieke_veiligheid, individu_moeilijker,
+        individu_makkelijker, groep_moeilijker, groep_makkelijker, usv_uitdagend, usv_speelbaar, usv_veilig_aanvulling } = o;
+      const leeg = (t: string) => (t === "" ? null : t);
+      check(await admin.from("avf_onderdeel").insert({
+        avf_id: leegAvf!.id, fase, volgorde, naam, duur_minuten, beschrijving, sociale_veiligheid, fysieke_veiligheid,
+        individu_moeilijker: leeg(individu_moeilijker), individu_makkelijker: leeg(individu_makkelijker),
+        groep_moeilijker: leeg(groep_moeilijker), groep_makkelijker: leeg(groep_makkelijker),
+        usv_uitdagend, usv_speelbaar, usv_veilig_aanvulling: leeg(usv_veilig_aanvulling),
+      }).select(), `voorbeeld-onderdeel ${naam}`);
     }
   }
 

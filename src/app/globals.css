@@ -14,6 +14,9 @@
   --color-thema: var(--kleur-thema);
   --color-op-thema: var(--kleur-op-thema);
   --color-fout: var(--status-fout);
+  --color-goedgekeurd: var(--status-goedgekeurd);
+  --color-actie: var(--status-actie);
+  --color-ingediend: var(--status-ingediend);
   --font-sans: var(--font-basis);
   --font-heading: var(--font-kop);
   --radius-han: var(--radius);

@@ -1,5 +1,5 @@
 {
-  "_toelichting": "Fictief voorbeeld-AVF. Wordt geladen bij vd-groep-1 (tot de livegang) en bij test-groep-1 (blijvend), gebaseerd op de opbouw van Voorbeeld AVF.pdf. Namen zijn verzonnen.",
+  "_toelichting": "Fictief voorbeeld-AVF. Wordt geladen bij vd-groep-1 (tot de livegang) en bij test-groep-1 (blijvend), gebaseerd op de opbouw van Voorbeeld AVF.pdf. Namen zijn verzonnen. Dag, tijd en locatie komen uit het programma (projectgroep 1 organiseert de avondactiviteit van maandag 19:30–21:00 op de camping); de velden dag, starttijd en eindtijd hieronder worden dus genegeerd. Materialen en financieel plan worden pas in opdracht 5 geladen.",
   "projectgroep": {
     "cluster": "VD",
     "nummer": 1
@@ -7,13 +7,10 @@
   "status": "in_ontwikkeling",
   "titel": "Oer-Olympische Spelen",
   "verschijningsvorm": "Spel",
-  "publieke_samenvatting": "Stammen nemen het tegen elkaar op in een middag vol oude sporten. Neem sportkleding mee die vies mag worden.",
+  "publieke_samenvatting": "Stammen nemen het tegen elkaar op in een avond vol oude sporten. Neem sportkleding mee die vies mag worden.",
   "organiserende_studenten": "Teststudent 1, Teststudent 2, Teststudent 3, Teststudent 4, Teststudent 5, Teststudent 6",
   "doelgroep": "Studenten 18–22 jaar",
   "aantal_deelnemers": 10,
-  "dag": "2027-06-28",
-  "starttijd": "13:00",
-  "eindtijd": "16:00",
   "locatie_tekst": "Veld naast de camping",
   "contactpersoon": "Teststudent 1",
   "beginsituatie": {
@@ -212,10 +209,10 @@
     }
   },
   "organisatie": {
-    "bijdrage_thema": "De stammen en de stamvlag sluiten aan op het meerdaagsethema Oerspelen.",
+    "bijdrage_thema": "De stammen en de stamvlag passen bij een oertijd-thema: elke stam strijdt voor de eer van de vallei.",
     "samenhang": "Eerste belevenis van maandag; de stamindeling wordt later in de meerdaagse hergebruikt.",
     "vervoer": "Te voet vanaf de camping (5 minuten).",
-    "opbouw_afbouw": "Opbouw 12:15–13:00, afbouw 16:00–16:30.",
+    "opbouw_afbouw": "Opbouw 18:45–19:30, afbouw 21:00–21:30.",
     "catering": "Water en fruit bij de start en na de romp.",
     "allergieen_rekening_gehouden": true,
     "corvee": "Projectgroep ruimt het veld op en controleert op achtergebleven afval.",
@@ -263,16 +260,16 @@
     "regels": [
       {
         "omschrijving": "Stof voor vlaggen",
-        "bedrag": 25.0
+        "bedrag": 25
       },
       {
         "omschrijving": "Prijzen voor de winnende stam",
-        "bedrag": 35.0
+        "bedrag": 35
       }
     ]
   },
   "communicatie": {
-    "voor": "Sportkleding die vies mag worden, dichte schoenen, waterfles. Verzamelen om 12:55 bij de partytent op de camping.",
+    "voor": "Sportkleding die vies mag worden, dichte schoenen, waterfles. Verzamelen om 19:25 bij de partytent op de camping.",
     "tijdens": "Fluitsignaal: één keer = stoppen, twee keer = verzamelen bij de vlag. Contactpersoon draagt de telefoon. Bij een calamiteit belt de contactpersoon de docent.",
     "na": "Korte afsluiting in de kring; foto's van de stamvlaggen delen in het Teams-kanaal; terugkoppeling aan de stuurgroep na afloop."
   }

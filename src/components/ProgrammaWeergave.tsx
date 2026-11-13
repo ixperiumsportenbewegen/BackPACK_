@@ -1,6 +1,6 @@
 import { Flag, Mountain, Users } from "lucide-react";
 import { AvfStatusLabel, type AvfStatus } from "@/components/BelevenisKaart";
-import { PROGRAMMA_DAGEN, formatGroepNummers, type ProgrammaRegel } from "@/lib/programma";
+import { formatGroepNummers, type ProgrammaRegel } from "@/lib/programma";
 import { formatDag, formatTijd } from "@/lib/tijd";
 
 export interface ToegewezenBelevenis {
@@ -16,11 +16,12 @@ export interface ToegewezenBelevenis {
  * wie meedoet en wie met Rocks n Rivers is. `eigenGroep` markeert wat voor de eigen projectgroep geldt.
  */
 export function ProgrammaWeergave({
-  regels, toegewezen, eigenGroep,
+  regels, toegewezen, eigenGroep, ondertitels,
 }: {
   regels: ProgrammaRegel[];
   toegewezen: ToegewezenBelevenis[];
   eigenGroep?: number | null;
+  ondertitels: Record<string, string>;
 }) {
   const perDag = new Map<string, ProgrammaRegel[]>();
   for (const r of [...regels].sort((a, b) => a.volgorde - b.volgorde)) {
@@ -32,7 +33,7 @@ export function ProgrammaWeergave({
       {[...perDag.entries()].map(([dag, lijst]) => (
         <section key={dag} aria-labelledby={`dag-${dag}`}>
           <h2 id={`dag-${dag}`} className="text-2xl capitalize">{formatDag(dag)}</h2>
-          {PROGRAMMA_DAGEN[dag] && <p className="mt-1 text-zacht">{PROGRAMMA_DAGEN[dag]}</p>}
+          {ondertitels[dag] && <p className="mt-1 text-zacht">{ondertitels[dag]}</p>}
           <ol className="mt-3 flex flex-col gap-2">
             {lijst.map((r) => {
               const wie = r.soort === "belevenis" ? toegewezen.find((t) => t.regelId === r.id) : undefined;

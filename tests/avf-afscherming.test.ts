@@ -475,7 +475,9 @@ describe("Planning toewijzen", () => {
     // logboek: zichtbaar voor de stuurgroep van het cluster en de eigen projectgroep, niet voor anderen
     const { data: log } = await stuur.from("wijziging").select("actie, naam").eq("tabel", "avf").eq("record_id", avf[1]);
     expect(log?.map((l) => l.actie)).toEqual(expect.arrayContaining(["planning_toegewezen", "planning_gewisseld"]));
-    expect(log?.every((l) => l.naam === "Testpersoon")).toBe(true);
+    // andere testruns kunnen ook regels hebben achtergelaten; deze test controleert alleen de eigen regels
+    expect(log?.some((l) => l.naam === "Testpersoon" && l.actie === "planning_gewisseld")).toBe(true);
+    expect(log?.some((l) => l.naam === "Testpersoon" && l.actie === "planning_toegewezen")).toBe(true);
     const eigen = await (await inloggenAls("vd-groep-1")).from("wijziging").select("id").eq("record_id", avf[1]);
     expect((eigen.data ?? []).length).toBeGreaterThan(0);
     const ander = await (await inloggenAls("vd-groep-3")).from("wijziging").select("id").eq("record_id", avf[1]);
@@ -606,5 +608,33 @@ describe("Opruimen en niet van toepassing", () => {
     expect((await zet(a, "fysieke_veiligheid", true)).error).not.toBeNull();
     expect((await zet(await inloggenAls("vd-groep-2"), "usv_uitdagend", true)).data).toBe(false);
     expect((await zet(await inloggenAls("vd-stuur-programma"), "usv_uitdagend", true)).data).toBe(false);
+  });
+});
+
+describe("Programma per cluster", () => {
+  it("VC heeft een gespiegeld programma: bivak eerst, dinsdagavond naar de camping", async () => {
+    const vc = await (await inloggenAls("vc-groep-1")).from("programma_regel").select("volgorde, titel, locatie, soort").order("volgorde");
+    expect(vc.data).toHaveLength(18);
+    expect(vc.data?.filter((r) => r.soort === "belevenis")).toHaveLength(6);
+    const titels = vc.data?.map((r) => r.titel);
+    expect(titels).toContain("Bivak inrichten en avondeten");
+    expect(titels).toContain("Diner en lopen naar camping");
+    expect(titels).not.toContain("Camping inrichten en avondeten");
+    expect(vc.data?.find((r) => r.volgorde === 6)?.locatie).toBe("Bivak"); // maandagavond
+    expect(vc.data?.find((r) => r.volgorde === 12)?.locatie).toBe("Camping"); // dinsdagavond
+
+    const vd = await (await inloggenAls("vd-groep-1")).from("programma_regel").select("volgorde, titel, locatie").order("volgorde");
+    expect(vd.data?.map((r) => r.titel)).toContain("Camping inrichten en avondeten");
+    expect(vd.data?.find((r) => r.volgorde === 6)?.locatie).toBe("Camping");
+  });
+
+  it("elk cluster heeft zes toegewezen tijdvakken, één groep per tijdvak (VC en VD)", async () => {
+    for (const code of ["VD", "VC"]) {
+      const cl = await clusterId(code);
+      const { data } = await admin.from("avf").select("programma_regel_id").eq("cluster_id", cl);
+      const ids = (data ?? []).map((r) => r.programma_regel_id);
+      expect(ids.filter(Boolean), code).toHaveLength(6);
+      expect(new Set(ids).size, code).toBe(6);
+    }
   });
 });

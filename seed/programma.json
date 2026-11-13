@@ -1,38 +1,406 @@
 {
-  "_toelichting": "Het standaardprogramma van de Ardennen-meerdaagse (28–30 juni 2027), per cluster hetzelfde bij het laden. Bron: de programmaschermen van Bart. De stuurgroep kan alles daarna in de app aanpassen. Zes regels zijn tijdvakken voor een belevenis (soort 'belevenis'); `organisator` is de projectgroep die dat tijdvak voorlopig krijgt, `deelnemers` de groepen die meedoen en `rocks_rivers_groepen` de groepen die op dat moment met Rocks n Rivers zijn. In de bron staat 'PG5*' bij dinsdagmiddag; hier gelezen als projectgroep 6. 'Kamp' is in de teksten 'camping' geworden.",
-  "dagen": [
-    {
-      "dag": "2027-06-28",
-      "regels": [
-        { "start": "08:00", "eind": "08:30", "titel": "Verzamelen bij Gymnasion", "omschrijving": "Bagage inladen en aanwezigheidscheck · alle groepen", "locatie": "Gymnasion Nijmegen" },
-        { "start": "08:30", "eind": "11:30", "titel": "Busreis richting Ardennen", "omschrijving": "Start programma; reistijd indicatief", "locatie": "Onderweg" },
-        { "start": "11:30", "eind": "12:30", "titel": "Lunch en voorbereiding hike", "omschrijving": "Lunchpakket meenemen" },
-        { "start": "12:30", "eind": "16:30", "titel": "Hike naar de camping", "omschrijving": "Alle groepen · hike naar Camping · inclusief pauzes", "locatie": "Onderweg" },
-        { "start": "16:30", "eind": "19:30", "titel": "Camping inrichten en avondeten", "omschrijving": "Camping · tenten, eten en briefing", "locatie": "Camping" },
-        { "start": "19:30", "eind": "21:00", "soort": "belevenis", "titel": "Avondactiviteit", "locatie": "Camping", "organisator": 1, "deelnemers": [2, 3, 4, 5, 6] }
+  "_toelichting": "Het standaardprogramma van de Ardennen-meerdaagse (28–30 juni 2027) per cluster. VD begint op de camping en gaat dinsdagavond naar het bivak; VC is gespiegeld (eerst bivak, dinsdagavond naar de camping). Het cluster TEST gebruikt het programma van VD. Bron: de programmaschermen van Bart. Zes regels zijn tijdvakken voor een belevenis (soort 'belevenis'); `organisator` is de projectgroep die dat tijdvak voorlopig krijgt, `deelnemers` de groepen die meedoen en `rocks_rivers_groepen` de groepen die op dat moment met Rocks n Rivers zijn. In de bron staat 'PG5*' bij dinsdagmiddag; hier gelezen als projectgroep 6. 'Kamp' is in de teksten 'camping' of 'bivak' geworden. De stuurgroep kan alles daarna in de app aanpassen; `npm run seed` laat bestaande regels staan, tenzij je `--programma-opnieuw=VC` meegeeft.",
+  "programmas": {
+    "VD": {
+      "dagen": [
+        {
+          "dag": "2027-06-28",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "08:30",
+              "titel": "Verzamelen bij Gymnasion",
+              "omschrijving": "Bagage inladen en aanwezigheidscheck · alle groepen",
+              "locatie": "Gymnasion Nijmegen"
+            },
+            {
+              "start": "08:30",
+              "eind": "11:30",
+              "titel": "Busreis richting Ardennen",
+              "omschrijving": "Start programma; reistijd indicatief",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "11:30",
+              "eind": "12:30",
+              "titel": "Lunch en voorbereiding hike",
+              "omschrijving": "Lunchpakket meenemen"
+            },
+            {
+              "start": "12:30",
+              "eind": "16:30",
+              "titel": "Hike naar de camping",
+              "omschrijving": "Alle groepen · hike naar Camping · inclusief pauzes",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "16:30",
+              "eind": "19:30",
+              "titel": "Camping inrichten en avondeten",
+              "omschrijving": "Camping · tenten, eten en briefing",
+              "locatie": "Camping"
+            },
+            {
+              "start": "19:30",
+              "eind": "21:00",
+              "soort": "belevenis",
+              "titel": "Avondactiviteit",
+              "locatie": "Camping",
+              "organisator": 1,
+              "deelnemers": [
+                2,
+                3,
+                4,
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "dag": "2027-06-29",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "09:00",
+              "titel": "Ontbijt en briefing",
+              "omschrijving": "Camping · alle groepen",
+              "locatie": "Camping"
+            },
+            {
+              "start": "09:00",
+              "eind": "12:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma ochtend · 3 uur",
+              "locatie": "Camping / Rocks & Rivers",
+              "organisator": 2,
+              "deelnemers": [
+                1,
+                3
+              ],
+              "rocks_rivers_groepen": [
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "start": "12:00",
+              "eind": "13:00",
+              "titel": "Lunch",
+              "omschrijving": "Camping · alle groepen",
+              "locatie": "Camping"
+            },
+            {
+              "start": "13:00",
+              "eind": "16:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma middag · 3 uur",
+              "locatie": "Camping / Rocks & Rivers",
+              "organisator": 5,
+              "deelnemers": [
+                4,
+                6
+              ],
+              "rocks_rivers_groepen": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "start": "16:00",
+              "eind": "19:30",
+              "titel": "Diner en lopen naar bivak",
+              "omschrijving": "Verplaatsing Camping → bivaklocatie",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "19:30",
+              "eind": "21:00",
+              "soort": "belevenis",
+              "titel": "Avondactiviteit",
+              "locatie": "Bivaklocatie",
+              "organisator": 4,
+              "deelnemers": [
+                1,
+                2,
+                3,
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "dag": "2027-06-30",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "09:00",
+              "titel": "Ontbijt en briefing",
+              "omschrijving": "Bivaklocatie · alle groepen",
+              "locatie": "Bivaklocatie"
+            },
+            {
+              "start": "09:00",
+              "eind": "12:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma ochtend · 3 uur",
+              "locatie": "Bivak / Rocks & Rivers",
+              "organisator": 6,
+              "deelnemers": [
+                4,
+                5
+              ],
+              "rocks_rivers_groepen": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "start": "12:00",
+              "eind": "13:00",
+              "titel": "Lunch",
+              "omschrijving": "Bivaklocatie · alle groepen",
+              "locatie": "Bivaklocatie"
+            },
+            {
+              "start": "13:00",
+              "eind": "16:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma middag · 3 uur",
+              "locatie": "Bivak / Rocks & Rivers",
+              "organisator": 3,
+              "deelnemers": [
+                1,
+                2
+              ],
+              "rocks_rivers_groepen": [
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "start": "16:00",
+              "eind": "17:00",
+              "titel": "Opruimen, eten en vertrekcheck",
+              "omschrijving": "Bivaklocatie · bagage en terrein controleren",
+              "locatie": "Bivaklocatie"
+            },
+            {
+              "start": "17:00",
+              "eind": "20:30",
+              "titel": "Busreis terug naar Nijmegen",
+              "omschrijving": "Vertrek vanaf bivaklocatie → Gymnasion Nijmegen · aankomst indicatief",
+              "locatie": "Onderweg"
+            }
+          ]
+        }
       ]
     },
-    {
-      "dag": "2027-06-29",
-      "regels": [
-        { "start": "08:00", "eind": "09:00", "titel": "Ontbijt en briefing", "omschrijving": "Camping · alle groepen", "locatie": "Camping" },
-        { "start": "09:00", "eind": "12:00", "soort": "belevenis", "titel": "Spiegelprogramma ochtend · 3 uur", "locatie": "Camping / Rocks & Rivers", "organisator": 2, "deelnemers": [1, 3], "rocks_rivers_groepen": [4, 5, 6] },
-        { "start": "12:00", "eind": "13:00", "titel": "Lunch", "omschrijving": "Camping · alle groepen", "locatie": "Camping" },
-        { "start": "13:00", "eind": "16:00", "soort": "belevenis", "titel": "Spiegelprogramma middag · 3 uur", "locatie": "Camping / Rocks & Rivers", "organisator": 5, "deelnemers": [4, 6], "rocks_rivers_groepen": [1, 2, 3] },
-        { "start": "16:00", "eind": "19:30", "titel": "Diner en lopen naar bivak", "omschrijving": "Verplaatsing Camping → bivaklocatie", "locatie": "Onderweg" },
-        { "start": "19:30", "eind": "21:00", "soort": "belevenis", "titel": "Avondactiviteit", "locatie": "Bivaklocatie", "organisator": 4, "deelnemers": [1, 2, 3, 5, 6] }
+    "VC": {
+      "dagen": [
+        {
+          "dag": "2027-06-28",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "08:30",
+              "titel": "Verzamelen bij Gymnasion",
+              "omschrijving": "Bagage inladen en aanwezigheidscheck · alle groepen",
+              "locatie": "Gymnasion Nijmegen"
+            },
+            {
+              "start": "08:30",
+              "eind": "11:30",
+              "titel": "Busreis richting Ardennen",
+              "omschrijving": "Start programma; reistijd indicatief",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "11:30",
+              "eind": "12:30",
+              "titel": "Lunch en voorbereiding hike",
+              "omschrijving": "Lunchpakket meenemen"
+            },
+            {
+              "start": "12:30",
+              "eind": "16:30",
+              "titel": "Hike naar het bivak",
+              "omschrijving": "Alle groepen · hike naar bivak · inclusief pauzes",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "16:30",
+              "eind": "19:30",
+              "titel": "Bivak inrichten en avondeten",
+              "omschrijving": "Bivak · eten en briefing",
+              "locatie": "Bivak"
+            },
+            {
+              "start": "19:30",
+              "eind": "21:00",
+              "soort": "belevenis",
+              "titel": "Avondactiviteit",
+              "locatie": "Bivak",
+              "organisator": 1,
+              "deelnemers": [
+                2,
+                3,
+                4,
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "dag": "2027-06-29",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "09:00",
+              "titel": "Ontbijt en briefing",
+              "omschrijving": "Bivak · alle groepen",
+              "locatie": "Bivak"
+            },
+            {
+              "start": "09:00",
+              "eind": "12:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma ochtend · 3 uur",
+              "locatie": "Bivak / Rocks & Rivers",
+              "organisator": 2,
+              "deelnemers": [
+                1,
+                3
+              ],
+              "rocks_rivers_groepen": [
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "start": "12:00",
+              "eind": "13:00",
+              "titel": "Lunch",
+              "omschrijving": "Bivak · alle groepen",
+              "locatie": "Bivak"
+            },
+            {
+              "start": "13:00",
+              "eind": "16:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma middag · 3 uur",
+              "locatie": "Bivak / Rocks & Rivers",
+              "organisator": 5,
+              "deelnemers": [
+                4,
+                6
+              ],
+              "rocks_rivers_groepen": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "start": "16:00",
+              "eind": "19:30",
+              "titel": "Diner en lopen naar camping",
+              "omschrijving": "Verplaatsing bivak → camping, daarna eten",
+              "locatie": "Onderweg"
+            },
+            {
+              "start": "19:30",
+              "eind": "21:00",
+              "soort": "belevenis",
+              "titel": "Avondactiviteit",
+              "locatie": "Camping",
+              "organisator": 4,
+              "deelnemers": [
+                1,
+                2,
+                3,
+                5,
+                6
+              ]
+            }
+          ]
+        },
+        {
+          "dag": "2027-06-30",
+          "regels": [
+            {
+              "start": "08:00",
+              "eind": "09:00",
+              "titel": "Ontbijt en briefing",
+              "omschrijving": "Camping · alle groepen",
+              "locatie": "Camping"
+            },
+            {
+              "start": "09:00",
+              "eind": "12:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma ochtend · 3 uur",
+              "locatie": "Camping / Rocks & Rivers",
+              "organisator": 6,
+              "deelnemers": [
+                4,
+                5
+              ],
+              "rocks_rivers_groepen": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "start": "12:00",
+              "eind": "13:00",
+              "titel": "Lunch",
+              "omschrijving": "Camping · alle groepen",
+              "locatie": "Camping"
+            },
+            {
+              "start": "13:00",
+              "eind": "16:00",
+              "soort": "belevenis",
+              "titel": "Spiegelprogramma middag · 3 uur",
+              "locatie": "Camping / Rocks & Rivers",
+              "organisator": 3,
+              "deelnemers": [
+                1,
+                2
+              ],
+              "rocks_rivers_groepen": [
+                4,
+                5,
+                6
+              ]
+            },
+            {
+              "start": "16:00",
+              "eind": "17:00",
+              "titel": "Opruimen, eten en vertrekcheck",
+              "omschrijving": "Camping · bagage en terrein controleren",
+              "locatie": "Camping"
+            },
+            {
+              "start": "17:00",
+              "eind": "20:30",
+              "titel": "Busreis terug naar Nijmegen",
+              "omschrijving": "Vertrek vanaf camping → Gymnasion Nijmegen · aankomst indicatief",
+              "locatie": "Onderweg"
+            }
+          ]
+        }
       ]
     },
-    {
-      "dag": "2027-06-30",
-      "regels": [
-        { "start": "08:00", "eind": "09:00", "titel": "Ontbijt en briefing", "omschrijving": "Bivaklocatie · alle groepen", "locatie": "Bivaklocatie" },
-        { "start": "09:00", "eind": "12:00", "soort": "belevenis", "titel": "Spiegelprogramma ochtend · 3 uur", "locatie": "Bivak / Rocks & Rivers", "organisator": 6, "deelnemers": [4, 5], "rocks_rivers_groepen": [1, 2, 3] },
-        { "start": "12:00", "eind": "13:00", "titel": "Lunch", "omschrijving": "Bivaklocatie · alle groepen", "locatie": "Bivaklocatie" },
-        { "start": "13:00", "eind": "16:00", "soort": "belevenis", "titel": "Spiegelprogramma middag · 3 uur", "locatie": "Bivak / Rocks & Rivers", "organisator": 3, "deelnemers": [1, 2], "rocks_rivers_groepen": [4, 5, 6] },
-        { "start": "16:00", "eind": "17:00", "titel": "Opruimen, eten en vertrekcheck", "omschrijving": "Bivaklocatie · bagage en terrein controleren", "locatie": "Bivaklocatie" },
-        { "start": "17:00", "eind": "20:30", "titel": "Busreis terug naar Nijmegen", "omschrijving": "Vertrek vanaf bivaklocatie → Gymnasion Nijmegen · aankomst indicatief", "locatie": "Onderweg" }
-      ]
-    }
-  ]
+    "TEST": "VD"
+  }
 }

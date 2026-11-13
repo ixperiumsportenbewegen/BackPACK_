@@ -1,9 +1,20 @@
-/** Ondertitels per dag van het standaardprogramma. */
-export const PROGRAMMA_DAGEN: Record<string, string> = {
-  "2027-06-28": "Locaties: vertrek Gymnasion Nijmegen → hike → Camping",
-  "2027-06-29": "Overdag: Camping · dinsdagavond: verplaatsing naar bivak",
-  "2027-06-30": "Alle activiteiten vanuit de bivaklocatie · terugreis naar Gymnasion",
+const ONDERTITELS_VD: Record<string, string> = {
+  "2027-06-28": "Locaties: vertrek Gymnasion Nijmegen → hike → camping",
+  "2027-06-29": "Overdag: camping · dinsdagavond: verplaatsing naar bivak",
+  "2027-06-30": "Alle activiteiten vanuit het bivak · terugreis naar Gymnasion",
 };
+
+// VC is gespiegeld: eerst het bivak, dinsdagavond naar de camping.
+const ONDERTITELS_VC: Record<string, string> = {
+  "2027-06-28": "Locaties: vertrek Gymnasion Nijmegen → hike → bivak",
+  "2027-06-29": "Overdag: bivak · dinsdagavond: verplaatsing naar camping",
+  "2027-06-30": "Alle activiteiten vanuit de camping · terugreis naar Gymnasion",
+};
+
+/** Ondertitels per dag van het programma, per cluster. TEST gebruikt die van VD. */
+export function dagOndertitels(clusterCode: string | null | undefined): Record<string, string> {
+  return clusterCode === "VC" ? ONDERTITELS_VC : ONDERTITELS_VD;
+}
 
 /** [4, 5, 6] wordt "4 t/m 6", [1, 3] wordt "1 en 3", [2, 3, 4, 5, 6] wordt "2 t/m 6". */
 export function formatGroepNummers(nummers: number[]): string {

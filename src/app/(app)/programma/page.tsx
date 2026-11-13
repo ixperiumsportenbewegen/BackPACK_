@@ -3,6 +3,7 @@ import { Pencil } from "lucide-react";
 import { PaginaKop } from "@/components/PaginaKop";
 import { ProgrammaWeergave } from "@/components/ProgrammaWeergave";
 import { getProfiel } from "@/lib/profiel";
+import { dagOndertitels } from "@/lib/programma";
 import { laadProgramma } from "@/lib/programmaData";
 
 export const metadata = { title: "Programma · BackPACK_" };
@@ -27,7 +28,7 @@ export default async function ProgrammaPagina() {
       {regels.length === 0 ? (
         <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">Het programma is nog niet ingevuld.</p>
       ) : (
-        <ProgrammaWeergave regels={regels} toegewezen={toegewezen} eigenGroep={profiel.projectgroep?.nummer ?? null} />
+        <ProgrammaWeergave regels={regels} toegewezen={toegewezen} eigenGroep={profiel.projectgroep?.nummer ?? null} ondertitels={dagOndertitels(profiel.cluster?.code)} />
       )}
     </div>
   );

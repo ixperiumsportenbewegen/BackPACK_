@@ -343,3 +343,22 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
 
   await Promise.all([stuur.ctx.close(), groep.ctx.close()]);
 });
+
+test("VC heeft een eigen, gespiegeld programma", async ({ browser }) => {
+  const vc = await nieuweSessie(browser, "vc-groep-1");
+  await vc.page.goto("/programma");
+  await expect(vc.page.getByRole("heading", { name: "Maandag 28 juni" })).toBeVisible();
+  await expect(vc.page.getByText("Locaties: vertrek Gymnasion Nijmegen → hike → bivak")).toBeVisible();
+  await expect(vc.page.getByText("Bivak inrichten en avondeten")).toBeVisible();
+  await expect(vc.page.getByText("Diner en lopen naar camping")).toBeVisible();
+  await expect(vc.page.getByText("Camping inrichten en avondeten")).toHaveCount(0);
+  await expect(vc.page.getByText("Jullie organiseren dit")).toHaveCount(1);
+  await vc.ctx.close();
+
+  const vd = await nieuweSessie(browser, "vd-groep-1");
+  await vd.page.goto("/programma");
+  await expect(vd.page.getByText("Locaties: vertrek Gymnasion Nijmegen → hike → camping")).toBeVisible();
+  await expect(vd.page.getByText("Camping inrichten en avondeten")).toBeVisible();
+  await expect(vd.page.getByText("Bivak inrichten en avondeten")).toHaveCount(0);
+  await vd.ctx.close();
+});

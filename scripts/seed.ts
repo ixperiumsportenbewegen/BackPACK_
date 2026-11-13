@@ -115,16 +115,25 @@ async function main() {
   }
 
   // Programma per cluster. Bestaande regels blijven staan, zodat wijzigingen van de stuurgroep niet worden overschreven.
+  // Elk cluster heeft zijn eigen programma (VC is gespiegeld); TEST gebruikt het programma van VD.
+  // Met --programma-opnieuw=VC,VD worden bestaande regels van die clusters overschreven (toewijzingen blijven staan).
+  const opnieuw = new Set(
+    (process.argv.find((x) => x.startsWith("--programma-opnieuw="))?.split("=")[1] ?? "").split(",").filter(Boolean),
+  );
+  const dagenVan = (code: string): { dag: string; regels: Record<string, unknown>[] }[] => {
+    const bron = programma.programmas[code];
+    return typeof bron === "string" ? programma.programmas[bron].dagen : bron.dagen;
+  };
   for (const c of basis.clusters) {
     let volgorde = 0;
-    for (const dag of programma.dagen) {
+    for (const dag of dagenVan(c.code)) {
       for (const r of dag.regels) {
         volgorde++;
         check(await admin.from("programma_regel").upsert({
           cluster_id: clusterId[c.code], volgorde, dag: dag.dag, starttijd: r.start, eindtijd: r.eind,
           soort: r.soort ?? "vast", titel: r.titel, omschrijving: r.omschrijving ?? null, locatie: r.locatie ?? null,
           deelnemers: r.deelnemers ?? [], rocks_rivers_groepen: r.rocks_rivers_groepen ?? [],
-        }, { onConflict: "cluster_id,volgorde", ignoreDuplicates: true }).select(), `programma ${c.code} ${volgorde}`);
+        }, { onConflict: "cluster_id,volgorde", ignoreDuplicates: !opnieuw.has(c.code) }).select(), `programma ${c.code} ${volgorde}`);
       }
     }
     // Voorlopige toewijzing: elke groep krijgt het tijdvak waarin zij volgens het programma organiseert
@@ -132,10 +141,10 @@ async function main() {
       .select("id, volgorde").eq("cluster_id", clusterId[c.code]).eq("soort", "belevenis");
     let nr = 0;
     const organisatorPerVolgorde = new Map<number, number>();
-    for (const dag of programma.dagen) {
+    for (const dag of dagenVan(c.code)) {
       for (const r of dag.regels) {
         nr++;
-        if (r.soort === "belevenis") organisatorPerVolgorde.set(nr, r.organisator);
+        if (r.soort === "belevenis") organisatorPerVolgorde.set(nr, r.organisator as number);
       }
     }
     for (const regel of regels ?? []) {

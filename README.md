@@ -46,7 +46,7 @@ Supabase remt inloggen af op ca. 30 pogingen per 5 minuten per IP-adres (zie `do
 
 ## Programma en AVF
 
-- `seed/programma.json`: het standaardprogramma (28–30 juni) met de zes tijdvakken voor belevenissen; `npm run seed` laadt het per cluster en laat bestaande regels staan.
+- `seed/programma.json`: het programma (28–30 juni) per cluster (VD, VC en TEST) met de zes tijdvakken voor belevenissen; `npm run seed` laadt het en laat bestaande regels staan. Een programma opnieuw laden (overschrijft de regels van dat cluster, toewijzingen blijven): `npm run seed -- --programma-opnieuw=VC`.
 - `seed/avf-voorbeeld.json`: het voorbeeld-AVF bij `vd-groep-1` en `test-groep-1` (alleen als het AVF nog leeg is).
 - `src/config/avf-velden.ts`: alle AVF-velden met eigenaar, verplichting en stuurgroepkoppeling (bron: `docs/avf-velden.md`; een test bewaakt dat beide gelijk blijven).
 

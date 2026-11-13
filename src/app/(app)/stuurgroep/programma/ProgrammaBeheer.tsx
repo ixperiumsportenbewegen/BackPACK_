@@ -266,7 +266,7 @@ export function ProgrammaBeheer({ regels, groepen }: { regels: ProgrammaRegel[];
       <section className="flex flex-col gap-3">
         <h2 className="text-xl">Het hele programma aanpassen</h2>
         <p className="text-zacht">Tijden, titels en locaties van alle regels. Wijzigt een tijdvak, dan verschuift de belevenis in dat tijdvak mee.</p>
-        {regels.map((r) => <RegelFormulier key={`${r.id}:${r.updated_at}`} regel={r} naam={naam} />)}
+        {regels.map((r) => <RegelFormulier key={r.id} regel={r} naam={naam} />)}
       </section>
     </div>
   );

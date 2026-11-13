@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import type { CSSProperties } from "react";
+import { Suspense, type CSSProperties } from "react";
+import { NavigatieVoortgang } from "@/components/NavigatieVoortgang";
 import { BottomNav } from "@/components/BottomNav";
 import { Kopbalk } from "@/components/Kopbalk";
 import { getProfiel } from "@/lib/profiel";
@@ -20,6 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div style={themaStijl} className="min-h-dvh">
+      <Suspense fallback={null}><NavigatieVoortgang /></Suspense>
       <BottomNav soort={profiel.soort} />
       <div className="md:pl-60 print:pl-0">
         <Kopbalk profiel={profiel} />

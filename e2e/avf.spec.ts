@@ -199,6 +199,18 @@ test("een weerscenario afwegen en de EHBO-vraag", async ({ browser }) => {
   await s.ctx.close();
 });
 
+/**
+ * Een AVF van een ander is niet te openen. Door het laadscherm (streaming) kan de statuscode al 200 zijn voordat de
+ * pagina "niet gevonden" meldt; wat telt is dat er niets van het AVF in de pagina staat.
+ */
+async function geenToegang(res: { status(): number; text(): Promise<string> }) {
+  const html = await res.text();
+  expect([200, 404]).toContain(res.status());
+  expect(html).not.toContain("Tien studenten doen mee"); // sectie B
+  expect(html).not.toContain("Geraakt worden door een speer"); // sectie E
+  expect(html).not.toContain("Veld naast de camping"); // locatie
+}
+
 test("andere groepen, studenten en andere clusters zien alleen de publieke kaart", async ({ browser }) => {
   const groep2 = await nieuweSessie(browser, "vd-groep-2");
   await groep2.page.goto("/belevenissen");
@@ -208,20 +220,20 @@ test("andere groepen, studenten en andere clusters zien alleen de publieke kaart
   expect(tekst).not.toContain("Tien studenten doen mee"); // sectie B
   expect(tekst).not.toContain("Geraakt worden door een speer"); // sectie E
   expect(tekst).not.toContain("Veld naast de camping"); // locatie is niet publiek
-  expect((await groep2.page.request.get(`/belevenissen/${avf[1]}`)).status()).toBe(404);
+  await geenToegang(await groep2.page.request.get(`/belevenissen/${avf[1]}`));
   expect((await groep2.page.request.get(`/avf/A`)).url()).not.toContain(avf[1]); // eigen AVF, niet dat van groep 1
   await groep2.ctx.close();
 
   const student = await nieuweSessie(browser, "vd-student");
   await student.page.goto("/belevenissen");
   await expect(student.page.getByText("Oer-Olympische Spelen")).toBeVisible();
-  expect((await student.page.request.get(`/belevenissen/${avf[1]}`)).status()).toBe(404);
+  await geenToegang(await student.page.request.get(`/belevenissen/${avf[1]}`));
   await student.page.goto("/avf");
   await expect(student.page).toHaveURL(/\/belevenissen$/);
   await student.ctx.close();
 
   const vc = await nieuweSessie(browser, "vc-stuur-programma");
-  expect((await vc.page.request.get(`/belevenissen/${avf[1]}`)).status()).toBe(404);
+  await geenToegang(await vc.page.request.get(`/belevenissen/${avf[1]}`));
   await vc.page.goto("/belevenissen");
   await expect(vc.page.getByText("Oer-Olympische Spelen")).toHaveCount(0);
   await vc.ctx.close();

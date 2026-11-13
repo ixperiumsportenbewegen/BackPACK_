@@ -57,7 +57,12 @@ export function AfbeeldingVeld({
 
   async function verwijder() {
     const oud = pad;
-    if (await v.opslaan(null) && oud) await maakBrowserClient().storage.from("avf").remove([oud]);
+    setBezig(true);
+    try {
+      if (await v.opslaan(null) && oud) await maakBrowserClient().storage.from("avf").remove([oud]);
+    } finally {
+      setBezig(false);
+    }
   }
 
   return (
@@ -76,7 +81,7 @@ export function AfbeeldingVeld({
             />
           </label>
           {pad && (
-            <button type="button" onClick={() => void verwijder()} className="flex min-h-aanraak items-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+            <button type="button" onClick={() => void verwijder()} disabled={bezig} className="flex min-h-aanraak items-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
               <Trash2 aria-hidden className="size-5" /> Verwijderen
             </button>
           )}

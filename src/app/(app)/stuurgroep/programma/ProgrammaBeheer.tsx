@@ -99,7 +99,7 @@ function ToewijsKaart({ regel, groepen, naam }: { regel: ProgrammaRegel; groepen
       </p>
 
       <label htmlFor={id} className="mt-3 block font-bold text-kop">Organiserende projectgroep</label>
-      <select id={id} value={keuze} onChange={(e) => void kies(e.target.value)} disabled={!naam.trim()} className={`${INVOER} min-h-aanraak`}>
+      <select id={id} value={keuze} onChange={(e) => void kies(e.target.value)} disabled={!naam.trim() || melding?.soort === "bezig"} className={`${INVOER} min-h-aanraak`}>
         <option value="">Nog niet toegewezen</option>
         {groepen.map((g) => (
           <option key={g.avfId} value={g.avfId}>

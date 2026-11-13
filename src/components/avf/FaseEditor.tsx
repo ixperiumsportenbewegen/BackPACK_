@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronRight, Loader2, Plus, Trash2 } from "lucide-react";
 import { onderdeelToevoegen, onderdeelVerplaatsen, onderdeelVerwijderen } from "@/app/(app)/avf/actions";
 import { AfbeeldingVeld } from "@/components/avf/AfbeeldingVeld";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
@@ -27,6 +27,7 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
   const { naam, vergrendeld } = useAvfEditor();
   const [fout, setFout] = useState<string | null>(null);
   const [bevestig, setBevestig] = useState<string | null>(null);
+  const [bezig, setBezig] = useState(false);
   const f = avf.fasen.find((x) => x.fase === fase)!;
   const onderdelen = avf.onderdelen.filter((o) => o.fase === fase);
   const huidig = FASEN.find((x) => x.code === fase)!;
@@ -34,15 +35,18 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
   async function voegToe() {
     setFout(null);
     if (!naam.trim()) { setFout("Vul bovenaan eerst je naam in."); return; }
+    setBezig(true);
     const res = await onderdeelToevoegen(fase, naam);
-    if (res.status === "ok") router.push(`/avf/onderdeel/${res.id}`);
-    else setFout(res.melding);
+    if (res.status === "ok") router.push(`/avf/onderdeel/${res.id}`); // blijft 'bezig' tot de nieuwe pagina er is
+    else { setBezig(false); setFout(res.melding); }
   }
 
   async function verplaats(id: string, richting: -1 | 1) {
     setFout(null);
     if (!naam.trim()) { setFout("Vul bovenaan eerst je naam in."); return; }
+    setBezig(true);
     const res = await onderdeelVerplaatsen(id, richting, naam);
+    setBezig(false);
     if (res.status === "ok") router.refresh();
     else setFout(res.melding);
   }
@@ -50,7 +54,9 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
   async function verwijder(id: string) {
     setFout(null);
     if (!naam.trim()) { setFout("Vul bovenaan eerst je naam in."); return; }
+    setBezig(true);
     const res = await onderdeelVerwijderen(id, naam);
+    setBezig(false);
     if (res.status === "ok") { setBevestig(null); router.refresh(); }
     else setFout(res.melding);
   }
@@ -117,10 +123,10 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
                 </Link>
                 {!vergrendeld && (
                   <div className="flex">
-                    <button type="button" aria-label="Omhoog" disabled={n === 0} onClick={() => void verplaats(o.id, -1)} className="flex size-aanraak items-center justify-center text-kop disabled:opacity-30">
+                    <button type="button" aria-label="Omhoog" disabled={n === 0 || bezig} onClick={() => void verplaats(o.id, -1)} className="flex size-aanraak items-center justify-center text-kop disabled:opacity-30">
                       <ArrowUp aria-hidden className="size-5" />
                     </button>
-                    <button type="button" aria-label="Omlaag" disabled={n === onderdelen.length - 1} onClick={() => void verplaats(o.id, 1)} className="flex size-aanraak items-center justify-center text-kop disabled:opacity-30">
+                    <button type="button" aria-label="Omlaag" disabled={n === onderdelen.length - 1 || bezig} onClick={() => void verplaats(o.id, 1)} className="flex size-aanraak items-center justify-center text-kop disabled:opacity-30">
                       <ArrowDown aria-hidden className="size-5" />
                     </button>
                   </div>
@@ -130,7 +136,7 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
                 bevestig === o.id ? (
                   <div className="mt-1 flex flex-wrap items-center gap-2 px-1">
                     <span className="font-medium text-kop">Zeker weten?</span>
-                    <button type="button" onClick={() => void verwijder(o.id)} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk">Ja, verwijderen</button>
+                    <button type="button" onClick={() => void verwijder(o.id)} disabled={bezig} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">{bezig ? "Bezig…" : "Ja, verwijderen"}</button>
                     <button type="button" onClick={() => setBevestig(null)} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">Nee</button>
                   </div>
                 ) : (
@@ -143,8 +149,8 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
           ))}
         </ol>
         {!vergrendeld && (
-          <button type="button" onClick={() => void voegToe()} className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
-            <Plus aria-hidden className="size-5" /> Onderdeel toevoegen
+          <button type="button" onClick={() => void voegToe()} disabled={bezig} className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
+            {bezig ? <Loader2 aria-hidden className="size-5 animate-spin" /> : <Plus aria-hidden className="size-5" />} {bezig ? "Bezig…" : "Onderdeel toevoegen"}
           </button>
         )}
         {fout && <p role="alert" className="font-medium text-fout">{fout}</p>}

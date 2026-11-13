@@ -1,3 +1,4 @@
+import { SubmitKnop } from "@/components/SubmitKnop";
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
 import { CalendarDays, FileText, Users } from "lucide-react";
@@ -59,12 +60,9 @@ export default async function Meer() {
       )}
 
       <form action={uitloggen}>
-        <button
-          type="submit"
-          className="min-h-aanraak w-full rounded-han bg-merk px-4 text-lg font-bold text-op-merk"
-        >
+        <SubmitKnop bezigTekst="Bezig met uitloggen…" className="min-h-aanraak w-full rounded-han bg-merk px-4 text-lg font-bold text-op-merk">
           Uitloggen
-        </button>
+        </SubmitKnop>
       </form>
     </div>
   );

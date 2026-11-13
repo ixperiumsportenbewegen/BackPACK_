@@ -1,3 +1,4 @@
+import { SubmitKnop } from "@/components/SubmitKnop";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { CalendarDays, ChevronRight } from "lucide-react";
@@ -56,15 +57,14 @@ export default async function OnzeMeerdaagse() {
               return (
                 <form key={c.code} action={kiesCluster} className="flex-1">
                   <input type="hidden" name="code" value={c.code} />
-                  <button
-                    type="submit"
-                    aria-pressed={actief}
+                  <SubmitKnop
+                    pressed={actief} bezigTekst="Bezig…"
                     className={`min-h-aanraak w-full rounded-han border-2 px-3 font-bold ${
                       actief ? "border-merk bg-merk text-op-merk" : "border-rand bg-vlak text-kop"
                     }`}
                   >
                     {c.code}
-                  </button>
+                  </SubmitKnop>
                 </form>
               );
             })}

@@ -258,7 +258,7 @@ function RegelFormulier({
             <span className="flex-1 font-medium text-kop">
               Aangepast: was {formatTijd(regel.oorspronkelijke_starttijd!)}–{formatTijd(regel.oorspronkelijke_eindtijd!)}
             </span>
-            <button type="button" onClick={() => void bevestig()} disabled={!naam.trim()} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-3 font-bold text-kop disabled:opacity-60">
+            <button type="button" onClick={() => void bevestig()} disabled={!naam.trim() || melding?.soort === "bezig"} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-3 font-bold text-kop disabled:opacity-60">
               Wijziging bevestigen
             </button>
           </div>
@@ -299,7 +299,7 @@ function RegelFormulier({
           </div>
         )}
 
-        <button type="button" onClick={() => void bewaar()} disabled={!naam.trim() || voorbeeld.pastNiet} className="min-h-aanraak rounded-han bg-merk px-4 text-lg font-bold text-op-merk disabled:opacity-60">
+        <button type="button" onClick={() => void bewaar()} disabled={!naam.trim() || voorbeeld.pastNiet || melding?.soort === "bezig"} className="min-h-aanraak rounded-han bg-merk px-4 text-lg font-bold text-op-merk disabled:opacity-60">
           Opslaan
         </button>
         {melding && (
@@ -324,10 +324,10 @@ function RegelFormulier({
               <p className="font-bold text-kop">“{regel.titel}” verwijderen?</p>
               <p className="text-sm text-tekst">Wat moet er met de tijden van de volgende activiteiten gebeuren?</p>
               <div className="mt-2 flex flex-col gap-2">
-                <button type="button" onClick={() => void verwijder(true)} disabled={!naam.trim()} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">
+                <button type="button" onClick={() => void verwijder(true)} disabled={!naam.trim() || melding?.soort === "bezig"} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">
                   Verwijderen en volgende activiteiten naar voren schuiven
                 </button>
-                <button type="button" onClick={() => void verwijder(false)} disabled={!naam.trim()} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
+                <button type="button" onClick={() => void verwijder(false)} disabled={!naam.trim() || melding?.soort === "bezig"} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
                   Verwijderen, tijden laten staan
                 </button>
                 <button type="button" onClick={() => setVerwijderen(false)} className="min-h-aanraak rounded-han px-4 font-bold text-kop underline">Annuleren</button>

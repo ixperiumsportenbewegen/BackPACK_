@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { lijstToevoegen, lijstVerwijderen, type JsonSectie } from "@/app/(app)/avf/actions";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
 import { TekstVeld } from "@/components/avf/Velden";
@@ -52,7 +52,9 @@ export function LijstEditor({
 
   async function verwijder(id: string) {
     if (!naam.trim()) { setFout("Vul bovenaan eerst je naam in."); return; }
+    setBezig(true);
     const res = await lijstVerwijderen(sectie, pad, id, naam);
+    setBezig(false);
     if (res.status === "ok") {
       setItems((x) => x.filter((i) => i.id !== id));
       setBevestig(null);
@@ -83,8 +85,8 @@ export function LijstEditor({
             bevestig === item.id ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="font-medium text-kop">Zeker weten?</span>
-                <button type="button" onClick={() => void verwijder(item.id)} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk">
-                  Ja, verwijderen
+                <button type="button" onClick={() => void verwijder(item.id)} disabled={bezig} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60">
+                  {bezig ? "Bezig…" : "Ja, verwijderen"}
                 </button>
                 <button type="button" onClick={() => setBevestig(null)} className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
                   Nee
@@ -103,7 +105,7 @@ export function LijstEditor({
           type="button" onClick={() => void voegToe()} disabled={bezig}
           className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60"
         >
-          <Plus aria-hidden className="size-5" /> {toevoegenLabel}
+          {bezig ? <Loader2 aria-hidden className="size-5 animate-spin" /> : <Plus aria-hidden className="size-5" />} {bezig ? "Bezig…" : toevoegenLabel}
         </button>
       )}
       {fout && <p role="alert" className="font-medium text-fout">{fout}</p>}

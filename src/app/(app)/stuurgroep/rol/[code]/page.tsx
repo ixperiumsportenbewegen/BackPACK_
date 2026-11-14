@@ -148,7 +148,7 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
         </>
       )}
       {rolCode === "communicatie_financien" && (
-        <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">Het budgetoverzicht en de aanvragen beoordelen komen in een volgende stap.</p>
+        <LinkKaart href="/stuurgroep/budget" titel="Budget en aanvragen" uitleg="Het budget van het cluster, aanvragen van projectgroepen beoordelen en wat er nog over is." />
       )}
       {rolCode === "veiligheid_welzijn" && (
         <section className="rounded-han border border-rand bg-vlak p-4">

@@ -90,7 +90,10 @@ describe("Test 3: geen toegang tot een ander cluster", () => {
     const client = await inloggenAls("vd-groep-1");
     const eigen = await client.rpc("budget_resterend", { p_cluster_id: VD });
     expect(eigen.error).toBeNull();
-    expect(Number(eigen.data)).toBe(250);
+    // budget min wat is toegekend (het clusterbudget is aanpasbaar, de startwaarde is € 150)
+    const { data: budget } = await admin.from("cluster_budget").select("budget_totaal").eq("cluster_id", VD).single();
+    const { data: toegekend } = await admin.from("budgetaanvraag").select("bedrag_toegekend").eq("cluster_id", VD).eq("status", "toegekend");
+    expect(Number(eigen.data)).toBe(Number(budget!.budget_totaal) - (toegekend ?? []).reduce((som, r) => som + Number(r.bedrag_toegekend), 0));
     const ander = await client.rpc("budget_resterend", { p_cluster_id: VC });
     expect(ander.error).not.toBeNull();
   });

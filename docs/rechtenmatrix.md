@@ -46,7 +46,7 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 
 | Functie | Wie | Wat |
 |---|---|---|
-| `avf_indienen(avf_id, naam, wijzigingssamenvatting, open_bevestigd)` | PG eigen | Controleert verplichte velden (volgens `docs/avf-velden.md`) en of alle zes projectgroeprollen een naam hebben; maakt `avf_versie`; zet status op `ingediend`; zet budgetaanvraag `concept` → `aangevraagd` (dat laatste volgt in opdracht 5). Staan er nog open verbeterverzoeken waaraan niets is aangepast, dan geeft de functie die terug en dient pas in na `open_bevestigd = true` |
+| `avf_indienen(avf_id, naam, wijzigingssamenvatting, open_bevestigd)` | PG eigen | Controleert verplichte velden (volgens `docs/avf-velden.md`) en of alle zes projectgroeprollen een naam hebben; maakt `avf_versie`; zet status op `ingediend`; zet het financieel plan (budgetaanvraag van soort `avf`) van `concept` of `teruggegeven` naar `aangevraagd` als er bedragen in staan. Staan er nog open verbeterverzoeken waaraan niets is aangepast, dan geeft de functie die terug en dient pas in na `open_bevestigd = true` |
 | `avf_aanpassing_vragen(avf_id, naam)` | Stuurgroep, docent | Alleen als er minstens één open verbeterverzoek is; status → `aanpassing_gevraagd` |
 | `verbeterverzoek_plaatsen(avf_id, sectie, onderdeel_id, veld_sleutel, rol, tekst, naam)`, `verbeterverzoek_status_zetten(id, status, naam)`, `themacheck_zetten(avf_id, rol, oordeel, toelichting, naam)` | Stuurgroep, docent | Verzoeken en themachecks plaatsen en afhandelen (clients schrijven nooit rechtstreeks in deze tabellen) |
 | `avf_goedkeuren(avf_id, naam, open_bevestigd)` | Stuurgroep, docent | Status → `goedgekeurd`; legt account, naam en tijd vast; zet `opnieuw_te_controleren` op false |
@@ -56,9 +56,12 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `programma_regel_toevoegen(na_regel_id, titel, ..., schuif, naam)` | Stuurgroep, docent | Voegt een vaste activiteit toe na een bestaande activiteit (nooit een belevenisvak) |
 | `programma_regel_verwijderen(regel_id, schuif, naam)` | Stuurgroep, docent | Verwijdert een vaste activiteit; een belevenisvak wordt geweigerd |
 | `programma_wijzigingen_bevestigen(cluster_id, regel_id, naam)` | Stuurgroep, docent | Haalt de uitroeptekens weg zonder de tijden te veranderen |
-| `budget_besluit(aanvraag_id, besluit, bedrag, toelichting, naam)` | Stuurgroep, docent | `toegekend` (eventueel lager bedrag), `teruggegeven` of `afgewezen`; toelichting verplicht behalve bij volledig toekennen |
-| `budget_aanvraag_indienen(aanvraag_id, naam)` | PG eigen | Losse aanvraag (`soort = los`), alleen als het AVF is goedgekeurd |
-| `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Geeft alleen het resterende bedrag terug |
+| `budget_regels_opslaan(aanvraag_id, regels, omschrijving, toelichting, naam, verwacht_updated_at)` | PG eigen, docent | Slaat het financieel plan of een losse aanvraag op (regels met omschrijving en bedrag; het bedrag is de som). Alleen bij `concept` of `teruggegeven`; het plan van een goedgekeurd AVF ligt vast tenzij het is teruggegeven; waarschuwt bij gelijktijdig wijzigen |
+| `budget_losse_aanvraag_maken(avf_id, omschrijving, naam)` | PG eigen | Start een losse aanvraag (`soort = los`), alleen als het AVF is goedgekeurd |
+| `budget_aanvraag_indienen(aanvraag_id, naam)` | PG eigen | Dient een losse aanvraag in (AVF goedgekeurd) of het financieel plan opnieuw na `teruggegeven`; vraagt een bedrag |
+| `budget_besluit(aanvraag_id, besluit, bedrag, toelichting, naam)` | Stuurgroep van het cluster, docent | `toegekend` (eventueel lager bedrag, nooit hoger dan aangevraagd), `teruggegeven` of `afgewezen`; toelichting verplicht behalve bij volledig toekennen. Een bedrag boven de resterende ruimte mag: de functie meldt dat terug als waarschuwing |
+| `budget_besteed_zetten(aanvraag_id, bedrag, naam)` | Stuurgroep, docent | Het werkelijk bestede bedrag (handmatig, alleen bij toegekend). De app claimt nooit dat iets is betaald |
+| `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Budget min wat is toegekend; geeft alleen dat bedrag terug |
 | `account_wachtwoord_resetten(account_id)` | Docent | Server-side met service role; nieuw wachtwoord tonen aan docent |
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.

@@ -11,6 +11,8 @@ import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { VerzoekenLijst } from "@/components/avf/Verzoeken";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { MaterialenEditor } from "@/components/avf/MaterialenEditor";
+import { FinancieelPlanInAvf } from "@/components/budget/FinancieelPlan";
+import { laadBudgetAvf } from "@/lib/budget";
 import { laadAanvragen, laadAvfMaterialen, laadBeschikbaarheid, laadCategorieen, laadLijstStatus, laadMaterialen } from "@/lib/materialen";
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
@@ -184,16 +186,25 @@ export default async function SectiePagina({
     );
   } else if (code === "F") {
     const locatie = (avf.inhoud.locatie_keuze === "camping" || avf.inhoud.locatie_keuze === "bivak") ? avf.inhoud.locatie_keuze : null;
-    const [lijstStatus, materialen, regels, beschikbaar, categorieen, aanvragen] = await Promise.all([
-      laadLijstStatus(), laadMaterialen(), laadAvfMaterialen(avf.id), locatie ? laadBeschikbaarheid(avf.id) : Promise.resolve({}), laadCategorieen(), laadAanvragen(avf.id),
+    const [lijstStatus, materialen, regels, beschikbaar, categorieen, aanvragen, budget] = await Promise.all([
+      laadLijstStatus(), laadMaterialen(), laadAvfMaterialen(avf.id), locatie ? laadBeschikbaarheid(avf.id) : Promise.resolve({}), laadCategorieen(), laadAanvragen(avf.id), laadBudgetAvf(avf.id),
     ]);
+    const plan = budget.find((b) => b.soort === "avf");
     inhoudBlok = (
       <>
         <MaterialenEditor
           locatie={locatie} tijdvak={avf.tijdvak ? formatTijdvak(avf.tijdvak) : null} lijstDefinitief={lijstStatus.status === "definitief"}
           materialen={materialen} regels={regels} beschikbaar={beschikbaar} categorieVolgorde={categorieen.map((c) => c.naam)} aanvragen={aanvragen}
         />
-        <p className="rounded-han border border-rand bg-vlak p-4 text-zacht">Het financieel plan volgt in een latere versie. Leeg laten mag.</p>
+        {plan && (
+          <section className="flex flex-col gap-2" aria-labelledby="plan-kop">
+            <h2 id="plan-kop" className="text-xl">Financieel plan</h2>
+            {plan.status === "concept" && avf.status === "goedgekeurd" && (
+              <p className="rounded-han border border-rand bg-vlak p-3 text-tekst">Het AVF is goedgekeurd, dus het financieel plan ligt vast. Extra kosten vraag je aan bij <a href="/budget" className="font-bold text-kop underline">Budget</a> met een losse aanvraag.</p>
+            )}
+            <FinancieelPlanInAvf aanvraag={plan} avfBewerkbaar={avf.status === "in_ontwikkeling" || avf.status === "aanpassing_gevraagd"} />
+          </section>
+        )}
       </>
     );
   } else if (code === "G") {

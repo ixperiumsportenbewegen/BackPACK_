@@ -157,7 +157,7 @@ export const AVF_VELDEN: AvfVeld[] = [
   // F Materialen en financiën: volgt in opdracht 5
   veld({ sleutel: "avf_materiaal", sectie: "F", label: "Materialen uit de lijst", veldtype: "lijst", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
   veld({ sleutel: "avf_materiaal.aanvullend", docSleutels: [], sectie: "F", label: "Eigen materialen", veldtype: "lijst", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", wezenlijk: true }),
-  veld({ sleutel: "budgetaanvraag", sectie: "F", label: "Financieel plan (regels en totaal)", veldtype: "later", v: "nee", pg: "projectleider", sg: "communicatie_financien", pack: "C" }),
+  veld({ sleutel: "budgetaanvraag", sectie: "F", label: "Financieel plan (regels en totaal)", veldtype: "lijst", v: "nee", pg: "projectleider", sg: "communicatie_financien", pack: "C" }),
 
   // G Thema en organisatie
   veld({ sleutel: "organisatie.bijdrage_thema", sectie: "G", label: "Bijdrage aan het meerdaagsethema", veldtype: "lang", v: "ja", pg: "programma_beleving", sg: "beleving_thema", pack: "A", maxLengte: 1000 }),

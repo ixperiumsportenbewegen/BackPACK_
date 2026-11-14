@@ -7,6 +7,7 @@ import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
 import { laadStanden } from "@/lib/beoordeling";
+import { euro, laadClusterBudget, laadResterend } from "@/lib/budget";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
@@ -42,7 +43,18 @@ export default async function OnzeMeerdaagse() {
   const openAanvragen = toonStand && profiel.cluster
     ? ((await supabase.from("materiaal_aanvraag").select("id, avf:avf_id!inner(cluster_id)").eq("status", "open").eq("avf.cluster_id", profiel.cluster.id)).data ?? []).length
     : 0;
+  const budgetOpen = toonStand && profiel.cluster
+    ? ((await supabase.from("budgetaanvraag").select("id").eq("cluster_id", profiel.cluster.id).eq("status", "aangevraagd")).data ?? []).length
+    : 0;
+  const budgetTotaal = toonStand && profiel.cluster ? await laadClusterBudget(profiel.cluster.id) : null;
+  const budgetRest = toonStand && profiel.cluster ? await laadResterend(profiel.cluster.id) : null;
   const regelVoor = (code: string): string => {
+    if (code === "communicatie_financien") {
+      return [
+        budgetRest !== null && budgetTotaal !== null ? `Budget: ${euro(budgetRest)} van ${euro(budgetTotaal)} vrij` : null,
+        budgetOpen > 0 ? `${budgetOpen} ${budgetOpen === 1 ? "aanvraag wacht" : "aanvragen wachten"} op een besluit` : null,
+      ].filter(Boolean).join(" · ") || "Nog niets te melden";
+    }
     if (code === "logistiek_facilitair") return [
       zonderLocatie > 0 ? `${zonderLocatie} ${zonderLocatie === 1 ? "belevenis heeft" : "belevenissen hebben"} nog geen locatie` : "Alle locaties gekozen",
       openAanvragen > 0 ? `${openAanvragen} open materiaalaanvraag${openAanvragen === 1 ? "" : "en"}` : null,

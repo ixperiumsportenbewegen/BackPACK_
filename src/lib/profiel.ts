@@ -8,7 +8,7 @@ export interface Profiel {
   soort: Accountsoort;
   label: string;
   /** Cluster waarin het account werkt; bij de docent het gekozen cluster. */
-  cluster: { id: string; code: string; naam: string; teams_link: string | null } | null;
+  cluster: { id: string; code: string; naam: string; teams_link: string | null; forms_link: string | null } | null;
   alleClusters: { code: string; naam: string }[]; // alleen gevuld bij de docent
   stuurgroeprol: { code: string; naam: string; pack: string } | null;
   /** Alleen bij een projectgroepaccount. */
@@ -28,7 +28,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
   const { data: a } = await supabase
     .from("account")
     .select(`gebruikersnaam, soort,
-      cluster:cluster_id (id, code, naam, teams_link),
+      cluster:cluster_id (id, code, naam, teams_link, forms_link),
       projectgroep:projectgroep_id (id, nummer, naam),
       stuurgroeprol:stuurgroeprol_id (code, naam, pack)`)
     .eq("id", user.id)
@@ -44,7 +44,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
   let alleClusters: Profiel["alleClusters"] = [];
   if (soort === "docent") {
     const { data: lijst } = await supabase
-      .from("cluster").select("id, code, naam, teams_link").order("code", { ascending: false });
+      .from("cluster").select("id, code, naam, teams_link, forms_link").order("code", { ascending: false });
     const gekozen = (await cookies()).get("docent_cluster")?.value;
     alleClusters = (lijst ?? []).map((c) => ({ code: c.code, naam: c.naam }));
     cluster = lijst?.find((c) => c.code === gekozen) ?? lijst?.find((c) => c.code === "VD") ?? lijst?.[0] ?? null;

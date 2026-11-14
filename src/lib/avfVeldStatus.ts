@@ -47,6 +47,7 @@ export function veldStand(avf: AvfGegevens, v: AvfVeld): VeldStand {
 
   switch (v.sleutel) {
     case "tijdvak": return avf.tijdvak ? "ingevuld" : "leeg";
+    case "budgetaanvraag": return (inhoud.financieelPlanRegels ?? 0) > 0 ? "ingevuld" : "leeg";
     case "avf_materiaal": return (inhoud.materialenAantal ?? 0) > 0 ? "ingevuld" : "leeg";
     case "avf_materiaal.aanvullend": return (inhoud.eigenMaterialenAantal ?? 0) > 0 ? "ingevuld" : "leeg";
     case "projectgroep_rol": return samen(inhoud.rollenIngevuld, 6);

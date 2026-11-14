@@ -3,6 +3,7 @@ import { OPRUIMEN_VELDEN, WEER_SCENARIOS, WEER_VELDEN, SECTIES } from "@/config/
 import { PROJECTGROEPROLLEN } from "@/config/projectgroeprollen";
 import type { AvfGegevens } from "@/lib/avfData";
 import { isGevuld, type Json } from "@/lib/avfVoortgang";
+import { euro } from "@/lib/budgetTypes";
 import { formatTijdvak } from "@/lib/tijd";
 import { VerzoekSectie, type VerzoekContext } from "@/components/avf/VerzoekSectie";
 
@@ -219,7 +220,19 @@ export function AvfLeesweergave({ avf, verzoeken }: { avf: AvfGegevens; verzoeke
               </ul>
             ) : ""}
           />
-          <p className="text-sm text-zacht">Het financieel plan volgt in een latere versie van BackPACK_.</p>
+          <Rij
+            label="Financieel plan"
+            waarde={avf.financieelPlan && avf.financieelPlan.regels.length ? (
+              <table className="w-full border-collapse text-left text-sm">
+                <tbody>
+                  {avf.financieelPlan.regels.map((r, n) => (
+                    <tr key={n}><td className="border border-rand p-1">{r.omschrijving}</td><td className="w-24 border border-rand p-1 text-right">{euro(r.bedrag)}</td></tr>
+                  ))}
+                  <tr><th scope="row" className="border border-rand p-1 text-left">Totaal</th><td className="border border-rand p-1 text-right font-bold">{euro(avf.financieelPlan.totaal)}</td></tr>
+                </tbody>
+              </table>
+            ) : ""}
+          />
         </dl>
       </Blok>
     </div>

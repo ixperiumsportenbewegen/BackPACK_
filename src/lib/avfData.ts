@@ -49,6 +49,7 @@ export interface AvfGegevens {
   inhoud: AvfInhoud;
   rolverdeling: { rol: string; namen: string | null }[];
   materialen: MateriaalRegel[];
+  financieelPlan: { regels: { omschrijving: string; bedrag: number }[]; totaal: number; status: string } | null;
   fasen: FaseRij[];
   onderdelen: OnderdeelRij[];
 }
@@ -72,7 +73,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     .maybeSingle();
   if (!a) return null;
 
-  const [{ data: fasenRaw }, { data: onderdelenRaw }, { data: rollen }, regel, { data: matRaw }] = await Promise.all([
+  const [{ data: fasenRaw }, { data: onderdelenRaw }, { data: rollen }, regel, { data: matRaw }, { data: planRaw }] = await Promise.all([
     supabase.from("avf_fase").select("*").eq("avf_id", avfId),
     supabase.from("avf_onderdeel").select("*").eq("avf_id", avfId).order("fase").order("volgorde"),
     supabase.from("projectgroep_rol").select("rol, namen").eq("projectgroep_id", a.projectgroep_id),
@@ -80,7 +81,14 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
       ? supabase.from("programma_regel").select("id, dag, starttijd, eindtijd, titel, locatie").eq("id", a.programma_regel_id).maybeSingle()
       : Promise.resolve({ data: null }),
     supabase.from("avf_materiaal").select("id, fase, materiaal_id, omschrijving, aantal, aantal_gecorrigeerd, materiaal:materiaal_id(naam)").eq("avf_id", avfId).order("created_at"),
+    supabase.from("budgetaanvraag").select("regels, bedrag_aangevraagd, status").eq("avf_id", avfId).eq("soort", "avf").maybeSingle(),
   ]);
+  const financieelPlan = planRaw
+    ? {
+        regels: (Array.isArray(planRaw.regels) ? (planRaw.regels as { omschrijving?: string; bedrag?: number }[]) : []).map((r) => ({ omschrijving: String(r.omschrijving ?? ""), bedrag: Number(r.bedrag ?? 0) })),
+        totaal: Number(planRaw.bedrag_aangevraagd), status: planRaw.status as string,
+      }
+    : null;
   const materialen: MateriaalRegel[] = (matRaw ?? []).map((m) => ({
     id: m.id, naam: m.materiaal_id ? ((m.materiaal as unknown as { naam: string } | null)?.naam ?? "Materiaal") : (m.omschrijving ?? "Materiaal"),
     eigen: !m.materiaal_id, fase: m.fase, aantal: m.aantal, aantalGecorrigeerd: m.aantal_gecorrigeerd,
@@ -110,6 +118,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     rollenIngevuld: (rollen ?? []).filter((r) => isGevuld(r.namen)).length,
     materialenAantal: materialen.filter((m) => !m.eigen).length,
     eigenMaterialenAantal: materialen.filter((m) => m.eigen).length,
+    financieelPlanRegels: financieelPlan?.regels.length ?? 0,
   };
 
   const pg = a.projectgroep as unknown as { naam: string; nummer: number };
@@ -127,7 +136,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     sectieBijgewerkt: (a.sectie_bijgewerkt ?? {}) as AvfGegevens["sectieBijgewerkt"],
     inhoud, fasen, onderdelen,
     rolverdeling: (rollen ?? []) as { rol: string; namen: string | null }[],
-    materialen,
+    materialen, financieelPlan,
   };
 }
 

@@ -16,7 +16,7 @@ Voorstel voor versie 1. Tabellen gemarkeerd met *(later)* horen bij latere opdra
 | editie_id | uuid → editie | |
 | code | text | `VD`, `VC` of `TEST`, uniek per editie; TEST is een fictief oefencluster |
 | naam | text | |
-| budget_totaal | numeric(10,2) | standaard 250.00 |
+| budget_totaal | numeric(10,2) | standaard 150.00, aanpasbaar door stuurgroep en docent |
 | teams_link | text | knop naar Teams-kanaal |
 | forms_link | text | declaratieformulier |
 | meerdaagsemodus_aan | boolean | standaard false *(gebruikt in latere opdracht)* |
@@ -242,14 +242,18 @@ Materiaal kiezen kan pas als de locatie bekend is en de lijst definitief is. Mat
 | projectgroep_id | uuid → projectgroep | |
 | avf_id | uuid → avf | |
 | soort | enum | `avf` (financieel plan, één per AVF) of `los` |
-| omschrijving | text | |
-| regels | jsonb | `[{omschrijving, bedrag}]` |
+| omschrijving | text | bij een losse aanvraag: waarvoor |
+| toelichting | text | optionele toelichting van de groep |
+| regels | jsonb | `[{omschrijving, bedrag}]`, maximaal 30 regels |
 | bedrag_aangevraagd | numeric(10,2) | som van regels |
 | status | enum `budgetstatus` | `concept`, `aangevraagd`, `toegekend`, `teruggegeven`, `afgewezen` |
 | bedrag_toegekend | numeric(10,2) | mag lager zijn dan aangevraagd |
 | besluit_toelichting | text | verplicht bij teruggeven, afwijzen of lager bedrag |
 | besluit_door_naam, besluit_op | text, timestamptz | |
 | besteed | numeric(10,2) | handmatig na aankoop (Should) |
+| ingediend_door_naam, ingediend_op | text, timestamptz | |
+
+Elk AVF heeft automatisch één (aanvankelijk lege) aanvraag van soort `avf`: het financieel plan in sectie F. Dat plan gaat mee met het indienen van het AVF en ligt na goedkeuring vast; extra kosten gaan via een losse aanvraag.
 
 Functie `budget_resterend(cluster_id)` (`security definer`): budget_totaal minus toegekend. Projectgroepen gebruiken deze functie; zij kunnen de aanvragen van anderen niet lezen.
 

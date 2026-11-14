@@ -82,7 +82,13 @@ Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen 
 - **Veiligheid & Welzijn**: AVF's met ontbrekende weerafweging of EHBO-antwoord.
 
 ### Budget (projectgroep) – BUD-02, BUD-03, BUD-06
-Eigen aanvragen met status en besluit, resterende ruimte van het cluster, knop "Losse aanvraag" (alleen na goedkeuring van het AVF).
+Bovenaan de resterende ruimte van het cluster (alleen dat bedrag). Daaronder het financieel plan van het AVF met status en besluit (bewerken doe je in sectie F, behalve na "teruggegeven"), de losse aanvragen (eerst een omschrijving, dan regels met bedragen, dan indienen) en een blok over aankopen en declareren met de Forms-link. Een losse aanvraag kan alleen na goedkeuring van het AVF.
+
+### Financieel plan in sectie F
+Een tabel met regels (omschrijving en bedrag, in euro's) en een totaal dat de aanvraag is. Elke regel wordt opgeslagen zodra hij compleet is. Het plan gaat mee met het indienen van het AVF en ligt na goedkeuring vast.
+
+### Budget beheren (`/stuurgroep/budget`, Communicatie & Financiën)
+Het budget van het cluster (aanpasbaar), kaarten met toegekend, in behandeling, besteed en nog over (met een waarschuwing bij overschrijding), de aanvragen die op een besluit wachten (toekennen met een eventueel lager bedrag, teruggeven of afwijzen met toelichting), een tabel per belevenis (gevraagd, toegekend, besteed), de afgehandelde aanvragen met een veld voor het besteed bedrag, en de Forms- en Teams-link.
 
 ### Materialenlijst – MAT-00 (`/stuurgroep/materialen`)
 Een tabel per categorie met de kolommen Materiaal, Camping en Bivak; de voorraad is direct in de tabel invulbaar (leeg = nog niet ingeschat) en een potlood opent naam, categorie, opmerking en beschikbaarheid. Bovenaan de voortgang ("x van y ingeschat"), zoeken, filter op categorie en een knop "Alleen nog in te vullen". Beheer van de categorieën en materiaal toevoegen zitten in uitklapblokken. Knop "Afdrukken / PDF" naar `/stuurgroep/materialen/afdrukken`: de totale lijst per categorie als schoon overzicht (concept of definitief) om af te drukken of als PDF op te slaan. Wijzigen: Logistiek & Facilitair van VD en de docent. Als concept ziet alleen Logistiek & Facilitair van VD hem, met de knop "Lijst definitief maken". Daarna kiezen projectgroepen en ziet VC hem; Logistiek & Facilitair van VC kan alleen toevoegen. Onder Meer voor stuurgroep en docent.

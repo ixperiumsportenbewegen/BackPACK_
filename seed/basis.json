@@ -47,7 +47,7 @@
     {
       "code": "VD",
       "naam": "Cluster VD",
-      "budget_totaal": 250,
+      "budget_totaal": 150,
       "teams_link": "https://teams.microsoft.com/",
       "forms_link": "https://forms.office.com/",
       "meerdaagsethema": {
@@ -175,7 +175,7 @@
     {
       "code": "VC",
       "naam": "Cluster VC",
-      "budget_totaal": 250,
+      "budget_totaal": 150,
       "teams_link": "https://teams.microsoft.com/",
       "forms_link": "https://forms.office.com/",
       "meerdaagsethema": {
@@ -303,7 +303,7 @@
     {
       "code": "TEST",
       "naam": "Oefencluster",
-      "budget_totaal": 250,
+      "budget_totaal": 150,
       "teams_link": "",
       "forms_link": "",
       "meerdaagsethema": {

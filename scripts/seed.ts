@@ -138,15 +138,18 @@ async function main() {
   });
 
   // Startlijst met materialen (één lijst voor beide clusters), zonder voorraad: Logistiek & Facilitair schat die zelf in.
-  // Bestaande materialen blijven zoals ze zijn.
+  // Alleen als de lijst nog leeg is: daarna beheert Logistiek & Facilitair de lijst in de app (toevoegen en verwijderen),
+  // en moet een nieuwe seed-run niets terugzetten wat bewust is verwijderd.
   {
-    const { data: bestaand } = await admin.from("materiaal").select("naam");
-    const namen = new Set((bestaand ?? []).map((m) => m.naam.trim().toLowerCase()));
-    const nieuw = (materialenSeed.materialen as { naam: string; categorie: string; opmerking?: string }[])
-      .filter((m) => !namen.has(m.naam.trim().toLowerCase()))
-      .map((m) => ({ naam: m.naam, categorie: m.categorie, opmerking: m.opmerking ?? null, voorraad_camping: null, voorraad_bivak: null, bijgewerkt_door_naam: "Seed" }));
-    if (nieuw.length) check(await admin.from("materiaal").insert(nieuw).select(), "materialen");
-    console.log(`Materialen: ${nieuw.length} toegevoegd, ${namen.size} bestonden al.`);
+    const { count } = await admin.from("materiaal").select("id", { count: "exact", head: true });
+    if ((count ?? 0) === 0) {
+      const nieuw = (materialenSeed.materialen as { naam: string; categorie: string; opmerking?: string }[])
+        .map((m) => ({ naam: m.naam, categorie: m.categorie, opmerking: m.opmerking ?? null, voorraad_camping: null, voorraad_bivak: null, bijgewerkt_door_naam: "Seed" }));
+      check(await admin.from("materiaal").insert(nieuw).select(), "materialen");
+      console.log(`Materialen: ${nieuw.length} geladen.`);
+    } else {
+      console.log(`Materialen: de lijst heeft al ${count} materialen en blijft zoals hij is.`);
+    }
   }
 
   for (const c of basis.clusters) {
@@ -191,7 +194,9 @@ async function main() {
   }
 
   // Voorbeeld-AVF bij projectgroep 1 van VD (tot de livegang) en van TEST (blijvend). Alleen als het AVF nog leeg is.
-  for (const code of ["VD", "TEST"]) {
+  // Na de livegang (markering livegang_op) komt er in VD geen voorbeeld-AVF meer; TEST houdt het altijd.
+  const { data: livegang } = await admin.from("systeem_instelling").select("waarde").eq("sleutel", "livegang_op").maybeSingle();
+  for (const code of livegang ? ["TEST"] : ["VD", "TEST"]) {
     const pgId = groepId[`${code}:1`];
     const { data: leegAvf } = await admin.from("avf").select("id, titel").eq("projectgroep_id", pgId).single();
     const { count } = await admin.from("avf_onderdeel").select("id", { count: "exact", head: true }).eq("avf_id", leegAvf!.id);

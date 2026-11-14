@@ -23,6 +23,9 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const pad = request.nextUrl.pathname;
 
+  // de blijf-actief-route is bedoeld voor Vercel Cron en GitHub Actions: die loggen niet in en dragen een geheime sleutel
+  if (pad === "/api/blijf-actief") return response;
+
   if (!user && pad !== "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

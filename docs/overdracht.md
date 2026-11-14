@@ -25,9 +25,11 @@ Voor een nieuwe sessie of een nieuwe collega. Lees eerst `CLAUDE.md` (leidende d
 
 - **Opdracht 4** Indienen en beoordelen: `/avf/indienen` (controlelijst, naam, samenvatting vanaf versie 2, waarschuwing bij open verzoeken zonder aanpassing), beoordelen op `/belevenissen/[id]` (verbeterverzoeken per sectie en onderdeel, themachecks, aanpassing vragen, goedkeuren, tabblad Versies), label "Opnieuw te controleren" via triggers, stuurgroepdashboard met rolweergave op `/stuurgroep/rol/[code]` (opent op de eigen rol, overzicht via `/stuurgroep?alle=1`). Migraties 12 en 13.
 
-- **Opdracht 5, deel A (materialen)**: de projectgroep kiest zelf de locatie (camping of bivak, plus waar precies) in sectie A. Eén gedeelde materialenlijst voor VD en VC met voorraad per locatie: Logistiek & Facilitair van VD bouwt hem als concept en maakt hem definitief (`/stuurgroep/materialen`); daarna kiezen projectgroepen in sectie F en ziet VC de lijst (VC mag alleen toevoegen). Voorraad per locatie en moment (hergebruik): `/stuurgroep/materialen/behoefte` met tekorten en correcties. Migraties 14 tot en met 20. Opdracht 5, deel B (budget): financieel plan in sectie F, `/budget` voor de groep en `/stuurgroep/budget` voor Communicatie & Financiën, losse aanvragen, besluiten, besteed bedrag en resterende ruimte; clusterbudget € 150. Daarna: publiceren in plaats van definitief maken, VD en VC passen de gepubliceerde lijst aan, materiaal verwijderen, aanvragen van projectgroepen en de paklijst (`/stuurgroep/materialen/paklijst`). De startlijst (50 materialen in 10 categorieën, zonder voorraad) staat in `seed/materialen.json`; Logistiek & Facilitair schat de voorraad zelf in. Zie de beslissingen van 13 november.
+- **Opdracht 5, deel A (materialen)**: de projectgroep kiest zelf de locatie (camping of bivak, plus waar precies) in sectie A. Eén gedeelde materialenlijst voor VD en VC met voorraad per locatie: Logistiek & Facilitair van VD bouwt hem als concept en maakt hem definitief (`/stuurgroep/materialen`); daarna kiezen projectgroepen in sectie F en ziet VC de lijst (VC mag alleen toevoegen). Voorraad per locatie en moment (hergebruik): `/stuurgroep/materialen/behoefte` met tekorten en correcties. Migraties 14 tot en met 23. Opdracht 5, deel B (budget): financieel plan in sectie F, `/budget` voor de groep en `/stuurgroep/budget` voor Communicatie & Financiën, losse aanvragen, besluiten, besteed bedrag en resterende ruimte; clusterbudget € 150. Daarna: publiceren in plaats van definitief maken, VD en VC passen de gepubliceerde lijst aan, materiaal verwijderen, aanvragen van projectgroepen en de paklijst (`/stuurgroep/materialen/paklijst`). De startlijst (50 materialen in 10 categorieën, zonder voorraad) staat in `seed/materialen.json`; Logistiek & Facilitair schat de voorraad zelf in. Zie de beslissingen van 13 november.
 
-**Volgende stap: opdracht 5, deel C (beheer door de docent, export, blijf-actief, livegang).** Zie `docs/bouwvolgorde.md` en het plan in het gesprek. `avf_indienen` moet dan ook de budgetaanvraag doorzetten.
+- **Opdracht 5, deel C (beheer)**: `/beheer` voor de docent (wachtwoorden resetten, links per cluster, export JSON en Excel), Forms-link per cluster door Communicatie & Financiën, `/api/blijf-actief` met Vercel Cron, wekelijkse export via GitHub Actions, `npm run export` en `npm run livegang` (droge run, oefenen op TEST). Instellen van de geheime sleutels: `docs/beheer-instellen.md`.
+
+**Volgende stap: de echte livegang (door Bart) en daarna de latere opdrachten 6 tot en met 10.** Let op: na de livegang bevat VD geen voorbeeld-AVF meer, dus de tests die `vd-groep-1` met het voorbeeld gebruiken moeten dan naar TEST worden verplaatst. Zie `docs/bouwvolgorde.md` en het plan in het gesprek. `avf_indienen` moet dan ook de budgetaanvraag doorzetten.
 
 ## Hoe je werkt
 
@@ -43,7 +45,7 @@ Op deze Windows-machine blokkeert PowerShell `npx` en `npm`: gebruik `npx.cmd` e
 | Testdata laden | `npm run seed`; een programma terugzetten: `npm run seed -- --programma-opnieuw=VC` |
 | Iconen opnieuw maken | `node scripts/maak-iconen.mjs` |
 
-Migraties staan in `supabase/migrations/` (nu 1 t/m 20). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
+Migraties staan in `supabase/migrations/` (nu 1 t/m 23). Voor de livegang mogen ze nog opruimen; daarna alleen toevoegend (zie `CLAUDE.md`).
 
 ## Valkuilen uit de vorige sessie
 

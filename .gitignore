@@ -50,3 +50,7 @@ playwright-report/
 .claude/
 
 .auth-cache/
+
+# exports en inloggegevens van de livegang (bevatten persoonsgegevens en wachtwoorden)
+/export/
+seed/livegang-inloggegevens.txt

@@ -267,6 +267,11 @@ Functie `budget_resterend(cluster_id)` (`security definer`): budget_totaal minus
 | account_id, naam | uuid, text | |
 | details | jsonb | |
 
+## Beheer
+
+### systeem_instelling
+`sleutel`, `waarde`: alleen voor de server. Nu alleen `livegang_op` (tijdstip van de livegang): zolang die er is, laadt `npm run seed` geen voorbeeld-AVF meer in VD.
+
 ## Storage
 
 | bucket | inhoud | afscherming |

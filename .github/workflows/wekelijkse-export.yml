@@ -1,0 +1,34 @@
+# Elke week een volledige export van de gegevens (90 dagen bewaard als artefact) en een tweede keer de
+# blijf-actief-aanroep, zodat de database en de website nooit een week stil liggen.
+#
+# Vereist in GitHub (Settings > Secrets and variables > Actions) de geheimen:
+#   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, CRON_SECRET
+name: Wekelijkse export
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # maandag 04:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Export maken
+        run: npm run export -- --excel
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backpack-export
+          path: export/
+          retention-days: 90
+      - name: Blijf-actief aanroepen
+        run: curl --fail --silent --show-error -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" https://back-pack-one.vercel.app/api/blijf-actief

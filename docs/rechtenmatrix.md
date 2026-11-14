@@ -15,6 +15,9 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 |---|---|---|---|---|---|
 | editie, cluster (basisgegevens, links) | L S | L | L | L | L |
 | cluster.budget_totaal | L S | L S | via `budget_resterend` | via `budget_resterend` | – |
+| cluster.teams_link | L S | L | L | L | L |
+| cluster.forms_link | L S | L, S voor Communicatie & Financiën van het eigen cluster (via `cluster_forms_link_zetten`) | L | L | L |
+| systeem_instelling (markering livegang) | – (alleen server) | – | – | – | – |
 | meerdaagsethema | L S | L S | L | L | L |
 | stuurgroeprol (namen studenten) | L S | L S (eigen rol) | L | L | L |
 | projectgroep | L S | L | L | L | L |
@@ -62,7 +65,9 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `budget_besluit(aanvraag_id, besluit, bedrag, toelichting, naam)` | Stuurgroep van het cluster, docent | `toegekend` (eventueel lager bedrag, nooit hoger dan aangevraagd), `teruggegeven` of `afgewezen`; toelichting verplicht behalve bij volledig toekennen. Een bedrag boven de resterende ruimte mag: de functie meldt dat terug als waarschuwing |
 | `budget_besteed_zetten(aanvraag_id, bedrag, naam)` | Stuurgroep, docent | Het werkelijk bestede bedrag (handmatig, alleen bij toegekend). De app claimt nooit dat iets is betaald |
 | `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Budget min wat is toegekend; geeft alleen dat bedrag terug |
-| `account_wachtwoord_resetten(account_id)` | Docent | Server-side met service role; nieuw wachtwoord tonen aan docent |
+| `account_wachtwoord_resetten(account_id)` | Docent | In de app: server-actie op de beheerpagina met de service role (controleert eerst of de gebruiker de docent is); het nieuwe wachtwoord wordt één keer getoond aan de docent en alle sessies van het account worden ingetrokken (`account_sessies_verwijderen`, alleen voor de service role). Staat in het logboek |
+| `cluster_forms_link_zetten(cluster_id, link, naam)` | Communicatie & Financiën van het cluster, docent | Stelt de Forms-link in (https, geen spaties; leeg haalt hem weg); staat in het logboek |
+| `blijf_actief()` | Iedereen, ook niet ingelogd | Geeft alleen het aantal edities terug (voor `/api/blijf-actief`) |
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, TriangleAlert } from "lucide-react";
+import { formsLinkOpslaan } from "@/app/(app)/beheer/actions";
 import { budgetBesluit, budgetBesteedZetten, clusterBudgetZetten } from "@/app/(app)/budget-actions";
 import { NaamVeld, useNaam } from "@/components/NaamVeld";
 import { euro, leesBedrag, STATUS_NAAM, type BudgetAanvraagMetGroep } from "@/lib/budgetTypes";
@@ -98,6 +99,29 @@ function BesteedVeld({ a, naam }: { a: BudgetAanvraagMetGroep; naam: string }) {
   );
 }
 
+/** De Forms-link van het eigen cluster instellen (Communicatie & Financiën en de docent). */
+function FormsLinkVeld({ clusterId, huidig, naam }: { clusterId: string; huidig: string | null; naam: string }) {
+  const router = useRouter();
+  const [link, setLink] = useState(huidig ?? "");
+  const [melding, setMelding] = useState<{ fout: boolean; tekst: string } | null>(null);
+
+  async function bewaar() {
+    if (link.trim() === (huidig ?? "")) return;
+    setMelding(null);
+    if (!naam.trim()) return setMelding({ fout: true, tekst: "Vul bovenaan eerst je naam in." });
+    const res = await formsLinkOpslaan(clusterId, link, naam);
+    if (res.status === "ok") { setMelding({ fout: false, tekst: "Opgeslagen" }); router.refresh(); } else setMelding({ fout: true, tekst: res.melding });
+  }
+
+  return (
+    <label className="mt-3 flex flex-col gap-1 text-sm font-medium text-kop">
+      Link naar het declaratieformulier (Microsoft Forms)
+      <input value={link} onChange={(e) => setLink(e.target.value)} onBlur={() => void bewaar()} placeholder="https://forms.office.com/…" inputMode="url" autoComplete="off" className={`${INVOER} font-normal`} />
+      {melding && <span role={melding.fout ? "alert" : "status"} className={melding.fout ? "font-bold text-fout" : "text-kop"}>{melding.tekst}</span>}
+    </label>
+  );
+}
+
 export interface Samenvatting {
   totaal: number | null;
   resterend: number | null;
@@ -107,7 +131,8 @@ export interface Samenvatting {
 /** Budgetoverzicht en besluiten voor de stuurgroep (Communicatie & Financiën) en de docent. */
 export function BudgetBeheer({
   samenvatting, aanvragen, formsLink, teamsLink,
-}: { samenvatting: Samenvatting; aanvragen: BudgetAanvraagMetGroep[]; formsLink: string | null; teamsLink: string | null }) {
+  kanFormsLink,
+}: { samenvatting: Samenvatting; aanvragen: BudgetAanvraagMetGroep[]; formsLink: string | null; teamsLink: string | null; kanFormsLink: boolean }) {
   const router = useRouter();
   const [naam, setNaam] = useNaam();
   const [totaal, setTotaal] = useState(samenvatting.totaal === null ? "" : String(samenvatting.totaal).replace(".", ","));
@@ -239,6 +264,7 @@ export function BudgetBeheer({
           {formsLink ? <a href={formsLink} target="_blank" rel="noreferrer" className="flex min-h-aanraak items-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"><ExternalLink aria-hidden className="size-5" /> Declaratieformulier</a> : <p className="text-sm text-zacht">De Forms-link is nog niet ingesteld (de docent doet dat).</p>}
           {teamsLink && <a href={teamsLink} target="_blank" rel="noreferrer" className="flex min-h-aanraak items-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"><ExternalLink aria-hidden className="size-5" /> Teams</a>}
         </div>
+        {kanFormsLink && <FormsLinkVeld clusterId={samenvatting.clusterId} huidig={formsLink} naam={naam} />}
       </section>
     </div>
   );

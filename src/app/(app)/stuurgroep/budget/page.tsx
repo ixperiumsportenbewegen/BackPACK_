@@ -27,6 +27,7 @@ export default async function BudgetBeherenPagina() {
       <BudgetBeheer
         samenvatting={{ totaal, resterend, clusterId: cluster.id }} aanvragen={aanvragen}
         formsLink={cluster.forms_link} teamsLink={cluster.teams_link}
+        kanFormsLink={profiel.soort === "docent" || profiel.stuurgroeprol?.code === "communicatie_financien"}
       />
     </div>
   );

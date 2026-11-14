@@ -102,8 +102,8 @@ Per locatie (camping of bivak) en stap (Inpakken, Op kamp, Retour) een tabel met
 ### Behoefte en tekorten (`/stuurgroep/materialen/behoefte`)
 Per belevenis van het cluster een tabel met de gekozen materialen: nodig (met een veld voor een correctie van de stuurgroep), wat er ligt en het tekort; wat anderen tegelijk gebruiken staat bij het materiaal. Bovenaan wie nog geen locatie heeft gekozen.
 
-### Beheer (docent)
-Accounts per cluster met knop "Wachtwoord resetten"; clustergegevens (budget, Teams-link, Forms-link); knop "Alles exporteren" (JSON en Excel).
+### Beheer (docent, `/beheer`, onder Meer)
+Alles exporteren als JSON of Excel (zonder afbeeldingen). Per cluster (VD, VC en TEST): de Teams-link en de Forms-link, en de lijst met accounts met de knop "Wachtwoord resetten". Een reset toont het nieuwe wachtwoord één keer, met een knop "Kopieer voor Teams" die een korte tekst met website, gebruikersnaam en wachtwoord kopieert om per groep te delen. Alle sessies van dat account worden uitgelogd. Het docentaccount reset je hier niet. De Forms-link kan ook de stuurgroep Communicatie & Financiën van het eigen cluster instellen, op de pagina Budget.
 
 ## Stijl
 

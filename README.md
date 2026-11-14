@@ -21,9 +21,12 @@ npx supabase link --project-ref aryntrmhpgowvzxyobfr
 | `npm test` | Vitest (waaronder de afschermingstests tegen het Supabase-project) |
 | `npm run test:e2e` | Playwright (mobiel) |
 | `npm run db:push` | Migraties uit `supabase/migrations/` toepassen op het gekoppelde project |
-| `npm run seed` | `seed/basis.json` laden; schrijft wachtwoorden naar `seed/wachtwoorden.local.json` |
+| `npm run seed` | `seed/basis.json` laden; schrijft wachtwoorden naar `seed/wachtwoorden.local.json`. Laadt de startlijst met materialen alleen als de lijst nog leeg is, en na de livegang geen voorbeeld-AVF meer in VD |
+| `npm run export` | Volledige export van de gegevens naar `export/` (JSON; met `-- --excel` ook Excel). Dit doet ook de wekelijkse GitHub Actions-taak |
+| `npm run livegang -- --droog` | Laat zien wat de livegang zou verwijderen, zonder iets te wijzigen |
+| `npm run livegang` | De livegang voor VD en VC: export vooraf, testdata weg, nieuwe wachtwoorden. Vraagt om het intypen van LIVEGANG. `-- --cluster=TEST` oefent op het fictieve cluster (daarna `npm run seed`) |
 
-Export, livegang en blijf-actief volgen in latere opdrachten.
+Geheime instellingen (`CRON_SECRET`, de service role key in Vercel en GitHub), de dagelijkse blijf-actief-aanroep en de wekelijkse export: zie `docs/beheer-instellen.md`. De docent beheert wachtwoorden, links en de export in de app onder Meer, dan Beheer.
 
 ## Op Windows
 

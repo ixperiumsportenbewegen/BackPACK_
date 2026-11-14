@@ -29,6 +29,7 @@ async function eigenAvf() {
 
 function dbFout(error: { code?: string; message?: string }): string {
   if (error.code === "23514" && error.message?.includes("locatie")) return "Kies eerst de locatie van de belevenis in sectie A.";
+  if (error.code === "23514" && error.message?.includes("voorraad")) return "De voorraad van dit materiaal volgt nog. Je kunt het kiezen zodra Logistiek & Facilitair die heeft ingeschat.";
   if (error.code === "23514") return "Dit materiaal is niet meer beschikbaar.";
   if (error.code === "23505") return "Dit materiaal staat er al. Pas het aantal aan.";
   if (error.code === "42501") return "Dit AVF is ingediend of de lijst is nog niet klaar. Je kunt nu geen materiaal wijzigen.";
@@ -256,4 +257,89 @@ export async function categorieVerwijderen(id: string): Promise<Resultaat> {
   if (!data?.length) return { status: "fout", melding: "Alleen Logistiek & Facilitair van VD en de docent beheren de categorieën." };
   ververs();
   return { status: "ok" };
+}
+
+// ---------------------------------------------------------- verwijderen (stuurgroep)
+
+/** Verwijdert een materiaal uit de lijst. Kan niet als een projectgroep het heeft gekozen: dan kan het alleen op "niet beschikbaar". */
+export async function materiaalUitLijstVerwijderen(id: string, naam: string): Promise<Resultaat> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan materialen verwijderen." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  // de naam komt zo in het logboek van het verwijderen
+  await supabase.from("materiaal").update({ bijgewerkt_door_naam: naam.trim().slice(0, 60) }).eq("id", id);
+  const { data, error } = await supabase.from("materiaal").delete().eq("id", id).select("id");
+  if (error) {
+    if (error.code === "23503") return { status: "fout", melding: "Dit materiaal is al gekozen door een projectgroep en kan niet worden verwijderd. Zet het op 'niet beschikbaar': dan krijgt de groep een melding." };
+    return { status: "fout", melding: FOUT };
+  }
+  if (!data?.length) return { status: "fout", melding: "Jouw rol mag materialen niet verwijderen." };
+  ververs();
+  return { status: "ok" };
+}
+
+// -------------------------------------------------- aanvragen van projectgroepen
+
+/** Een projectgroep vraagt een materiaal of meer voorraad aan. */
+export async function aanvraagPlaatsen(materiaalId: string | null, omschrijving: string, aantal: number, toelichting: string, naam: string): Promise<Resultaat> {
+  const ctx = await eigenAvf();
+  if (!ctx) return { status: "fout", melding: "Alleen de projectgroep zelf kan iets aanvragen." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  const n = schoonAantal(aantal);
+  if (n === null) return { status: "fout", melding: "Vul een aantal in van 1 of meer." };
+  if (!materiaalId && !omschrijving.trim()) return { status: "fout", melding: "Kies een materiaal of beschrijf wat jullie nodig hebben." };
+  const { data, error } = await ctx.supabase.rpc("materiaal_aanvraag_plaatsen", {
+    p_avf_id: ctx.avfId, p_materiaal_id: materiaalId as string, p_omschrijving: omschrijving.trim().slice(0, 150),
+    p_aantal: n, p_toelichting: toelichting.trim().slice(0, 500), p_naam: naam.trim().slice(0, 60),
+  });
+  if (error) return { status: "fout", melding: FOUT };
+  const res = data as { ok: boolean; reden?: string };
+  if (res.ok) {
+    ververs();
+    return { status: "ok" };
+  }
+  if (res.reden === "nog_niet_gepubliceerd") return { status: "fout", melding: "De materialenlijst is nog niet gepubliceerd. Aanvragen kan daarna." };
+  return { status: "fout", melding: FOUT };
+}
+
+/** De stuurgroep handelt een aanvraag af (de lijst zelf pas je apart aan) of wijst hem af met een toelichting. */
+export async function aanvraagAfhandelen(id: string, status: "afgehandeld" | "afgewezen", uitkomst: string, naam: string): Promise<Resultaat> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan aanvragen afhandelen." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  if (status === "afgewezen" && !uitkomst.trim()) return { status: "fout", melding: "Leg kort uit waarom je de aanvraag afwijst." };
+  const { data, error } = await supabase.rpc("materiaal_aanvraag_afhandelen", { p_id: id, p_status: status, p_uitkomst: uitkomst.trim().slice(0, 500), p_naam: naam.trim().slice(0, 60) });
+  if (error) return { status: "fout", melding: "Alleen de stuurgroep van het cluster van de groep kan dit afhandelen." };
+  const res = data as { ok: boolean; reden?: string };
+  if (res.ok) {
+    ververs();
+    return { status: "ok" };
+  }
+  if (res.reden === "al_afgehandeld") return { status: "fout", melding: "Deze aanvraag is al afgehandeld. Ververs de pagina." };
+  return { status: "fout", melding: FOUT };
+}
+
+// ------------------------------------------------------------------- paklijst
+
+/** Eén veld van de paklijst bijwerken (meegenomen, op kamp, retour of opmerking). Alle stuurgroepen mogen dat. */
+export async function paklijstZetten(
+  materiaalId: string, locatie: "camping" | "bivak", veld: "meegenomen" | "op_kamp" | "retour" | "opmerking",
+  waarde: number | null, tekst: string, naam: string, verwacht: string | null,
+): Promise<{ status: "ok"; updatedAt: string } | { status: "conflict"; huidigUpdatedAt: string | null } | { status: "fout"; melding: string }> {
+  const supabase = await stuurgroepOfDocent();
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan de paklijst bijwerken." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  if (veld !== "opmerking" && waarde !== null && (!Number.isInteger(waarde) || waarde < 0 || waarde > 99999)) return { status: "fout", melding: "Vul een heel getal van 0 of meer in." };
+  const { data, error } = await supabase.rpc("materiaal_telling_zetten", {
+    p_materiaal_id: materiaalId, p_locatie: locatie, p_veld: veld, p_waarde: waarde as number, p_tekst: tekst.trim().slice(0, 300),
+    p_naam: naam.trim().slice(0, 60), p_verwacht: verwacht as string,
+  });
+  if (error) return { status: "fout", melding: FOUT };
+  const res = data as { ok: boolean; reden?: string; updated_at?: string; huidig?: { updated_at: string } | null };
+  if (res.ok) {
+    ververs();
+    return { status: "ok", updatedAt: res.updated_at! };
+  }
+  if (res.reden === "gewijzigd") return { status: "conflict", huidigUpdatedAt: res.huidig?.updated_at ?? null };
+  return { status: "fout", melding: FOUT };
 }

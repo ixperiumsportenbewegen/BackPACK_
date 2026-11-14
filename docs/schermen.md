@@ -87,6 +87,12 @@ Eigen aanvragen met status en besluit, resterende ruimte van het cluster, knop "
 ### Materialenlijst – MAT-00 (`/stuurgroep/materialen`)
 Een tabel per categorie met de kolommen Materiaal, Camping en Bivak; de voorraad is direct in de tabel invulbaar (leeg = nog niet ingeschat) en een potlood opent naam, categorie, opmerking en beschikbaarheid. Bovenaan de voortgang ("x van y ingeschat"), zoeken, filter op categorie en een knop "Alleen nog in te vullen". Beheer van de categorieën en materiaal toevoegen zitten in uitklapblokken. Knop "Afdrukken / PDF" naar `/stuurgroep/materialen/afdrukken`: de totale lijst per categorie als schoon overzicht (concept of definitief) om af te drukken of als PDF op te slaan. Wijzigen: Logistiek & Facilitair van VD en de docent. Als concept ziet alleen Logistiek & Facilitair van VD hem, met de knop "Lijst definitief maken". Daarna kiezen projectgroepen en ziet VC hem; Logistiek & Facilitair van VC kan alleen toevoegen. Onder Meer voor stuurgroep en docent.
 
+### Aanvragen (`/stuurgroep/materialen/aanvragen`)
+Open aanvragen van de projectgroepen van het cluster met knoppen Afgehandeld en Afwijzen (antwoord aan de groep, verplicht bij afwijzen); afgehandelde aanvragen in een uitklapblok. De projectgroep dient aanvragen in onderaan sectie F ("Ontbreekt er iets, of is er te weinig?") en ziet daar de uitkomst.
+
+### Paklijst (`/stuurgroep/materialen/paklijst`)
+Per locatie (camping of bivak) en stap (Inpakken, Op kamp, Retour) een tabel met Plan of Mee, het invulveld, een vinkje "klopt", het verschil en een opmerking (bijvoorbeeld "2 lek"). Voortgang "x van y gecontroleerd". Alle stuurgroepen en de docent vullen in. Knop voor een papieren paklijst per locatie (`/stuurgroep/materialen/afdrukken?papier=camping` of `bivak`) om met pen in te vullen. Projectgroepen krijgen een melding op hun startscherm, het AVF-overzicht en in sectie F als een gekozen materiaal niet meer beschikbaar is of er een tekort ontstaat.
+
 ### Behoefte en tekorten (`/stuurgroep/materialen/behoefte`)
 Per belevenis van het cluster een tabel met de gekozen materialen: nodig (met een veld voor een correctie van de stuurgroep), wat er ligt en het tekort; wat anderen tegelijk gebruiken staat bij het materiaal. Bovenaan wie nog geen locatie heeft gekozen.
 

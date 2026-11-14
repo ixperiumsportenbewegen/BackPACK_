@@ -18,7 +18,8 @@ export default async function MaterialenPagina() {
   // Zelfde regels als in de database: de docent en Logistiek & Facilitair van VD (en TEST) bouwen de lijst;
   // Logistiek & Facilitair van VC mag toevoegen zodra de lijst definitief is.
   const kanBeheren = profiel.soort === "docent" || (logistiek && (clusterCode === "VD" || clusterCode === "TEST"));
-  const kanToevoegen = kanBeheren || (logistiek && clusterCode === "VC" && status.status === "definitief");
+  // na publicatie mogen VD en VC (Logistiek & Facilitair) de lijst aanpassen en materialen verwijderen
+  const kanAanpassen = kanBeheren || (logistiek && clusterCode === "VC" && status.status === "definitief");
   const [materialen, categorieen] = await Promise.all([laadMaterialen(), laadCategorieen()]);
   const mag = kanBeheren || status.status === "definitief";
 
@@ -29,14 +30,22 @@ export default async function MaterialenPagina() {
       </Link>
       <PaginaKop titel="Materialenlijst" foto="ochtend-tentterrein" />
       <p className="text-zacht">
-        Eén lijst voor VD en VC. Logistiek &amp; Facilitair van VD schat per materiaal in hoeveel er op de camping en op het bivak aanwezig moet zijn en maakt de lijst
-        daarna definitief. Dan kunnen projectgroepen kiezen en kan VC materialen toevoegen.
+        Eén lijst voor VD en VC. Logistiek &amp; Facilitair van VD schat per materiaal in hoeveel er op de camping en op het bivak aanwezig moet zijn en publiceert de lijst
+        daarna. Dan kunnen projectgroepen kiezen en ziet VC de lijst. Daarna passen VD en VC hem aan op basis van aanvragen van projectgroepen.
       </p>
-      <Link href="/stuurgroep/materialen/behoefte" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
-        Behoefte en tekorten per belevenis <ChevronRight aria-hidden className="size-5" />
-      </Link>
+      <nav aria-label="Onderdelen van de materialen" className="grid gap-2 sm:grid-cols-3">
+        {[
+          { href: "/stuurgroep/materialen/aanvragen", tekst: "Aanvragen van projectgroepen" },
+          { href: "/stuurgroep/materialen/behoefte", tekst: "Behoefte en tekorten" },
+          { href: "/stuurgroep/materialen/paklijst", tekst: "Paklijst voor het kamp" },
+        ].map((l) => (
+          <Link key={l.href} href={l.href} className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+            {l.tekst} <ChevronRight aria-hidden className="size-5 shrink-0" />
+          </Link>
+        ))}
+      </nav>
       {mag ? (
-        <MateriaalBeheer materialen={materialen} categorieen={categorieen} status={status} kanBeheren={kanBeheren} kanToevoegen={kanToevoegen} isDocent={profiel.soort === "docent"} />
+        <MateriaalBeheer materialen={materialen} categorieen={categorieen} status={status} kanBeheren={kanBeheren} kanAanpassen={kanAanpassen} isDocent={profiel.soort === "docent"} />
       ) : (
         <p role="status" className="rounded-han border-2 border-kop bg-vlak p-4 font-medium text-kop">
           De materialenlijst wordt nog opgebouwd door Logistiek &amp; Facilitair van VD. Zodra hij definitief is, zie je hem hier en kun je materialen toevoegen die nog ontbreken.

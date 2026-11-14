@@ -213,6 +213,12 @@ Eén lijst voor beide clusters, met de voorraad per locatie (op basis van ervari
 ### materiaal_categorie
 Vaste lijst van categorieën (`naam`, `volgorde`), beheerd door de docent en Logistiek & Facilitair van VD; VC kiest alleen. Startlijst: Afbakening en markering, Teamherkenning, Ballen, Sport- en spelmateriaal, Touwen en stokken, Archery tag, Veiligheid en communicatie, Organisatie en schrijfmateriaal, Opslag en Overig. Een categorie hernoemen werkt door bij alle materialen; verwijderen kan alleen als er geen materialen in zitten.
 
+### materiaal_telling (paklijst)
+PK (`materiaal_id`, `locatie`). `meegenomen`, `op_kamp`, `retour` (alle optioneel), `opmerking`, `bijgewerkt_door_naam`. Verschil = retour min meegenomen (of plan). Wat er echt is (`op_kamp`, anders `meegenomen`, anders de voorraad uit de lijst) telt mee in `materiaal_beschikbaar` en `materiaal_context`, zodat projectgroepen een tekort direct zien.
+
+### materiaal_aanvraag
+Een projectgroep vraagt materiaal aan (`avf_id`, `materiaal_id` of `omschrijving`, `aantal` in totaal nodig, `toelichting`, `status` open, afgehandeld of afgewezen, `uitkomst`, namen en tijden). De stuurgroep past de lijst zelf aan en handelt de aanvraag af.
+
 ### materiaallijst_status
 Eén rij: `status` (`concept` of `definitief`), `definitief_op`, `definitief_door_naam`, `definitief_door_cluster`. Projectgroepen kunnen pas materiaal kiezen als de lijst definitief is.
 

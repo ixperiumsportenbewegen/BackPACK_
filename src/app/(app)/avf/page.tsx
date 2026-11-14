@@ -9,6 +9,8 @@ import { SECTIES, eigenarenVanSectie } from "@/config/avf-velden";
 import { rolNaam } from "@/components/avf/Sectie";
 import { laadEigenAvf } from "@/lib/avfData";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
+import { laadMateriaalMeldingen } from "@/lib/materialen";
+import { MateriaalMeldingen } from "@/components/avf/MateriaalMeldingen";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { getProfiel } from "@/lib/profiel";
 import { formatMoment, formatTijdvak } from "@/lib/tijd";
@@ -23,6 +25,7 @@ export default async function AvfOverzicht() {
 
   const voortgang = voortgangPerSectie(avf.inhoud);
   const verzoeken = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status !== "afgehandeld");
+  const meldingen = avf.inhoud.locatie_keuze ? await laadMateriaalMeldingen(avf.id) : [];
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
 
@@ -32,6 +35,7 @@ export default async function AvfOverzicht() {
         <ChevronLeft aria-hidden className="size-5" /> Belevenissen
       </Link>
       <PaginaKop titel="Jullie AVF" foto="klimmen-staand" />
+      <MateriaalMeldingen meldingen={meldingen} />
 
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="text-sm font-medium text-zacht">{avf.projectgroepNaam}</p>

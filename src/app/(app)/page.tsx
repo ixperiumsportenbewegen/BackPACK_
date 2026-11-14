@@ -39,8 +39,14 @@ export default async function OnzeMeerdaagse() {
   const zonderLocatie = toonStand && profiel.cluster
     ? ((await supabase.from("avf").select("id").eq("cluster_id", profiel.cluster.id).is("locatie_keuze", null)).data ?? []).length
     : 0;
+  const openAanvragen = toonStand && profiel.cluster
+    ? ((await supabase.from("materiaal_aanvraag").select("id, avf:avf_id!inner(cluster_id)").eq("status", "open").eq("avf.cluster_id", profiel.cluster.id)).data ?? []).length
+    : 0;
   const regelVoor = (code: string): string => {
-    if (code === "logistiek_facilitair") return zonderLocatie > 0 ? `${zonderLocatie} ${zonderLocatie === 1 ? "belevenis heeft" : "belevenissen hebben"} nog geen locatie` : "Alle locaties gekozen";
+    if (code === "logistiek_facilitair") return [
+      zonderLocatie > 0 ? `${zonderLocatie} ${zonderLocatie === 1 ? "belevenis heeft" : "belevenissen hebben"} nog geen locatie` : "Alle locaties gekozen",
+      openAanvragen > 0 ? `${openAanvragen} open materiaalaanvraag${openAanvragen === 1 ? "" : "en"}` : null,
+    ].filter(Boolean).join(" · ");
     if (code !== "programma_kwaliteit" && code !== "projectleiding") return "Nog niets te melden";
     const delen = [
       wachten > 0 ? `${wachten} ${wachten === 1 ? "AVF wacht" : "AVF's wachten"} op beoordeling` : null,

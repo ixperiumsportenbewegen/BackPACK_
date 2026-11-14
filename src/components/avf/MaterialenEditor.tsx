@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
-  aanvullendToevoegen, materiaalAantalWijzigen, materiaalKiezen, materiaalVerwijderen,
+  aanvraagPlaatsen, aanvullendToevoegen, materiaalAantalWijzigen, materiaalKiezen, materiaalVerwijderen,
 } from "@/app/(app)/materiaal-actions";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
-import { locatieNaam, tekort, vraagVan, type AvfMateriaal, type Beschikbaarheid, type Materiaal } from "@/lib/materialenTypes";
+import { locatieNaam, tekort, vraagVan, type Aanvraag, type AvfMateriaal, type Beschikbaarheid, type Materiaal } from "@/lib/materialenTypes";
+import { formatMoment } from "@/lib/tijd";
 
 const FASEN = [
   { code: "", naam: "Hele belevenis" },
@@ -105,12 +106,89 @@ function Tabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+const AANVRAAG_STATUS: Record<Aanvraag["status"], string> = { open: "Open", afgehandeld: "Afgehandeld", afgewezen: "Afgewezen" };
+
+/** Ontbreekt er iets of is er te weinig? De groep vraagt het aan; de stuurgroep handelt het af. */
+function AanvraagBlok({ materialen, aanvragen, naam }: { materialen: Materiaal[]; aanvragen: Aanvraag[]; naam: string }) {
+  const router = useRouter();
+  const [materiaalId, setMateriaalId] = useState("");
+  const [omschrijving, setOmschrijving] = useState("");
+  const [aantal, setAantal] = useState("1");
+  const [toelichting, setToelichting] = useState("");
+  const [bezig, setBezig] = useState(false);
+  const [fout, setFout] = useState<string | null>(null);
+  const perId = new Map(materialen.map((m) => [m.id, m]));
+
+  async function verstuur(e: React.FormEvent) {
+    e.preventDefault();
+    setFout(null);
+    if (!naam.trim()) return setFout("Vul bovenaan eerst je naam in.");
+    setBezig(true);
+    const res = await aanvraagPlaatsen(materiaalId || null, omschrijving, Number(aantal), toelichting, naam);
+    setBezig(false);
+    if (res.status === "ok") { setMateriaalId(""); setOmschrijving(""); setAantal("1"); setToelichting(""); router.refresh(); }
+    else setFout(res.melding);
+  }
+
+  return (
+    <section className="flex flex-col gap-3" aria-labelledby="aanvraag-kop">
+      <h2 id="aanvraag-kop" className="text-xl">Ontbreekt er iets, of is er te weinig?</h2>
+      <p className="text-sm text-zacht">Vraag het hier aan. Logistiek &amp; Facilitair van de stuurgroep kijkt ernaar en past de lijst aan of laat weten waarom dat niet kan.</p>
+      <form onSubmit={verstuur} className="flex flex-col gap-3 rounded-han border border-rand bg-vlak p-4">
+        <label className="flex flex-col gap-1 font-medium text-kop">
+          Welk materiaal?
+          <select value={materiaalId} onChange={(e) => setMateriaalId(e.target.value)} className={`${INVOER} font-normal`}>
+            <option value="">Iets wat niet in de lijst staat</option>
+            {materialen.filter((m) => m.actief).map((m) => <option key={m.id} value={m.id}>{m.naam}</option>)}
+          </select>
+        </label>
+        {!materiaalId && (
+          <label className="flex flex-col gap-1 font-medium text-kop">
+            Wat hebben jullie nodig?
+            <input value={omschrijving} onChange={(e) => setOmschrijving(e.target.value)} maxLength={150} placeholder="Bijvoorbeeld: een grote tent" className={`${INVOER} font-normal`} />
+          </label>
+        )}
+        <label className="flex flex-col gap-1 font-medium text-kop">
+          Hoeveel hebben jullie in totaal nodig?
+          <input type="number" inputMode="numeric" min={1} max={9999} value={aantal} onChange={(e) => setAantal(e.target.value)} className={`${INVOER} w-28 font-normal`} />
+        </label>
+        <label className="flex flex-col gap-1 font-medium text-kop">
+          Waarvoor? (kort)
+          <input value={toelichting} onChange={(e) => setToelichting(e.target.value)} maxLength={500} className={`${INVOER} font-normal`} />
+        </label>
+        {fout && <p role="alert" className="font-bold text-fout">{fout}</p>}
+        <button type="submit" disabled={bezig} className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
+          {bezig ? <Loader2 aria-hidden className="size-5 animate-spin" /> : <Plus aria-hidden className="size-5" />} {bezig ? "Bezig…" : "Aanvraag versturen"}
+        </button>
+      </form>
+      {aanvragen.length > 0 && (
+        <ul className="flex flex-col gap-2" aria-label="Jullie aanvragen">
+          {aanvragen.map((a) => (
+            <li key={a.id} className="rounded-han border border-rand bg-vlak p-3">
+              <p className="flex flex-wrap items-center gap-2 font-bold text-kop">
+                {a.materiaalId ? perId.get(a.materiaalId)?.naam ?? "Materiaal" : a.omschrijving}: {a.aantal}
+                <span className={`rounded-han px-2 py-0.5 text-xs font-bold text-black ${a.status === "open" ? "bg-ingediend" : a.status === "afgehandeld" ? "bg-goedgekeurd" : "bg-actie"}`}>{AANVRAAG_STATUS[a.status]}</span>
+              </p>
+              {a.toelichting && <p className="text-tekst">{a.toelichting}</p>}
+              {a.uitkomst && <p className="mt-1 font-medium text-kop">Antwoord van de stuurgroep: {a.uitkomst}</p>}
+              <p className="text-sm text-zacht">
+                {a.doorNaam} · {formatMoment(a.createdAt)}
+                {a.afgehandeldDoorNaam && ` · afgehandeld door ${a.afgehandeldDoorNaam}`}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 /**
  * Sectie F: materialen kiezen uit de lijst van de stuurgroep. Per materiaal zie je wat er op jullie locatie ligt en wat
  * andere belevenissen op hetzelfde moment gebruiken. Een tekort is een waarschuwing en blokkeert niets.
  */
 export function MaterialenEditor({
-  locatie, tijdvak, lijstDefinitief, materialen, regels, beschikbaar, categorieVolgorde,
+  locatie, tijdvak, lijstDefinitief, materialen, regels, beschikbaar, categorieVolgorde, aanvragen,
 }: {
   locatie: "camping" | "bivak" | null;
   tijdvak: string | null;
@@ -119,6 +197,7 @@ export function MaterialenEditor({
   regels: AvfMateriaal[];
   beschikbaar: Record<string, Beschikbaarheid>;
   categorieVolgorde: string[];
+  aanvragen: Aanvraag[];
 }) {
   const router = useRouter();
   const { naam, vergrendeld } = useAvfEditor();
@@ -203,7 +282,8 @@ export function MaterialenEditor({
                     {keuzes.filter((m) => m.categorie === c).map((m) => {
                       const b = beschikbaar[m.id];
                       const vrij = b ? Math.max(0, b.voorraad - b.anderen) : null;
-                      return <option key={m.id} value={m.id}>{m.naam}{vrij !== null ? ` (${vrij} beschikbaar)` : ""}</option>;
+                      const volgt = b ? !b.ingeschat : false;
+                      return <option key={m.id} value={m.id} disabled={volgt}>{m.naam}{volgt ? " (voorraad volgt)" : vrij !== null ? ` (${vrij} beschikbaar)` : ""}</option>;
                     })}
                   </optgroup>
                 ))}
@@ -286,6 +366,7 @@ export function MaterialenEditor({
           </form>
         )}
       </section>
+      {lijstDefinitief && <AanvraagBlok materialen={materialen} aanvragen={aanvragen} naam={naam} />}
     </div>
   );
 }

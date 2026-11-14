@@ -130,7 +130,9 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
       {rolCode === "logistiek_facilitair" && (
         <>
           <LinkKaart href="/stuurgroep/materialen" titel="Materialenlijst" uitleg="De gedeelde lijst met voorraad op de camping en het bivak. Bouwen, definitief maken en aanvullen." />
+          <LinkKaart href="/stuurgroep/materialen/aanvragen" titel="Aanvragen van projectgroepen" uitleg="Materiaal dat groepen missen of waarvan er te weinig is." />
           <LinkKaart href="/stuurgroep/materialen/behoefte" titel="Behoefte en tekorten" uitleg="Wat de belevenissen nodig hebben per locatie en moment, en correcties." />
+          <LinkKaart href="/stuurgroep/materialen/paklijst" titel="Paklijst voor het kamp" uitleg="Inpakken, op kamp en retour: wat er echt is, per locatie." />
           <section className="rounded-han border border-rand bg-vlak p-4">
             <h2 className="text-xl">Locatie per belevenis</h2>
             <p className="text-sm text-zacht">De projectgroepen kiezen zelf camping of bivak in sectie A. Hier zie je wie dat nog moet doen.</p>

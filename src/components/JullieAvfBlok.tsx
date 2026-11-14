@@ -5,6 +5,8 @@ import { StatusLabel } from "@/components/avf/StatusLabel";
 import { SECTIES } from "@/config/avf-velden";
 import type { AvfGegevens } from "@/lib/avfData";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
+import { laadMateriaalMeldingen } from "@/lib/materialen";
+import { MateriaalMeldingen } from "@/components/avf/MateriaalMeldingen";
 import { samenvatting, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { formatTijdvak } from "@/lib/tijd";
 
@@ -12,11 +14,14 @@ import { formatTijdvak } from "@/lib/tijd";
 export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop?: "h2" | "h3" }) {
   const Kop = kop;
   const open = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status === "open").length;
+  const meldingen = avf.inhoud.locatie_keuze ? await laadMateriaalMeldingen(avf.id) : [];
   const voortgang = voortgangPerSectie(avf.inhoud);
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
 
   return (
+    <>
+    <MateriaalMeldingen meldingen={meldingen} />
     <section className="rounded-han border-2 border-thema bg-vlak p-4" aria-label="Jullie AVF">
       <Kop className="text-xl">Jullie AVF</Kop>
       <p className="mt-1 text-lg font-bold text-kop">{avf.inhoud.titel?.trim() || "Nog geen titel"}</p>
@@ -51,5 +56,6 @@ export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop
         Verder met het AVF <ChevronRight aria-hidden className="size-5" />
       </Link>
     </section>
+    </>
   );
 }

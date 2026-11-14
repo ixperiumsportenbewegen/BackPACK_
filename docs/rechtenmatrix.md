@@ -31,7 +31,10 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | avf_versie | L | L | L | – | – |
 | verbeterverzoek | L S | L S | L, status naar `aangepast` | – | – |
 | themacheck | L S | L S | L | – | – |
-| materiaal (gedeelde basislijst voor VD en VC) | L S | Als concept: alleen Logistiek & Facilitair van VD (en TEST) leest en schrijft. Als definitief: alle stuurgroepen lezen; Logistiek & Facilitair van VD schrijft; Logistiek & Facilitair van VC alleen toevoegen | L zodra de lijst definitief is | L zodra de lijst definitief is | – |
+| materiaal (gedeelde basislijst voor VD en VC) | L S | Als concept: alleen Logistiek & Facilitair van VD (en TEST) leest en schrijft. Gepubliceerd: alle stuurgroepen lezen; Logistiek & Facilitair van VD én VC wijzigen, voegen toe en verwijderen (niet als een projectgroep het materiaal heeft gekozen) | L zodra de lijst is gepubliceerd; materiaal zonder ingeschatte voorraad is nog niet te kiezen | L zodra de lijst is gepubliceerd | – |
+| materiaal_categorie (vaste lijst) | L S | Lezen als de lijst; beheren (toevoegen, hernoemen, verwijderen) alleen Logistiek & Facilitair van VD en de docent | L | L | – |
+| materiaal_telling (paklijst: meegenomen, op kamp, retour) | L, schrijven via F | L, schrijven via F (`materiaal_telling_zetten`, alle stuurgroepen) | – (zij zien de gevolgen als melding) | – | – |
+| materiaal_aanvraag (aanvraag van een projectgroep) | L | L (eigen cluster), afhandelen via F | L eigen, plaatsen via F | – | – |
 | materiaallijst_status (concept of definitief) | L, terugzetten via F | L, definitief maken via F (`materiaallijst_definitief_maken`, alleen Logistiek & Facilitair van VD) | L | L | – |
 | functies `materiaal_beschikbaar` en `materiaal_context` (voorraad en gebruik door anderen op dezelfde locatie en hetzelfde moment) | L | L (eigen cluster, per belevenis) | L (alleen voor het eigen AVF: voorraad en aantal dat anderen tegelijk gebruiken, zonder namen) | – | – |
 | budgetaanvraag | L S | L, besluit via F (`budget_besluit`) | L S zolang `concept` of `teruggegeven`; indienen via F. Na goedkeuring van het AVF is het financieel plan vast; extra kosten via een losse aanvraag | – | – |
@@ -60,7 +63,10 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.
 
-| `materiaallijst_definitief_maken(naam)` | Logistiek & Facilitair van VD (en TEST), docent | Zet de gedeelde lijst van concept op definitief; daarna kunnen projectgroepen kiezen en ziet VC de lijst |
+| `materiaallijst_definitief_maken(naam)` (in de app: "publiceren") | Logistiek & Facilitair van VD (en TEST), docent | Publiceert de gedeelde lijst (ook als niet alle voorraden zijn ingeschat); daarna kunnen projectgroepen kiezen en ziet VC de lijst |
+| `materiaal_telling_zetten(materiaal, locatie, veld, waarde, tekst, naam, verwacht)` | Alle stuurgroepen, docent | Werkt één veld van de paklijst bij met waarschuwing bij gelijktijdig wijzigen; wat er echt is (op kamp, anders meegenomen) telt mee in de beschikbaarheid |
+| `materiaal_aanvraag_plaatsen(avf, materiaal, omschrijving, aantal, toelichting, naam)` | PG eigen | Vraagt een materiaal of meer voorraad aan (alleen als de lijst is gepubliceerd) |
+| `materiaal_aanvraag_afhandelen(id, status, uitkomst, naam)` | Stuurgroep van het cluster, docent | Markeert de aanvraag als afgehandeld of afgewezen (toelichting verplicht bij afwijzen) |
 | `materiaallijst_terugzetten(naam)` | Docent | Zet de lijst weer op concept |
 | `avf_materiaal_corrigeren(id, aantal, naam)` | Stuurgroep, docent | Corrigeert het aantal van een gekozen materiaal; de projectgroep ziet de correctie |
 
@@ -74,5 +80,5 @@ Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijzi
 5. `vd-groep-1` kan `avf.status` niet rechtstreeks wijzigen en geen budget toekennen.
 6. `vd-groep-1` kan de budgetaanvragen van andere groepen niet lezen, wel `budget_resterend`.
 7. `vd-student` kan niets schrijven.
-8. Alleen `vd-stuur-logistiek` en `docent` kunnen de materialenlijst wijzigen; `vc-stuur-logistiek` kan alleen toevoegen (en pas als de lijst definitief is); zolang de lijst concept is, leest niemand anders hem.
+8. Alleen `vd-stuur-logistiek` en `docent` kunnen de materialenlijst wijzigen; `vc-stuur-logistiek` kan na publicatie ook toevoegen, wijzigen en verwijderen (een gekozen materiaal kan niemand verwijderen); zolang de lijst concept is, leest niemand anders hem.
 9. Een niet-ingelogde bezoeker kan niets lezen.

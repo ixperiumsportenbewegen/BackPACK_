@@ -42,8 +42,50 @@ export interface AvfMateriaal {
 }
 
 export interface Beschikbaarheid {
+  /** wat er echt is: de laatste telling, anders de ingeschatte voorraad */
   voorraad: number;
   anderen: number;
+  /** false = de voorraad is nog niet ingeschat ("voorraad volgt") */
+  ingeschat: boolean;
+}
+
+export interface Aanvraag {
+  id: string;
+  avfId: string;
+  materiaalId: string | null;
+  omschrijving: string | null;
+  aantal: number;
+  toelichting: string | null;
+  status: "open" | "afgehandeld" | "afgewezen";
+  doorNaam: string;
+  uitkomst: string | null;
+  afgehandeldDoorNaam: string | null;
+  afgehandeldOp: string | null;
+  createdAt: string;
+}
+
+/** Eén regel van de paklijst: wat er is meegenomen, op kamp aanwezig is en teruggekomen. */
+export interface Telling {
+  materiaalId: string;
+  locatie: Locatie;
+  meegenomen: number | null;
+  opKamp: number | null;
+  retour: number | null;
+  opmerking: string | null;
+  bijgewerktDoorNaam: string | null;
+  updatedAt: string;
+}
+
+export interface MateriaalMelding {
+  soort: "tekort" | "niet_beschikbaar";
+  materiaal: string;
+  tekst: string;
+}
+
+/** Totaal van camping en bivak (wat al is ingeschat); null als er nog niets is ingevuld. */
+export function totaalVoorraad(m: { voorraadCamping: number | null; voorraadBivak: number | null }): number | null {
+  if (m.voorraadCamping === null && m.voorraadBivak === null) return null;
+  return (m.voorraadCamping ?? 0) + (m.voorraadBivak ?? 0);
 }
 
 /** Het aantal dat telt: de correctie van de stuurgroep als die er is. */

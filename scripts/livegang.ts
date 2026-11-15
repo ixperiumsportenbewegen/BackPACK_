@@ -3,7 +3,7 @@
  *
  *  - maakt eerst een export (export/voor-livegang-<tijd>.json en .xlsx);
  *  - verwijdert alle AVF-gegevens van het cluster: inhoud, fasen, onderdelen, versies, verbeterverzoeken, themachecks,
- *    gekozen materialen, materiaalaanvragen, budgetaanvragen, logboek en de bestanden in Storage;
+ *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, logboek en de bestanden in Storage;
  *  - zet het meerdaagsethema, de rolverdeling en de namen van de stuurgroepleden terug naar leeg;
  *  - laadt de basisgegevens opnieuw (npm run seed) zonder voorbeeld-AVF: de groepen krijgen weer het standaardtijdvak;
  *  - maakt nieuwe wachtwoorden voor alle accounts van het cluster en trekt hun sessies in.
@@ -99,7 +99,7 @@ async function overzicht(c: Cluster) {
     avfs: ids.length, ids,
     onderdelen: await perAvf("avf_onderdeel"), versies: await perAvf("avf_versie"), verzoeken: await perAvf("verbeterverzoek"),
     themachecks: await perAvf("themacheck"), materialen: await perAvf("avf_materiaal"), materiaalaanvragen: await perAvf("materiaal_aanvraag"),
-    budgetaanvragen: await perAvf("budgetaanvraag"), logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
+    budgetaanvragen: await perAvf("budgetaanvraag"), deadlines: await tel("deadline", (q) => q.eq("cluster_id", c.id)), logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
     accounts, bestanden,
   };
 }
@@ -161,9 +161,11 @@ async function maakSchoon(c: Cluster, ids: string[]) {
   }
   await ok(admin.from("stuurgroeprol").update({ studenten: null }).eq("cluster_id", c.id), "namen stuurgroep");
 
-  // 4. logboek van dit cluster (na alle wijzigingen hierboven, want die loggen zelf ook)
+  // 4. deadlines (testdata: de stuurgroep stelt ze na de livegang zelf in) en het logboek van dit cluster (na alle wijzigingen
+  //    hierboven, want die loggen zelf ook)
+  await ok(admin.from("deadline").delete().eq("cluster_id", c.id), "deadlines");
   await ok(admin.from("wijziging").delete().eq("cluster_id", c.id), "logboek");
-  console.log("  thema, rolverdeling, namen en logboek teruggezet");
+  console.log("  thema, rolverdeling, namen, deadlines en logboek teruggezet");
 }
 
 async function nieuweWachtwoorden(clusters: Cluster[]) {
@@ -211,7 +213,7 @@ async function main() {
     const o = await overzicht(c);
     per.set(c.code, o);
     console.log(`${c.naam} (${c.code}): ${o.avfs} AVF's (${o.onderdelen} onderdelen, ${o.versies} versies, ${o.verzoeken} verbeterverzoeken, ${o.themachecks} themachecks),`);
-    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
+    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
     console.log(`  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
   }
   console.log("\nBlijft staan: de materialenlijst, het programma (tijden en activiteiten), de links, het clusterbudget, het docentaccount en cluster TEST.");

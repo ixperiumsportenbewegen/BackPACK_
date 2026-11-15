@@ -35,7 +35,8 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 ### Onze meerdaagse (startscherm) – OVZ-01, OVZ-02
 1. Kop met sfeerbeeld, naam en verhaal van het meerdaagsethema (anders: foto `vallei-viaduct` en de melding "Meerdaagsethema nog niet gekozen" met uitleg; stuurgroep en docent krijgen een knop "Thema kiezen").
    Zolang er geen thema is, is dit blok compact en staat bij een projectgroep het blok "Jullie AVF" (punt 4) er bovenaan.
-2. Aftellen tot 28 juni 2027.
+2. Aftellen tot 28 juni 2027, in kalenderdagen in Nederlandse tijd (het getal springt dus om middernacht, ook in de winter).
+2a. Kaart "Deadlines" (onder de aftelling): wat moet wanneer af en hoe lang het nog duurt, op volgorde van datum, met kleur, icoon en tekst (ruim, binnenkort, vandaag of morgen, verstreken). Een projectgroep ziet de eigen stand per onderdeel ("2 punten open", met een link naar de plek), wat klaar is staat onder "klaar". Stuurgroep en docent zien "4 van 6 groepen klaar", wie nog open staat, een knop "Kopieer herinnering voor Teams" en "Deadlines beheren"; is er nog niets ingesteld, dan staat daar de knop "Deadlines instellen". Een student ziet de deadlines zonder stand. Zonder deadlines ziet een projectgroep of student de kaart niet.
 3. Zes belevenissen als kaarten: titel, publieke samenvatting, statuslabel.
 4. Alleen projectgroep: blok "Jullie AVF" met voortgang per sectie en open verbeterverzoeken.
 5. Alleen stuurgroep en docent: per stuurgroeprol één regel stand van zaken (bijv. "Budget: € 180 van € 250 vrij", "2 materiaaltekorten", "3 AVF's wachten op beoordeling").
@@ -109,6 +110,13 @@ Per locatie (camping of bivak) en stap (Inpakken, Op kamp, Retour) een tabel met
 
 ### Behoefte en tekorten (`/stuurgroep/materialen/behoefte`)
 Per belevenis van het cluster een tabel met de gekozen materialen: nodig (met een veld voor een correctie van de stuurgroep), wat er ligt en het tekort; wat anderen tegelijk gebruiken staat bij het materiaal. Bovenaan wie nog geen locatie heeft gekozen.
+
+### Deadlines (stuurgroep en docent, `/stuurgroep/deadlines`)
+Per cluster één deadline per onderdeel: sectie A t/m H, AVF indienen, materiaal kiezen en budgetaanvraag. Per onderdeel een datum, een tijd (standaard 17:00, aanpasbaar, Nederlandse tijd) en een optionele toelichting ("Waarom deze datum? Wat wacht erop?"), met opslaan, verschuiven en verwijderen. Een datum in het verleden of op of na 28 juni 2027 geeft een zachte waarschuwing en blokkeert niets. Bij een gelijktijdige wijziging van hetzelfde onderdeel volgt de bekende waarschuwing ("Hun versie houden" of "Mijn versie bewaren"). Wie een deadline zette of verschoof staat in het logboek, ook "verschoven van … naar …". Bereikbaar via Meer, Projectleiding en de kaart op het startscherm.
+
+**Een deadline is een afspraak en blokkeert niets**: groepen kunnen na de deadline gewoon doorwerken en indienen. De groep ziet bij de sectie en in het AVF-overzicht een kleine regel ("Deadline: nog 5 dagen"), die verdwijnt zodra de sectie compleet is.
+
+Wanneer een groep "klaar" is: sectie A t/m H: de bestaande voortgang is compleet; AVF indienen: status ingediend of goedgekeurd; materiaal: minstens één materiaal gekozen (of eigen materiaal); budget: het financieel plan heeft minstens één regel. Een groep die geen materiaal nodig heeft, kan dus niet "klaar" zijn voor dat onderdeel.
 
 ### Beheer (docent, `/beheer`, onder Meer)
 Alles exporteren als JSON of Excel (zonder afbeeldingen). Per cluster (VD, VC en TEST): de Teams-link en de Forms-link, en de lijst met accounts met de knop "Wachtwoord resetten". Een reset toont het nieuwe wachtwoord één keer, met een knop "Kopieer voor Teams" die een korte tekst met website, gebruikersnaam en wachtwoord kopieert om per groep te delen. Alle sessies van dat account worden uitgelogd. Het docentaccount reset je hier niet. De Forms-link kan ook de stuurgroep Communicatie & Financiën van het eigen cluster instellen, op de pagina Budget.

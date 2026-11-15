@@ -6,7 +6,7 @@ Nog niet besloten. Claude Code gebruikt de **tijdelijke keuze** en meldt het aan
 |---|---|---|---|
 | 1 | Actuele HAN-logo's als SVG (de PNG's in `assets/logo` zijn uit 2019) en de HAN-iconenset, aan te vragen via huisstijl@han.nl | PNG-logo's uit `assets/logo` op witte achtergrond; Lucide-lijniconen | 1, 2 |
 | 2 | AVF-velden en vereenvoudigingen bevestigd door de docenten (PRD 5.1 en 5.2) | Velden zoals in PRD 5.1 | 3 |
-| 3 | Precieze AVF-deadlines VD en VC | Geen deadline in de app tot ze bekend zijn | later |
+| 3 | ~~Precieze AVF-deadlines VD en VC~~ Besloten op 2026-11-15: de stuurgroep stelt ze zelf in de app in (zie `beslissingen.md`) | – | – |
 | 4 | Hoe wachtwoorden bij de groepen komen | Besloten: de docent deelt per groep via het eigen Teams-kanaal; de beheerpagina en de livegang maken per account een korte deeltekst | livegang |
 | 5 | Wanneer gaan de eerste VD-projectgroepen de app echt gebruiken? | Na opdracht 5 | livegang |
 | 6 | Webadres (nu back-pack-one.vercel.app; eigen naam kan later) | `<projectnaam>.vercel.app` | 1 |

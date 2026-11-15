@@ -94,12 +94,15 @@ export default async function OnzeMeerdaagse() {
         </section>
       )}
 
-      <section className="relative overflow-hidden rounded-han bg-kop text-white">
+      {/* Zonder thema is het eigen AVF het belangrijkste: dat staat dan bovenaan. */}
+      {eigenAvf && !heeftThema && <JullieAvfBlok avf={eigenAvf} />}
+
+      <section className="relative overflow-hidden rounded-han bg-kop text-white" data-testid="thema-blok">
         {sfeer && <img src={sfeer} alt="" className="absolute inset-0 size-full object-cover opacity-60" />}
-        <div className="relative flex min-h-56 flex-col justify-end gap-2 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <h1 className="text-3xl !text-white">{heeftThema ? thema!.naam : "Meerdaagsethema nog niet gekozen"}</h1>
+        <div className={`relative flex ${heeftThema ? "min-h-56" : "min-h-28"} flex-col justify-end gap-2 bg-gradient-to-t from-black/80 to-transparent p-4`}>
+          <h1 className={`${heeftThema ? "text-3xl" : "text-2xl"} !text-white`}>{heeftThema ? thema!.naam : "Meerdaagsethema nog niet gekozen"}</h1>
           {!heeftThema && (
-            <p className="text-white">
+            <p className="text-sm text-white">
               Jullie meerdaagsethema is nog niet gekozen en nog niet ingevuld. De stuurgroep (Beleving & Thema) kiest het thema.
               Zodra dat is gebeurd, zie je hier de naam, het verhaal en het sfeerbeeld.
             </p>
@@ -124,7 +127,7 @@ export default async function OnzeMeerdaagse() {
         </p>
       </section>
 
-      {eigenAvf && <JullieAvfBlok avf={eigenAvf} />}
+      {eigenAvf && heeftThema && <JullieAvfBlok avf={eigenAvf} />}
 
       <section aria-labelledby="belevenissen-kop" className="flex flex-col gap-3">
         <div className="flex items-end justify-between">

@@ -177,6 +177,11 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
           {avfs.map((a) => {
             const open = verzoeken.filter((v) => v.avfId === a.id && v.status === "open");
             const perSectie = SECTIES.map((s) => ({ s, velden: velden.filter((v) => v.sectie === s.code) })).filter((x) => x.velden.length > 0);
+            // Samenvatting van de velden van deze rol; de velden zelf staan achter een uitklapblok.
+            const stands = velden.map((v) => veldStand(a, v)).filter((x) => x !== "later");
+            const aantalIngevuld = stands.filter((x) => x === "ingevuld").length;
+            const aantalDeels = stands.filter((x) => x === "deels").length;
+            const aantalLeeg = stands.filter((x) => x === "leeg").length;
             return (
               <li key={a.id} className="rounded-han border border-rand bg-vlak p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
@@ -192,6 +197,14 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
                 <p className="mt-1 text-sm text-zacht">{open.length === 0 ? "Geen open verbeterverzoeken" : `${open.length} open ${open.length === 1 ? "verbeterverzoek" : "verbeterverzoeken"}`}</p>
                 <Link href={`/belevenissen/${a.id}`} className="inline-flex min-h-aanraak items-center font-bold text-kop underline">Het hele AVF lezen en beoordelen</Link>
 
+                <details className="mt-2 rounded-han border border-rand" data-testid={`velden-${a.id}`}>
+                  <summary className="flex min-h-aanraak cursor-pointer flex-wrap items-center justify-between gap-2 px-3 font-bold text-kop">
+                    <span>{aantalIngevuld} van {stands.length} velden ingevuld</span>
+                    <span className="text-sm font-medium text-zacht">
+                      {aantalDeels > 0 && `${aantalDeels} deels`}{aantalDeels > 0 && aantalLeeg > 0 && " · "}{aantalLeeg > 0 && `${aantalLeeg} leeg`}
+                    </span>
+                  </summary>
+                <div className="px-3 pb-3">
                 {perSectie.map(({ s, velden: sv }) => {
                   const bijgewerkt = a.sectieBijgewerkt[s.code];
                   return (
@@ -231,6 +244,8 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
                     </div>
                   );
                 })}
+                </div>
+                </details>
               </li>
             );
           })}

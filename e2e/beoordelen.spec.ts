@@ -127,6 +127,9 @@ test("een stuurgroepaccount opent het dashboard op de eigen rol; alle rollen zij
   // zes belevenissen als kaarten
   await expect(p.locator("main ul > li > h3, main li h3")).toHaveCount(6);
 
+  // per belevenis staat een samenvatting; de velden zitten achter een uitklapblok
+  await expect(p.locator("summary").filter({ hasText: /\d+ van \d+ velden ingevuld/ })).toHaveCount(6);
+  await p.locator("summary").filter({ hasText: /\d+ van \d+ velden ingevuld/ }).first().click();
   // een veld aantikken brengt je bij het AVF met het verbeterverzoek-formulier op de juiste rol
   await p.getByRole("link", { name: /Weer|Fysieke veiligheid|Risico/ }).first().click();
   await expect(p).toHaveURL(/\/belevenissen\/.+sectie=/);

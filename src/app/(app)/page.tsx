@@ -3,6 +3,7 @@ import { SubmitKnop } from "@/components/SubmitKnop";
 import Link from "next/link";
 import { CalendarDays, ChevronRight } from "lucide-react";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
+import { DeadlinesKaart } from "@/components/DeadlinesKaart";
 import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
@@ -123,6 +124,8 @@ export default async function OnzeMeerdaagse() {
           {dagen > 0 ? `Nog ${dagen} ${dagen === 1 ? "dag" : "dagen"}` : "Het is zover"}
         </p>
       </section>
+
+      <DeadlinesKaart profiel={profiel} eigenAvf={eigenAvf} />
 
       {eigenAvf && heeftThema && <JullieAvfBlok avf={eigenAvf} />}
 

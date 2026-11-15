@@ -16,6 +16,7 @@ import { laadBudgetAvf } from "@/lib/budget";
 import { laadAanvragen, laadAvfMaterialen, laadBeschikbaarheid, laadCategorieen, laadLijstStatus, laadMaterialen } from "@/lib/materialen";
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
+import { laadDeadlines } from "@/lib/deadlineData";
 import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
 import { buren } from "@/lib/avfNavigatie";
 import { getProfiel } from "@/lib/profiel";
@@ -104,7 +105,8 @@ export default async function SectiePagina({
   );
   const faseParam = (await searchParams).fase;
   const fase = (["kop", "romp", "staart"] as const).find((f) => f === faseParam) ?? "kop";
-  const kop = <SectieKop sectie={code} status={voortgang.status} ontbrekend={voortgang.ontbrekend.map((o) => o.melding)} />;
+  const deadline = (await laadDeadlines(avf.clusterId)).find((d) => d.onderdeel === code) ?? null;
+  const kop = <SectieKop sectie={code} status={voortgang.status} ontbrekend={voortgang.ontbrekend.map((o) => o.melding)} deadline={deadline} />;
   const inhoud = avf.inhoud;
 
   let inhoudBlok: React.ReactNode = null;

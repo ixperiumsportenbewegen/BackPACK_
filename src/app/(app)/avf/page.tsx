@@ -1,3 +1,5 @@
+import { DeadlineLabel } from "@/components/DeadlineLabel";
+import { laadDeadlines } from "@/lib/deadlineData";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, FileText, MapPin, Send } from "lucide-react";
@@ -24,6 +26,8 @@ export default async function AvfOverzicht() {
   if (!avf) redirect("/");
 
   const voortgang = voortgangPerSectie(avf.inhoud);
+  const deadlines = await laadDeadlines(avf.clusterId);
+  const indienenDeadline = deadlines.find((d) => d.onderdeel === "indienen");
   const verzoeken = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status !== "afgehandeld");
   const meldingen = avf.inhoud.locatie_keuze ? await laadMateriaalMeldingen(avf.id) : [];
   const { compleet, totaal } = samenvatting(voortgang);
@@ -71,10 +75,15 @@ export default async function AvfOverzicht() {
         <ChevronRight aria-hidden className="size-5" />
       </Link>
 
+      {indienenDeadline && avf.status !== "ingediend" && avf.status !== "goedgekeurd" && (
+        <p className="-mt-2"><DeadlineLabel moment={indienenDeadline.moment} volledig /></p>
+      )}
+
       <ul className="flex flex-col gap-2">
         {SECTIES.map((s) => {
           const v = voortgang.find((x) => x.sectie === s.code)!;
           const bijgewerkt = avf.sectieBijgewerkt[s.code];
+          const dl = deadlines.find((d) => d.onderdeel === s.code);
           const eigenaren = eigenarenVanSectie(s.code).map((r) => rolNaam(r)).filter(Boolean).join(", ");
           return (
             <li key={s.code}>
@@ -86,6 +95,7 @@ export default async function AvfOverzicht() {
                     <StatusLabel status={v.status} />
                     {verzoeken.some((z) => z.sectie === s.code && z.status === "open") ? <VerzoekLabel status="open" /> : verzoeken.some((z) => z.sectie === s.code && z.status === "aangepast") ? <VerzoekLabel status="aangepast" /> : null}
                   </span>
+                  {dl && v.status !== "compleet" && <span className="mt-1 block"><DeadlineLabel moment={dl.moment} volledig /></span>}
                   <span className="mt-1 block text-sm text-zacht">Eigenaar: {eigenaren}</span>
                   {bijgewerkt && (
                     <span className="block text-sm text-zacht">

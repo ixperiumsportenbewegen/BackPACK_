@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ChevronRight, MessageSquareWarning } from "lucide-react";
 import { AvfStatusLabel, OpnieuwLabel } from "@/components/BelevenisKaart";
 import { StatusLabel } from "@/components/avf/StatusLabel";
+import { DeadlineLabel } from "@/components/DeadlineLabel";
+import { laadDeadlines } from "@/lib/deadlineData";
 import { SECTIES } from "@/config/avf-velden";
 import type { AvfGegevens } from "@/lib/avfData";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
@@ -16,6 +18,7 @@ export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop
   const open = (await laadVerzoekenVoorGroep(avf.id, avf.status)).filter((v) => v.status === "open").length;
   const meldingen = avf.inhoud.locatie_keuze ? await laadMateriaalMeldingen(avf.id) : [];
   const voortgang = voortgangPerSectie(avf.inhoud);
+  const deadlines = await laadDeadlines(avf.clusterId);
   const { compleet, totaal } = samenvatting(voortgang);
   const leeg = compleet === 0 && voortgang.every((v) => v.status === "niet_gestart" || v.status === "nvt");
 
@@ -39,6 +42,7 @@ export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop
       <ul className="mt-3 grid grid-cols-2 gap-2">
         {SECTIES.map((s) => {
           const v = voortgang.find((x) => x.sectie === s.code)!;
+          const dl = deadlines.find((d) => d.onderdeel === s.code);
           return (
             <li key={s.code}>
               <Link href={`/avf/${s.code}`} className="flex min-h-aanraak items-center gap-2 rounded-han border border-rand px-2 py-1">
@@ -46,6 +50,7 @@ export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop
                 <span className="flex flex-col">
                   <span className="text-sm font-bold leading-tight text-kop">{s.naam}</span>
                   <StatusLabel status={v.status} />
+                  {dl && v.status !== "compleet" && <DeadlineLabel moment={dl.moment} />}
                 </span>
               </Link>
             </li>

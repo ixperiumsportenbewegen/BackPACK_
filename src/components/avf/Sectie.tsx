@@ -4,13 +4,15 @@ import { AVF_VELDEN, SECTIES, eigenarenVanSectie, type SectieCode } from "@/conf
 import { PROJECTGROEPROLLEN } from "@/config/projectgroeprollen";
 import type { VoortgangStatus } from "@/lib/avfVoortgang";
 import { StatusLabel } from "@/components/avf/StatusLabel";
+import { DeadlineBadge } from "@/components/DeadlineBadge";
+import { deadlineNiveau, formatDeadline, resterendTekst } from "@/lib/deadlines";
 
 export function rolNaam(code: string | null | undefined): string | null {
   return PROJECTGROEPROLLEN.find((r) => r.code === code)?.naam ?? null;
 }
 
 /** Kop van een sectiescherm met terugknop, voortgang en de eigenaren van de sectie. */
-export function SectieKop({ sectie, status, ontbrekend }: { sectie: SectieCode; status: VoortgangStatus; ontbrekend: string[] }) {
+export function SectieKop({ sectie, status, ontbrekend, deadline }: { sectie: SectieCode; status: VoortgangStatus; ontbrekend: string[]; deadline?: { moment: Date; toelichting: string | null } | null }) {
   const s = SECTIES.find((x) => x.code === sectie)!;
   const eigenaren = eigenarenVanSectie(sectie).map((r) => rolNaam(r)).filter(Boolean);
   // Per projectgroeprol de velden van deze sectie waar die rol eigenaar van is
@@ -32,6 +34,12 @@ export function SectieKop({ sectie, status, ontbrekend }: { sectie: SectieCode; 
         <StatusLabel status={status} />
         {eigenaren.length > 0 && <span className="text-sm text-zacht">Eigenaar: {eigenaren.join(", ")}</span>}
       </div>
+      {deadline && status !== "compleet" && (
+        <div className="flex flex-wrap items-center gap-2" data-testid="sectie-deadline">
+          <DeadlineBadge niveau={deadlineNiveau(deadline.moment)} tekst={resterendTekst(deadline.moment)} />
+          <span className="text-sm text-zacht">Deadline {formatDeadline(deadline.moment)}{deadline.toelichting ? ` · ${deadline.toelichting}` : ""}</span>
+        </div>
+      )}
       {wieVultWat.length > 0 && (
         <details className="rounded-han border border-rand bg-vlak p-3" data-testid="wie-vult-wat">
           <summary className="min-h-aanraak cursor-pointer py-2 font-bold text-kop">Wie vult wat in?</summary>

@@ -117,3 +117,148 @@ test("een projectgroep en een student kunnen niets instellen", async ({ browser 
     await s.ctx.close();
   }
 });
+
+// ------------------------------------------------------------------ het startscherm
+
+const UNIEK = "E2E-deadline-test";
+const dagenVanNu = (dagen: number) => new Date(Date.now() + dagen * 86_400_000).toISOString();
+
+async function zetDeadlines() {
+  await opschonen();
+  const rijen = [
+    ["B", dagenVanNu(-3)], // drie dagen te laat
+    ["D", dagenVanNu(5)], // nog 5 dagen
+    ["E", dagenVanNu(1)], // morgen
+    ["indienen", dagenVanNu(10)],
+  ] as const;
+  for (const [onderdeel, moment] of rijen) {
+    await admin.from("deadline").insert({ cluster_id: TEST, onderdeel, moment, toelichting: UNIEK, gezet_door_naam: NAAM });
+  }
+}
+
+test("de kaart op het startscherm toont hoe lang het nog duurt, in volgorde en met kleur, icoon en tekst", async ({ browser }) => {
+  await zetDeadlines();
+  const s = await nieuweSessie(browser, "test-student");
+  const p = s.page;
+  await p.goto("/");
+  const kaart = p.getByTestId("deadlines-kaart");
+  await expect(kaart).toBeVisible();
+
+  const b = kaart.getByTestId("deadline-B");
+  await expect(b).toContainText("Sectie B · Beginsituatie");
+  await expect(b).toContainText("3 dagen te laat");
+  await expect(b.locator("[data-niveau]")).toHaveAttribute("data-niveau", "verstreken");
+  await expect(kaart.getByTestId("deadline-E")).toContainText("morgen");
+  await expect(kaart.getByTestId("deadline-E").locator("[data-niveau]")).toHaveAttribute("data-niveau", "dringend");
+  await expect(kaart.getByTestId("deadline-D")).toContainText("nog 5 dagen");
+  await expect(kaart.getByTestId("deadline-D").locator("[data-niveau]")).toHaveAttribute("data-niveau", "binnenkort");
+  await expect(kaart.getByTestId("deadline-indienen")).toContainText("nog 10 dagen");
+  await expect(kaart.getByTestId("deadline-indienen").locator("[data-niveau]")).toHaveAttribute("data-niveau", "ruim");
+
+  // op volgorde van datum: B (voorbij), E (morgen), D (5 dagen), indienen (10 dagen)
+  const volgorde = await kaart.locator("li[data-testid^='deadline-']").evaluateAll((els) => els.map((e) => e.getAttribute("data-testid")));
+  expect(volgorde).toEqual(["deadline-B", "deadline-E", "deadline-D", "deadline-indienen"]);
+
+  // een student ziet geen eigen stand en geen knop om in te stellen
+  await expect(kaart.getByText(/Jullie stand/)).toHaveCount(0);
+  await expect(kaart.getByRole("link", { name: "Deadlines beheren" })).toHaveCount(0);
+  await s.ctx.close();
+});
+
+test("een projectgroep ziet de eigen stand; wat klaar is staat apart", async ({ browser }) => {
+  // test-groep-1 heeft een compleet voorbeeld-AVF, test-groep-2 een leeg AVF
+  const g1 = await nieuweSessie(browser, "test-groep-1");
+  await g1.page.goto("/");
+  const k1 = g1.page.getByTestId("deadlines-kaart");
+  // B, D en E zijn compleet: staan onder "klaar"; indienen is nog open
+  await expect(k1.getByTestId("deadline-B")).toHaveCount(0);
+  await expect(k1.getByTestId("deadline-indienen")).toContainText("nog niet ingediend");
+  await k1.getByText(/klaar$/).click();
+  await expect(k1.getByTestId("deadline-klaar-B")).toBeVisible();
+  await g1.ctx.close();
+
+  const g2 = await nieuweSessie(browser, "test-groep-2");
+  await g2.page.goto("/");
+  const k2 = g2.page.getByTestId("deadlines-kaart");
+  await expect(k2.getByTestId("deadline-D")).toContainText(/Jullie stand: \d+ punten open/);
+  await expect(k2.getByTestId("deadline-D").getByRole("link", { name: /Jullie stand/ })).toHaveAttribute("href", "/avf/D");
+  await expect(k2.getByTestId("deadline-indienen").getByRole("link", { name: /Jullie stand/ })).toHaveAttribute("href", "/avf/indienen");
+  await g2.ctx.close();
+});
+
+test("de stuurgroep ziet hoeveel groepen klaar zijn en wie nog open staat", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "test-stuur");
+  await s.page.goto("/");
+  const d = s.page.getByTestId("deadlines-kaart").getByTestId("deadline-D");
+  await expect(d).toContainText("1 van 2 groepen klaar");
+  await expect(d).toContainText("Nog open: Testgroep 2");
+  await expect(s.page.getByTestId("deadlines-kaart").getByRole("link", { name: "Deadlines beheren" })).toBeVisible();
+  await s.ctx.close();
+});
+
+test("de deadlines van een cluster zijn niet te zien in een ander cluster", async ({ browser }) => {
+  for (const gebruiker of ["vd-groep-2", "vd-stuur-programma"]) {
+    const s = await nieuweSessie(browser, gebruiker);
+    await s.page.goto("/");
+    await expect(s.page.getByRole("heading", { name: "Belevenissen", level: 2 })).toBeVisible();
+    await expect(s.page.getByText(UNIEK)).toHaveCount(0);
+    await s.ctx.close();
+  }
+});
+
+test("bij het AVF zelf staat een kleine deadlineregel, en die verdwijnt als de sectie klaar is", async ({ browser }) => {
+  const g = await nieuweSessie(browser, "test-groep-2");
+  await g.page.goto("/avf/D");
+  await expect(g.page.getByTestId("sectie-deadline")).toContainText("nog 5 dagen");
+  await expect(g.page.getByTestId("sectie-deadline")).toContainText(UNIEK);
+  await g.page.goto("/avf");
+  await expect(g.page.getByTestId("deadline-label").first()).toBeVisible();
+  await g.ctx.close();
+
+  // test-groep-1 is compleet voor sectie D: daar staat geen regel meer
+  const g1 = await nieuweSessie(browser, "test-groep-1");
+  await g1.page.goto("/avf/D");
+  await expect(g1.page.getByRole("heading", { name: "Kop, romp en staart", level: 1 })).toBeVisible();
+  await expect(g1.page.getByTestId("sectie-deadline")).toHaveCount(0);
+  await g1.ctx.close();
+});
+
+test("na de deadline kan een groep gewoon doorwerken: een deadline blokkeert niets", async ({ browser }) => {
+  // B is drie dagen voorbij
+  const g = await nieuweSessie(browser, "test-groep-2");
+  const { data: voor } = await admin.from("avf").select("id, projectgroep:projectgroep_id!inner(nummer)").eq("cluster_id", TEST).eq("projectgroep.nummer", 2).single();
+  try {
+    await g.page.goto("/avf/B");
+    await expect(g.page.getByTestId("sectie-deadline")).toContainText("3 dagen te laat");
+    await g.page.getByLabel("Wie werkt hier?").fill(NAAM);
+    const veld = g.page.getByLabel("Algemene omschrijving van de groep");
+    await expect(veld).toBeEnabled();
+    await veld.fill("Na de deadline nog aangevuld.");
+    await veld.blur();
+    await expect.poll(async () => (await admin.from("avf").select("beginsituatie").eq("id", voor!.id).single()).data?.beginsituatie?.algemeen).toBe("Na de deadline nog aangevuld.");
+    // en het indienen is ook niet geblokkeerd door een verlopen deadline
+    await g.page.goto("/avf/indienen");
+    await expect(g.page.getByRole("heading", { name: "AVF indienen" })).toBeVisible();
+    await expect(g.page.getByRole("heading", { name: "Controlelijst" })).toBeVisible();
+  } finally {
+    const { data: begin } = await admin.from("avf").select("beginsituatie").eq("id", voor!.id).single();
+    const rest = { ...(begin?.beginsituatie ?? {}) } as Record<string, unknown>;
+    delete rest.algemeen;
+    await admin.from("avf").update({ beginsituatie: rest }).eq("id", voor!.id);
+    await g.ctx.close();
+  }
+});
+
+test("zonder deadlines ziet de stuurgroep een uitnodiging en een groep niets", async ({ browser }) => {
+  await opschonen();
+  const s = await nieuweSessie(browser, "test-stuur");
+  await s.page.goto("/");
+  await expect(s.page.getByTestId("deadlines-kaart")).toContainText("Er zijn nog geen deadlines");
+  await expect(s.page.getByRole("link", { name: "Deadlines instellen" })).toBeVisible();
+  await s.ctx.close();
+
+  const g = await nieuweSessie(browser, "test-groep-2");
+  await g.page.goto("/");
+  await expect(g.page.getByTestId("deadlines-kaart")).toHaveCount(0);
+  await g.ctx.close();
+});

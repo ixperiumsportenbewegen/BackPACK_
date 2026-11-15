@@ -6,6 +6,7 @@ import { Loader2, Plus, Send, Trash2 } from "lucide-react";
 import { budgetAanvraagIndienen, budgetRegelsOpslaan } from "@/app/(app)/budget-actions";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
 import { NaamVeld, useNaam } from "@/components/NaamVeld";
+import { useAutoBewaar } from "@/components/useAutoBewaar";
 import { euro, leesBedrag, STATUS_NAAM, type BudgetAanvraag, type BudgetRegel } from "@/lib/budgetTypes";
 import { formatMoment } from "@/lib/tijd";
 
@@ -94,6 +95,9 @@ export function FinancieelPlan({
   };
 
   const kanIndienen = bewerkbaar && (losse || aanvraag.status === "teruggegeven");
+
+  // Opslaan terwijl je typt, zodat niets verloren gaat als je direct daarna doorklikt.
+  useAutoBewaar(JSON.stringify([rijen, omschrijving, toelichting]), () => bewaar(), { actief: bewerkbaar });
 
   return (
     <section className="flex flex-col gap-3 rounded-han border border-rand bg-vlak p-4" aria-label={losse ? (aanvraag.omschrijving ?? "Losse aanvraag") : "Financieel plan"}>

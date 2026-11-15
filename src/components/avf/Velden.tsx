@@ -5,6 +5,7 @@ import { Check, TriangleAlert } from "lucide-react";
 import type { VeldDoel, Waarde } from "@/app/(app)/avf/actions";
 import { useAvfEditor } from "@/components/avf/AvfEditor";
 import { useVeld, type Conflict, type Melding } from "@/components/avf/useVeld";
+import { useAutoBewaar } from "@/components/useAutoBewaar";
 
 export function MeldingRegel({ melding }: { melding: Melding | null }) {
   if (!melding) return <p aria-live="polite" className="min-h-6" />;
@@ -79,6 +80,9 @@ export function TekstVeld({ doel, begin, label, hulp, eigenaar, maxLengte, meerR
     if (nieuw === v.opgeslagen) return;
     if (await v.opslaan(nieuw)) bijOpgeslagen?.(nieuw);
   }
+
+  // Opslaan terwijl je typt, zodat niets verloren gaat als je direct daarna doorklikt.
+  useAutoBewaar(tekst, bijVerlaten, { actief: !uit });
 
   return (
     <div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import type { NamenResultaat } from "@/app/(app)/namen-actions";
+import { useAutoBewaar } from "@/components/useAutoBewaar";
 
 type Melding = { soort: "bezig" | "ok" | "fout" | "waarschuwing"; tekst: string };
 
@@ -47,11 +48,14 @@ export function NamenRegel({
     }
   }
 
-  function bijVerlaten() {
+  async function bijVerlaten() {
     const nieuw = tekst.trim().replace(/\s+/g, " ");
     if (nieuw === (opgeslagen.namen ?? "")) return;
-    void bewaar(nieuw, opgeslagen.updatedAt);
+    await bewaar(nieuw, opgeslagen.updatedAt);
   }
+
+  // Opslaan terwijl je typt, zodat niets verloren gaat als je direct daarna doorklikt.
+  useAutoBewaar(tekst, bijVerlaten, { actief: kanBewerken });
 
   const id = `namen-${label.replace(/\W+/g, "-").toLowerCase()}`;
   return (
@@ -63,7 +67,7 @@ export function NamenRegel({
           id={id}
           value={tekst}
           onChange={(e) => setTekst(e.target.value)}
-          onBlur={bijVerlaten}
+          onBlur={() => void bijVerlaten()}
           maxLength={200}
           autoComplete="off"
           placeholder="Namen van de student(en)"

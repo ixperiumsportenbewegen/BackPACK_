@@ -56,3 +56,15 @@ test("de naam die je invult, staat ook bij de themachecks", async ({ browser }) 
   await expect(p.getByLabel("Jouw naam", { exact: true })).toHaveValue("Sanne");
   await s.ctx.close();
 });
+
+test("na het indienen ziet de groep een samenvatting en kan het AVF lezen", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "vd-groep-5");
+  const p = s.page;
+  await p.goto("/avf/indienen");
+  const kaart = p.getByTestId("indiening-samenvatting");
+  await expect(kaart).toContainText("Testpersoon");
+  await expect(kaart).toContainText("Versie");
+  await kaart.getByRole("link", { name: /Jullie AVF lezen/ }).click();
+  await expect(p).toHaveURL(new RegExp(`/belevenissen/${avfId}`));
+  await s.ctx.close();
+});

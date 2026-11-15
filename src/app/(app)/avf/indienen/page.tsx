@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Hourglass } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, FileText, Hourglass } from "lucide-react";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { SECTIES } from "@/config/avf-velden";
 import { laadEigenAvf } from "@/lib/avfData";
 import { ontbrekendLink, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { getProfiel } from "@/lib/profiel";
+import { maakServerClient } from "@/lib/supabase/server";
+import { formatMoment } from "@/lib/tijd";
 import { IndienenFormulier } from "./IndienenFormulier";
 
 export const metadata = { title: "Indienen · BackPACK_" };
@@ -22,6 +24,9 @@ export default async function IndienenPagina() {
   const aantalOpen = problemen.reduce((n, p) => n + p.ontbrekend.length, 0);
   const verzoeken = await laadVerzoekenVoorGroep(avf.id, avf.status);
   const open = verzoeken.filter((v) => v.status === "open").map((v) => ({ id: v.id, sectie: v.sectie, tekst: v.tekst }));
+  const { data: indiening } = avf.status === "ingediend"
+    ? await (await maakServerClient()).from("avf").select("ingediend_op, ingediend_door_naam").eq("id", avf.id).single()
+    : { data: null };
   const kanIndienen = avf.status === "in_ontwikkeling" || avf.status === "aanpassing_gevraagd";
 
   return (
@@ -40,6 +45,20 @@ export default async function IndienenPagina() {
           <Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" />
           Jullie AVF is ingediend (versie {avf.versie}). De stuurgroep gaat het beoordelen. Jullie krijgen op deze plek te zien of er aanpassingen nodig zijn.
         </p>
+      )}
+      {avf.status === "ingediend" && (
+        <section aria-label="Samenvatting van de indiening" className="flex flex-col gap-2 rounded-han border border-rand bg-vlak p-4" data-testid="indiening-samenvatting">
+          <h2 className="text-xl">Jullie indiening</h2>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            <dt className="font-medium text-zacht">Titel</dt><dd className="font-bold text-kop">{avf.inhoud.titel?.trim() || "Nog geen titel"}</dd>
+            <dt className="font-medium text-zacht">Versie</dt><dd className="text-tekst">{avf.versie}</dd>
+            <dt className="font-medium text-zacht">Ingediend door</dt><dd className="text-tekst">{indiening?.ingediend_door_naam ?? "onbekend"}</dd>
+            <dt className="font-medium text-zacht">Wanneer</dt><dd className="text-tekst">{indiening?.ingediend_op ? formatMoment(indiening.ingediend_op) : "onbekend"}</dd>
+          </dl>
+          <Link href={`/belevenissen/${avf.id}`} className="mt-1 flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+            <FileText aria-hidden className="size-5" /> Jullie AVF lezen
+          </Link>
+        </section>
       )}
       {avf.status === "goedgekeurd" && (
         <p role="status" className="flex items-start gap-2 rounded-han border-2 border-goedgekeurd bg-vlak p-4 font-medium text-kop">

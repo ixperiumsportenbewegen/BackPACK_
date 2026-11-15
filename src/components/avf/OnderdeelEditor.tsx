@@ -103,17 +103,15 @@ export function OnderdeelEditor({ onderdeel, avfId, clusterId }: { onderdeel: On
         />
       </section>
 
-      <section className="flex flex-col gap-4 rounded-han border border-rand bg-vlak p-4">
-        <h2 className="text-xl">Differentiatie en groepsaanpassing</h2>
+      <Inklapbaar titel="Differentiatie en groepsaanpassing" testId="blok-differentiatie" ingevuld={hebtIngevuld(onderdeel, nvt, ["individu_moeilijker", "individu_makkelijker", "groep_moeilijker", "groep_makkelijker"])}>
         <p className="-mt-2 text-sm font-medium text-zacht">Eigenaar: {eigenaarPB}</p>
         {p("individu_moeilijker", "Individu: moeilijker maken")}
         {p("individu_makkelijker", "Individu: makkelijker maken")}
         {p("groep_moeilijker", "Groep: moeilijker maken")}
         {p("groep_makkelijker", "Groep: makkelijker maken")}
-      </section>
+      </Inklapbaar>
 
-      <section className="flex flex-col gap-4 rounded-han border border-rand bg-vlak p-4">
-        <h2 className="text-xl">USV</h2>
+      <Inklapbaar titel="USV" testId="blok-usv" ingevuld={hebtIngevuld(onderdeel, nvt, ["usv_uitdagend", "usv_speelbaar", "usv_veilig_aanvulling"])}>
         {p("usv_uitdagend", "Uitdagend", { eigenaar: eigenaarPB })}
         {p("usv_speelbaar", "Speelbaar", { eigenaar: eigenaarPB })}
         <div className="rounded-han bg-achtergrond p-3">
@@ -121,7 +119,30 @@ export function OnderdeelEditor({ onderdeel, avfId, clusterId }: { onderdeel: On
           <p className="text-tekst">{onderdeel.fysieke_veiligheid?.trim() || <span className="text-zacht">Vul hierboven de fysieke veiligheid in; die staat hier dan ook.</span>}</p>
         </div>
         {p("usv_veilig_aanvulling", "Veilig: aanvulling (alleen als er meer nodig is)", { eigenaar: eigenaarVE })}
-      </section>
+      </Inklapbaar>
     </div>
+  );
+}
+
+/** Heeft de groep in dit blok al iets ingevuld (tekst of "niet van toepassing")? Op basis van wat is opgeslagen. */
+function hebtIngevuld(onderdeel: OnderdeelRij, nvt: Set<string>, kolommen: Kolom[]): boolean {
+  return kolommen.some((k) => nvt.has(k) || Boolean((onderdeel[k] as string | null)?.trim()));
+}
+
+/**
+ * Een blok dat dichtgeklapt begint: niet verplicht voor het indienen. De velden blijven in de pagina,
+ * dus wat je typt gaat niet verloren als je het blok sluit.
+ */
+function Inklapbaar({ titel, ingevuld, testId, children }: { titel: string; ingevuld: boolean; testId: string; children: React.ReactNode }) {
+  return (
+    <details className="rounded-han border border-rand bg-vlak" data-testid={testId}>
+      <summary className="flex min-h-aanraak cursor-pointer flex-wrap items-center justify-between gap-2 p-4">
+        <h2 className="text-xl">{titel}</h2>
+        <span className="rounded-han bg-rand px-2 py-0.5 text-sm font-bold text-kop">
+          {ingevuld ? "Ingevuld" : "Niet verplicht"}
+        </span>
+      </summary>
+      <div className="flex flex-col gap-4 border-t border-rand p-4">{children}</div>
+    </details>
   );
 }

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { Bandage, Camera, ChevronRight, CircleCheck, CircleDashed, CircleDot, Compass, Flame, Hourglass, Users } from "lucide-react";
 import { AvfStatusLabel, OpnieuwLabel } from "@/components/BelevenisKaart";
 import { PaginaKop } from "@/components/PaginaKop";
+import { RollenBalk } from "@/components/RollenBalk";
 import { AVF_VELDEN, SECTIES, type SectieCode, type StuurgroepRolCode } from "@/config/avf-velden";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { laadAvf, laadKaarten } from "@/lib/avfData";
@@ -86,20 +87,24 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
     <div className="flex flex-col gap-4">
       <PaginaKop titel={rol.naam} foto="ochtend-tentterrein" />
 
-      <nav aria-label="Rollen van de stuurgroep" className="flex flex-wrap gap-2">
+      <RollenBalk label="Rollen van de stuurgroep">
         {STUURGROEPROL_VOLGORDE.map((c) => (
-          <Link
-            key={c} href={`/stuurgroep/rol/${c}`} aria-current={c === rolCode ? "page" : undefined}
-            className={`flex min-h-aanraak items-center gap-1 rounded-han border-2 px-3 text-sm font-bold ${c === rolCode ? "border-merk bg-merk text-op-merk" : "border-rand bg-vlak text-kop"}`}
-          >
-            <span aria-hidden>{ROLLEN[c].pack}</span> {ROLLEN[c].naam}
-            {c === profiel.stuurgroeprol?.code && <span className="sr-only"> (jullie rol)</span>}
-          </Link>
+          <li key={c} className="shrink-0">
+            <Link
+              href={`/stuurgroep/rol/${c}`} aria-current={c === rolCode ? "page" : undefined}
+              className={`flex min-h-aanraak items-center gap-1 whitespace-nowrap rounded-han border-2 px-3 text-sm font-bold ${c === rolCode ? "border-merk bg-merk text-op-merk" : "border-rand bg-vlak text-kop"}`}
+            >
+              <span aria-hidden>{ROLLEN[c].pack}</span> {ROLLEN[c].naam}
+              {c === profiel.stuurgroeprol?.code && <span className="sr-only"> (jullie rol)</span>}
+            </Link>
+          </li>
         ))}
-        <Link href="/stuurgroep?alle=1" className="flex min-h-aanraak items-center gap-1 rounded-han border-2 border-rand bg-vlak px-3 text-sm font-bold text-kop">
-          <Users aria-hidden className="size-4" /> Overzicht
-        </Link>
-      </nav>
+        <li className="shrink-0">
+          <Link href="/stuurgroep?alle=1" className="flex min-h-aanraak items-center gap-1 whitespace-nowrap rounded-han border-2 border-rand bg-vlak px-3 text-sm font-bold text-kop">
+            <Users aria-hidden className="size-4" /> Overzicht
+          </Link>
+        </li>
+      </RollenBalk>
 
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="flex items-center gap-2 text-sm font-bold text-zacht">

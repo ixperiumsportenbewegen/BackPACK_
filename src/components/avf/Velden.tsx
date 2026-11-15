@@ -46,10 +46,14 @@ export function ConflictBlok({ conflict, onHun, onMijn }: { conflict: Conflict |
   );
 }
 
-/** Kleine regel onder het label: welke projectgroeprol eigenaar is van dit veld. */
+/**
+ * Wie eigenaar is van een veld staat niet meer bij elk veld (dat was veel herhaling), maar per sectie in het
+ * uitklapblok "Wie vult wat in?" (zie SectieKop). Deze component blijft bestaan zodat de velden hun eigenaar
+ * kunnen blijven meekrijgen, maar toont niets.
+ */
 export function Eigenaar({ rol }: { rol?: string | null }) {
-  if (!rol) return null;
-  return <span className="block text-xs font-medium text-zacht">Eigenaar: {rol}</span>;
+  void rol;
+  return null;
 }
 
 const INVOER = "w-full rounded-han border-2 border-zacht bg-vlak px-3 text-base font-normal text-tekst disabled:bg-achtergrond disabled:text-zacht";

@@ -94,7 +94,6 @@ export function FaseEditor({ fase, avf }: { fase: Fase; avf: AvfGegevens }) {
 
       <section className="flex flex-col gap-4 rounded-han border border-rand bg-vlak p-4">
         <h2 className="text-xl">Opruimen volgens de 6 W&apos;s</h2>
-        <p className="-mt-2 text-sm font-medium text-zacht">Eigenaar: {naamVan("corvee_communicatie")}</p>
         {OPRUIMEN_VELDEN.map((w) => (
           <TekstVeld
             key={w.sleutel}

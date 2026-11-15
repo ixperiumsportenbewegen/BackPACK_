@@ -33,3 +33,22 @@ test("differentiatie en USV klappen in, de verplichte velden niet", async ({ bro
   await expect(p.getByLabel("Uitdagend")).toBeVisible();
   await s.ctx.close();
 });
+
+test("de eigenaar van een veld staat per sectie in een uitklapblok en niet bij elk veld", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "vd-groep-1");
+  const p = s.page;
+  await p.goto("/avf/A");
+  await expect(p.getByRole("heading", { name: "Basisgegevens", level: 1 })).toBeVisible();
+  // niet meer bij elk veld
+  await expect(p.getByText(/^Eigenaar: /).filter({ hasNotText: "," })).toHaveCount(0);
+  // wel per sectie, met de velden per rol
+  const blok = p.getByTestId("wie-vult-wat");
+  await expect(blok).not.toHaveAttribute("open", "");
+  await blok.locator("summary").click();
+  await expect(blok).toContainText("Projectleider");
+  await expect(blok).toContainText("Titel van de belevenis");
+  // sectie F legt uit dat het niet verplicht is
+  await p.goto("/avf/F");
+  await expect(p.getByText(/Alleen invullen als je materiaal of budget nodig hebt/)).toBeVisible();
+  await s.ctx.close();
+});

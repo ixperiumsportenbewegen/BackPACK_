@@ -50,7 +50,7 @@ export const SECTIES: { code: SectieCode; naam: string; uitleg: string }[] = [
   { code: "C", naam: "Doelen", uitleg: "Wat moeten deelnemers aan het einde kunnen of hebben ervaren?" },
   { code: "D", naam: "Kop, romp en staart", uitleg: "Het verloop van de belevenis in drie fasen met onderdelen." },
   { code: "E", naam: "Veiligheid, EHBO en weer", uitleg: "Risico's, het weer en eerste hulp." },
-  { code: "F", naam: "Materialen en financiën", uitleg: "Materialen en financieel plan." },
+  { code: "F", naam: "Materialen en financiën", uitleg: "Materialen en financieel plan. Alleen invullen als je materiaal of budget nodig hebt." },
   { code: "G", naam: "Thema en organisatie", uitleg: "Bijdrage aan het thema, rolverdeling, vervoer, catering en corvee." },
   { code: "H", naam: "Communicatie", uitleg: "Wat deelnemers vooraf, tijdens en na de belevenis horen." },
 ];

@@ -104,7 +104,6 @@ export function OnderdeelEditor({ onderdeel, avfId, clusterId }: { onderdeel: On
       </section>
 
       <Inklapbaar titel="Differentiatie en groepsaanpassing" testId="blok-differentiatie" ingevuld={hebtIngevuld(onderdeel, nvt, ["individu_moeilijker", "individu_makkelijker", "groep_moeilijker", "groep_makkelijker"])}>
-        <p className="-mt-2 text-sm font-medium text-zacht">Eigenaar: {eigenaarPB}</p>
         {p("individu_moeilijker", "Individu: moeilijker maken")}
         {p("individu_makkelijker", "Individu: makkelijker maken")}
         {p("groep_moeilijker", "Groep: moeilijker maken")}

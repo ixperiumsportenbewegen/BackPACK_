@@ -38,7 +38,12 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
         const w = leesWaarde(avf.inhoud, v.sleutel);
         const eigenaar = rolNaam(v.pgRol);
         if (v.veldtype === "jaNee") {
-          return <JaNeeVeld key={v.sleutel} doel={doelVoor(v)} begin={typeof w === "boolean" ? w : null} label={v.label} hulp={v.hulp} eigenaar={eigenaar} />;
+          return (
+            <JaNeeVeld
+              key={v.sleutel} doel={doelVoor(v)} begin={typeof w === "boolean" ? w : null} label={v.label} hulp={v.hulp} eigenaar={eigenaar}
+              waarschuwingBijNee={WAARSCHUWING_BIJ_NEE[v.sleutel]}
+            />
+          );
         }
         if (v.veldtype === "keuze") {
           return (
@@ -69,6 +74,10 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
   );
 }
 
+const WAARSCHUWING_BIJ_NEE: Record<string, string> = {
+  "organisatie.allergieen_rekening_gehouden":
+    "Weet je het zeker? Bij een meerdaagse met veel studenten is er vrijwel altijd iemand met een allergie. Overleg met Catering en kijk naar de voedselvoorziening voordat je dit op Nee laat staan.",
+};
 const LOCATIE_VELDEN = new Set(["locatie_keuze", "locatie_detail"]);
 const EENVOUDIG = new Set(["tekst", "lang", "getal", "keuze", "meerkeuze", "jaNee"]);
 

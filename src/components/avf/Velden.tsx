@@ -128,9 +128,11 @@ interface JaNeeProps {
   eigenaar?: string | null;
   uitgeschakeld?: boolean;
   bijOpgeslagen?: (w: boolean | null) => void;
+  /** Zachte waarschuwing (blokkeert niets) zodra het antwoord Nee is. */
+  waarschuwingBijNee?: string;
 }
 
-export function JaNeeVeld({ doel, begin, label, hulp, eigenaar, uitgeschakeld, bijOpgeslagen }: JaNeeProps) {
+export function JaNeeVeld({ doel, begin, label, hulp, eigenaar, uitgeschakeld, bijOpgeslagen, waarschuwingBijNee }: JaNeeProps) {
   const { vergrendeld } = useAvfEditor();
   const v = useVeld(doel, begin);
   const uit = vergrendeld || uitgeschakeld;
@@ -159,6 +161,11 @@ export function JaNeeVeld({ doel, begin, label, hulp, eigenaar, uitgeschakeld, b
           </button>
         ))}
       </div>
+      {waarschuwingBijNee && v.opgeslagen === false && (
+        <p role="status" data-testid="waarschuwing-bij-nee" className="mt-2 flex items-start gap-2 rounded-han border-2 border-actie bg-vlak p-3 font-medium text-kop">
+          <TriangleAlert aria-hidden className="mt-0.5 size-5 shrink-0" /> {waarschuwingBijNee}
+        </p>
+      )}
       <ConflictBlok
         conflict={v.conflict}
         onHun={() => v.resetNaar(v.conflict?.huidig ?? null)}

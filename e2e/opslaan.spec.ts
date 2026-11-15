@@ -11,17 +11,19 @@ test.describe.configure({ mode: "serial" });
 
 let avfId: string;
 let oorspronkelijk: string | null;
+let oorspronkelijkOrganisatie: unknown;
 
 test.beforeAll(async () => {
   const VD = await clusterId("VD");
-  const { data } = await admin.from("avf").select("id, contactpersoon, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
+  const { data } = await admin.from("avf").select("id, contactpersoon, organisatie, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
   const eerste = (data ?? []).find((r) => (r.projectgroep as unknown as { nummer: number }).nummer === 6)!;
   avfId = eerste.id;
   oorspronkelijk = eerste.contactpersoon;
+  oorspronkelijkOrganisatie = eerste.organisatie;
 });
 
 test.afterAll(async () => {
-  await admin.from("avf").update({ contactpersoon: oorspronkelijk }).eq("id", avfId);
+  await admin.from("avf").update({ contactpersoon: oorspronkelijk, organisatie: oorspronkelijkOrganisatie }).eq("id", avfId);
 });
 
 async function contactpersoonInDatabase() {
@@ -59,5 +61,20 @@ test("tekst blijft bewaard als je de pagina direct na het typen opnieuw laadt", 
   await s.page.getByLabel("Contactpersoon").fill("Pagina-herladen");
   await s.page.goto("/");
   await expect.poll(contactpersoonInDatabase, { timeout: 10_000 }).toBe("Pagina-herladen");
+  await s.ctx.close();
+});
+
+test("bij allergieën kiezen voor Nee geeft een zachte waarschuwing, Ja haalt hem weg", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "vd-groep-6");
+  const p = s.page;
+  await p.goto("/avf/G");
+  await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
+  const groep = p.getByRole("radiogroup", { name: /rekening gehouden met allergieën/ });
+  await groep.getByRole("radio", { name: "Nee" }).click();
+  await expect(p.getByTestId("waarschuwing-bij-nee")).toContainText(/Weet je het zeker/);
+  // het blokkeert niets: het antwoord is gewoon opgeslagen
+  await expect.poll(async () => (await admin.from("avf").select("organisatie").eq("id", avfId).single()).data?.organisatie?.allergieen_rekening_gehouden).toBe(false);
+  await groep.getByRole("radio", { name: "Ja" }).click();
+  await expect(p.getByTestId("waarschuwing-bij-nee")).toHaveCount(0);
   await s.ctx.close();
 });

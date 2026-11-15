@@ -154,7 +154,7 @@ export function BeheerPaneel({ clusters }: { clusters: ClusterBeheer[] }) {
     <div className="flex flex-col gap-6">
       {clusters.map((c) => (
         <section key={c.id} aria-labelledby={`cluster-${c.code}`} className="flex flex-col gap-3">
-          <h2 id={`cluster-${c.code}`} className="text-2xl">{c.naam} <span className="text-base font-normal text-zacht">({c.code})</span></h2>
+          <h2 id={`cluster-${c.code}`} className="text-2xl">{c.naam}{!c.naam.includes(c.code) && <span className="text-base font-normal text-zacht"> ({c.code})</span>}</h2>
           <Links c={c} />
           <details className="rounded-han border border-rand bg-vlak">
             <summary className="flex min-h-aanraak cursor-pointer items-center px-4 font-bold text-kop">Accounts en wachtwoorden ({c.accounts.length})</summary>

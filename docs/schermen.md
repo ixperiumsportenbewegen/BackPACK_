@@ -13,7 +13,7 @@ Onderste balk met vier knoppen, voor elk account gelijk van vorm:
 | **Stuurgroep** / **Budget** | Budget (eigen aanvragen) | Werkpagina's | Werkpagina's | – (knop verborgen) |
 | **Meer** | rolverdeling, Teams-knop, uitloggen | materialenlijst, thema instellen, Teams-knop, uitloggen | beheer, materialenlijst, thema, uitloggen | Teams-knop, uitloggen |
 
-Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop.
+Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop. Bij de docent staat in het label het gekozen cluster ("Docent · TEST") en brengt een tik erop je naar de clusterkeuze op het startscherm.
 
 ## Programma
 
@@ -34,6 +34,7 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 
 ### Onze meerdaagse (startscherm) – OVZ-01, OVZ-02
 1. Kop met sfeerbeeld, naam en verhaal van het meerdaagsethema (anders: foto `vallei-viaduct` en de melding "Meerdaagsethema nog niet gekozen" met uitleg; stuurgroep en docent krijgen een knop "Thema kiezen").
+   Zolang er geen thema is, is dit blok compact en staat bij een projectgroep het blok "Jullie AVF" (punt 4) er bovenaan.
 2. Aftellen tot 28 juni 2027.
 3. Zes belevenissen als kaarten: titel, publieke samenvatting, statuslabel.
 4. Alleen projectgroep: blok "Jullie AVF" met voortgang per sectie en open verbeterverzoeken.
@@ -48,14 +49,15 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 - Sectie H: drie blokken Voor, Tijdens en Na.
 - Sectie F: eerst de locatie (anders een melding met link naar sectie A) en de lijst (anders de melding dat de materialenlijst nog niet klaar is). Daarna materiaal kiezen uit de lijst met aantal en fase (kop, romp, staart of hele belevenis) en de beschikbare voorraad op de locatie en op dit moment; een tekort is een waarschuwing en blokkeert niets. Eigen materiaal (zonder voorraad). Het financieel plan volgt in deel B.
 - Rolverdeling (onder "Meer" en als controle bij indienen).
-- Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting.
+- Velden worden opgeslagen terwijl je typt (na ongeveer een seconde stilte) en bij het verlaten van het veld of de pagina, zodat er niets verloren gaat als je direct doorklikt. Is er nog iets niet opgeslagen terwijl de pagina sluit, dan waarschuwt de browser.
+- Een onderdeel (sectie D): naam, duur, beschrijving en veiligheid staan direct zichtbaar. Differentiatie en USV zijn niet verplicht en klappen in (met het label "Ingevuld" of "Niet verplicht").
+- Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting. De controlelijst begint met een samenvatting ("Nog 12 punten open in 5 secties"). Elke sectie klapt in als er meer dan drie punten openstaan, en elk punt linkt naar de plek waar je het invult (sectie D opent de juiste fase, de rolverdeling staat onder Meer).
 - Knop **Afdrukken / PDF**: printvriendelijke weergave van het volledige AVF (PDF-01).
 
 ### AVF beoordelen (stuurgroep en docent) – AVF-06 t/m AVF-09
-- Leesweergave van het AVF per sectie.
+- Leesweergave van het AVF per sectie, bovenaan met een korte stand ("Beoordelen · 1 open · 0 aangepast") die naar het besluit springt.
 - Bij elke sectie en elk onderdeel: "Verbeterverzoek" (tekst, voor welke projectgroeprol).
-- Themacheck per stuurgroeprol: akkoord of aandachtspunt met toelichting.
-- Knoppen **Aanpassing vragen** en **Goedkeuren** (vragen om een naam).
+- Onder het AVF: de knoppen **Aanpassing vragen** en **Goedkeuren** (vragen om een naam) en de themacheck per stuurgroeprol: akkoord of aandachtspunt met toelichting. De naam die je op één plek invult, staat meteen ook op de andere plekken van de pagina.
 - Tabblad "Versies": eerdere indieningen met wijzigingssamenvatting.
 
 ### Belevenis bekijken (andere projectgroep en student)
@@ -71,7 +73,7 @@ Indeling in de vier PACK-vakken (kleine letter en icoon, speels en niet te zwaar
 
 Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen zijn te bekijken.
 
-**Rolweergave** (voor elke rol gelijk opgebouwd, gevuld via `src/config/avf-velden.ts`): een matrix met de zes belevenissen als rijen en de velden van die rol als kolommen of kaarten. Per veld: leeg, ingevuld of "opnieuw te controleren", laatste wijziging en open verbeterverzoeken. Tik op een veld → AVF op die plek → "Verbeterverzoek" (automatisch voor de juiste projectgroeprol).
+**Rolweergave** (voor elke rol gelijk opgebouwd, gevuld via `src/config/avf-velden.ts`): de zes belevenissen als kaarten, elk met een samenvatting ("12 van 14 velden ingevuld, 2 leeg") en de velden van die rol achter een uitklapblok. Per veld: leeg, ingevuld of "opnieuw te controleren", laatste wijziging en open verbeterverzoeken. Tik op een veld → AVF op die plek → "Verbeterverzoek" (automatisch voor de juiste projectgroeprol).
 
 **Extra per rol in opdracht 1–5:**
 - **Beleving & Thema**: meerdaagsethema instellen (THM-01) met live voorbeeld; accentkleur uit HAN rood, oranje, groen of blauw; tip over passend sfeerbeeld.

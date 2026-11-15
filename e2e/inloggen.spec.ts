@@ -20,7 +20,8 @@ function verwachtLabel(a: Basis["accounts"][number]): string {
   const cluster = basis.clusters.find((c) => c.code === a.cluster);
   return accountLabel({
     soort: a.soort,
-    clusterCode: a.cluster,
+    // de docent begint op VD en dat staat in het label
+    clusterCode: a.soort === "docent" ? "VD" : a.cluster,
     projectgroepNaam: cluster?.projectgroepen.find((g) => g.nummer === a.projectgroep)?.naam,
     stuurgroeprolNaam: cluster?.stuurgroeprollen.find((r) => r.code === a.stuurgroeprol)?.naam,
   });

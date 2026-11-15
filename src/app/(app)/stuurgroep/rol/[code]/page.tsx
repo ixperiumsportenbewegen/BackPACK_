@@ -119,6 +119,7 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
       {rolCode === "projectleiding" && (
         <>
           <LinkKaart href="/stuurgroep/programma" titel="Dag en tijd per belevenis toewijzen" uitleg="Wijs elke projectgroep een tijdvak toe of wissel twee groepen." />
+          <LinkKaart href="/stuurgroep/deadlines" titel="Deadlines" uitleg="Stel per onderdeel van het AVF in wanneer het af moet zijn." />
           <section className="rounded-han border border-rand bg-vlak p-4">
             <h2 className="text-xl">Rolverdelingen</h2>
             <ul className="mt-2 divide-y divide-rand">

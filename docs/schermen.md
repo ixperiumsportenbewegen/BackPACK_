@@ -42,17 +42,21 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 
 ### AVF bewerken (projectgroep) – AVF-01 t/m AVF-05, PGR-01
 - Dag en tijd staan bovenaan als alleen-lezen (toegewezen door de stuurgroep; "nog niet ingepland" zolang leeg). De locatie kiest de projectgroep zelf in sectie A: camping of bivak (geen "anders"), plus een tekstveld voor waar precies.
-- Overzicht met secties A–H als lijst met voortgangslabel (niet gestart, onvolledig, compleet) en de eigenaar-rol (projectgroeprol) van elke sectie. De stuurgroepkoppeling is hier niet zichtbaar.
+- Overzicht met secties A–H als lijst met voortgangslabel (niet gestart, onvolledig, compleet) en de eigenaar-rol (projectgroeprol) van elke sectie. Per sectie staat onder "Wie vult wat in?" (uitklapblok) welke rol welke velden invult; bij de velden zelf staat geen eigenaar meer. De voortgang heet "x van y secties ingepakt". De stuurgroepkoppeling is hier niet zichtbaar.
 - Per sectie een eigen scherm met velden die automatisch opslaan (melding "Opgeslagen" of "Iemand anders heeft dit net gewijzigd – herladen?").
 - Sectie D: drie tabbladen Kop, Romp, Staart. Per fase de fasevelden en een lijst onderdelen (toevoegen, verschuiven, verwijderen). Een onderdeel opent in een eigen scherm.
 - Sectie E: risicotabel, vier weerscenario's als kaarten met schakelaar "relevant" en de vraag "Zijn aanvullende EHBO-maatregelen nodig?" (ja → velden; nee → verwijzing naar het algemene EHBO-plan).
 - Sectie H: drie blokken Voor, Tijdens en Na.
-- Sectie F: eerst de locatie (anders een melding met link naar sectie A) en de lijst (anders de melding dat de materialenlijst nog niet klaar is). Daarna materiaal kiezen uit de lijst met aantal en fase (kop, romp, staart of hele belevenis) en de beschikbare voorraad op de locatie en op dit moment; een tekort is een waarschuwing en blokkeert niets. Eigen materiaal (zonder voorraad). Het financieel plan volgt in deel B.
+- Sectie A vraagt de locatie (camping of bivak) vooraan, direct onder het tijdvak. Bij allergieën (sectie G) geeft het antwoord Nee een zachte waarschuwing; die blokkeert niets.
+- Sectie F (niet verplicht: alleen invullen bij materiaal of budget): eerst de locatie (anders een melding met link naar sectie A) en de lijst (anders de melding dat de materialenlijst nog niet klaar is). Daarna materiaal kiezen uit de lijst met aantal en fase (kop, romp, staart of hele belevenis) en de beschikbare voorraad op de locatie en op dit moment; een tekort is een waarschuwing en blokkeert niets. Eigen materiaal (zonder voorraad). Het financieel plan volgt in deel B.
 - Rolverdeling (onder "Meer" en als controle bij indienen).
 - Velden worden opgeslagen terwijl je typt (na ongeveer een seconde stilte) en bij het verlaten van het veld of de pagina, zodat er niets verloren gaat als je direct doorklikt. Is er nog iets niet opgeslagen terwijl de pagina sluit, dan waarschuwt de browser.
 - Een onderdeel (sectie D): naam, duur, beschrijving en veiligheid staan direct zichtbaar. Differentiatie en USV zijn niet verplicht en klappen in (met het label "Ingevuld" of "Niet verplicht").
 - Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting. De controlelijst begint met een samenvatting ("Nog 12 punten open in 5 secties"). Elke sectie klapt in als er meer dan drie punten openstaan, en elk punt linkt naar de plek waar je het invult (sectie D opent de juiste fase, de rolverdeling staat onder Meer).
 - Knop **Afdrukken / PDF**: printvriendelijke weergave van het volledige AVF (PDF-01).
+
+### Na het indienen (projectgroep)
+De indienpagina toont een samenvatting (titel, versie, door wie, wanneer) en de knop "Jullie AVF lezen"; bij een gevraagde aanpassing staan de verbeterverzoeken in de secties en op het startscherm.
 
 ### AVF beoordelen (stuurgroep en docent) – AVF-06 t/m AVF-09
 - Leesweergave van het AVF per sectie, bovenaan met een korte stand ("Beoordelen · 1 open · 0 aangepast") die naar het besluit springt.
@@ -72,6 +76,8 @@ Indeling in de vier PACK-vakken (kleine letter en icoon, speels en niet te zwaar
 - **K · Kompas**: Projectleiding
 
 Het eigen stuurgroepaccount opent standaard op zijn eigen rol, maar alle rollen zijn te bekijken.
+
+De zes rollen staan in één rij die zijwaarts scrolt (de gekozen rol springt in beeld). Een foute link toont een gewone 404-pagina in de huisstijl met de knop "Terug naar het begin".
 
 **Rolweergave** (voor elke rol gelijk opgebouwd, gevuld via `src/config/avf-velden.ts`): de zes belevenissen als kaarten, elk met een samenvatting ("12 van 14 velden ingevuld, 2 leeg") en de velden van die rol achter een uitklapblok. Per veld: leeg, ingevuld of "opnieuw te controleren", laatste wijziging en open verbeterverzoeken. Tik op een veld → AVF op die plek → "Verbeterverzoek" (automatisch voor de juiste projectgroeprol).
 

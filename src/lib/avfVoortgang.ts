@@ -217,6 +217,19 @@ export function samenvatting(voortgang: SectieVoortgang[]): { compleet: number; 
   return { compleet: meetellend.filter((v) => v.status === "compleet").length, totaal: meetellend.length };
 }
 
+/**
+ * Waar je een ontbrekend punt invult. Sectie D opent de juiste fase, de rolverdeling staat onder Meer,
+ * alle andere punten staan in hun sectie.
+ */
+export function ontbrekendLink(sectie: SectieCode, sleutel: string): string {
+  if (sleutel === "projectgroep_rol") return "/meer/rolverdeling";
+  if (sectie === "D") {
+    const fase = sleutel.split(".")[0];
+    if ((FASEN as string[]).includes(fase)) return `/avf/D?fase=${fase}`;
+  }
+  return `/avf/${sectie}`;
+}
+
 export function alleOntbrekend(voortgang: SectieVoortgang[]): Ontbrekend[] {
   return voortgang.flatMap((v) => v.ontbrekend);
 }

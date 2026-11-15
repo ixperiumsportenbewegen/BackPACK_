@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircle2, ChevronLeft, CircleAlert, Hourglass } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Hourglass } from "lucide-react";
 import { AvfStatusLabel } from "@/components/BelevenisKaart";
 import { SECTIES } from "@/config/avf-velden";
 import { laadEigenAvf } from "@/lib/avfData";
-import { voortgangPerSectie } from "@/lib/avfVoortgang";
+import { ontbrekendLink, voortgangPerSectie } from "@/lib/avfVoortgang";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { getProfiel } from "@/lib/profiel";
 import { IndienenFormulier } from "./IndienenFormulier";
@@ -19,6 +19,7 @@ export default async function IndienenPagina() {
 
   const voortgang = voortgangPerSectie(avf.inhoud);
   const problemen = voortgang.filter((v) => v.ontbrekend.length > 0);
+  const aantalOpen = problemen.reduce((n, p) => n + p.ontbrekend.length, 0);
   const verzoeken = await laadVerzoekenVoorGroep(avf.id, avf.status);
   const open = verzoeken.filter((v) => v.status === "open").map((v) => ({ id: v.id, sectie: v.sectie, tekst: v.tekst }));
   const kanIndienen = avf.status === "in_ontwikkeling" || avf.status === "aanpassing_gevraagd";
@@ -64,14 +65,32 @@ export default async function IndienenPagina() {
             </p>
           ) : (
             <>
-              <p className="mt-1 text-tekst">Dit moet nog worden ingevuld voordat je kunt indienen:</p>
-              <ul className="mt-2 flex flex-col gap-3">
+              <p className="mt-1 text-lg font-bold text-kop" data-testid="controle-samenvatting">
+                Nog {aantalOpen} {aantalOpen === 1 ? "punt" : "punten"} open in {problemen.length} {problemen.length === 1 ? "sectie" : "secties"}
+              </p>
+              <p className="text-sm text-zacht">Tik op een punt om het meteen in te vullen. Open een sectie om te zien wat er nog mist.</p>
+              <ul className="mt-3 flex flex-col gap-2">
                 {problemen.map((p) => (
                   <li key={p.sectie}>
-                    <Link href={`/avf/${p.sectie}`} className="inline-flex min-h-aanraak items-center font-bold text-kop underline">
-                      Sectie {p.sectie} · {SECTIES.find((s) => s.code === p.sectie)?.naam}
-                    </Link>
-                    <ul className="list-disc pl-5 text-tekst">{p.ontbrekend.map((o) => <li key={o.sleutel}>{o.melding}</li>)}</ul>
+                    <details open={p.ontbrekend.length <= 3} className="rounded-han border border-rand">
+                      <summary className="flex min-h-aanraak cursor-pointer items-center justify-between gap-2 px-3 font-bold text-kop">
+                        <span>Sectie {p.sectie} · {SECTIES.find((s) => s.code === p.sectie)?.naam}</span>
+                        <span className="rounded-han bg-rand px-2 py-0.5 text-sm">{p.ontbrekend.length} open</span>
+                      </summary>
+                      <ul className="flex flex-col border-t border-rand">
+                        {p.ontbrekend.map((o) => (
+                          <li key={o.sleutel} className="border-b border-rand last:border-b-0">
+                            <Link
+                              href={ontbrekendLink(p.sectie, o.sleutel)}
+                              className="flex min-h-aanraak items-center justify-between gap-2 px-3 py-2 text-tekst"
+                            >
+                              <span>{o.melding}</span>
+                              <ChevronRight aria-hidden className="size-5 shrink-0 text-kop" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
                   </li>
                 ))}
               </ul>

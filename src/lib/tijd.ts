@@ -1,5 +1,19 @@
 const TZ = "Europe/Amsterdam";
 
+/** De kalenderdag ("2026-11-15") op een moment, in Nederlandse tijd (dus niet in UTC). */
+export function nlDag(moment: Date = new Date()): string {
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: TZ }).format(moment);
+}
+
+/**
+ * Hoeveel kalenderdagen het nog is tot een dag ("2027-06-28"), in Nederlandse tijd. Er wordt niet in blokken van
+ * 24 uur geteld: tussen winter en zomer zit een tijdwisseling, waardoor het getal anders een uur te vroeg zou
+ * springen. Vandaag is 0, morgen is 1; een dag die voorbij is geeft een negatief getal.
+ */
+export function dagenTot(doelDag: string, nu: Date = new Date()): number {
+  return Math.round((Date.parse(doelDag) - Date.parse(nlDag(nu))) / 86_400_000);
+}
+
 /** "2027-06-28" wordt "maandag 28 juni". */
 export function formatDag(dag: string): string {
   return new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${dag}T00:00:00Z`));

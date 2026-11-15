@@ -9,21 +9,18 @@ import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
 import { laadStanden } from "@/lib/beoordeling";
 import { euro, laadClusterBudget, laadResterend } from "@/lib/budget";
 import { getProfiel } from "@/lib/profiel";
+import { dagenTot } from "@/lib/tijd";
 import { maakServerClient } from "@/lib/supabase/server";
 import { STANDAARD_SFEERBEELD, themaBeeldUrl } from "@/lib/themaBeeld";
 import { kiesCluster } from "./actions";
 
-const STARTDATUM = new Date("2027-06-28T00:00:00+02:00");
-
-function dagenTot(datum: Date): number {
-  return Math.ceil((datum.getTime() - Date.now()) / 86_400_000);
-}
+const STARTDAG = "2027-06-28"; // eerste dag van de meerdaagse
 
 export default async function OnzeMeerdaagse() {
   const profiel = (await getProfiel())!;
   const thema = profiel.thema;
   const heeftThema = Boolean(thema?.naam);
-  const dagen = dagenTot(STARTDATUM);
+  const dagen = dagenTot(STARTDAG);
   const supabase = await maakServerClient();
   const kaarten = profiel.cluster ? await laadKaarten(profiel.cluster.id) : [];
   const eigenAvf = profiel.soort === "projectgroep" ? await laadEigenAvf() : null;
@@ -123,7 +120,7 @@ export default async function OnzeMeerdaagse() {
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="text-sm font-medium text-zacht">Ardennen-meerdaagse · 28–30 juni 2027</p>
         <p className="mt-1 font-heading text-3xl font-bold text-kop">
-          {dagen > 0 ? `Nog ${dagen} dagen` : "Het is zover"}
+          {dagen > 0 ? `Nog ${dagen} ${dagen === 1 ? "dag" : "dagen"}` : "Het is zover"}
         </p>
       </section>
 

@@ -55,7 +55,7 @@ export function NamenRegel({
   }
 
   // Opslaan terwijl je typt, zodat niets verloren gaat als je direct daarna doorklikt.
-  useAutoBewaar(tekst, bijVerlaten, { actief: kanBewerken });
+  const auto = useAutoBewaar(tekst, bijVerlaten, { actief: kanBewerken && !conflict });
 
   const id = `namen-${label.replace(/\W+/g, "-").toLowerCase()}`;
   return (
@@ -67,7 +67,7 @@ export function NamenRegel({
           id={id}
           value={tekst}
           onChange={(e) => setTekst(e.target.value)}
-          onBlur={() => void bijVerlaten()}
+          onBlur={() => void auto.bewaarNu()}
           maxLength={200}
           autoComplete="off"
           placeholder="Namen van de student(en)"

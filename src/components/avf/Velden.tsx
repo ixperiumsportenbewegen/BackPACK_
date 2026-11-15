@@ -86,7 +86,8 @@ export function TekstVeld({ doel, begin, label, hulp, eigenaar, maxLengte, meerR
   }
 
   // Opslaan terwijl je typt, zodat niets verloren gaat als je direct daarna doorklikt.
-  useAutoBewaar(tekst, bijVerlaten, { actief: !uit });
+  // Zolang er een waarschuwing over een gelijktijdige wijziging openstaat, wordt er niet automatisch opgeslagen.
+  const auto = useAutoBewaar(tekst, bijVerlaten, { actief: !uit && !v.conflict });
 
   return (
     <div>
@@ -96,12 +97,12 @@ export function TekstVeld({ doel, begin, label, hulp, eigenaar, maxLengte, meerR
         {hulp && <span className="text-sm font-normal text-zacht">{hulp}</span>}
         {meerRegels ? (
           <textarea
-            value={tekst} onChange={(e) => setTekst(e.target.value)} onBlur={bijVerlaten}
+            value={tekst} onChange={(e) => setTekst(e.target.value)} onBlur={() => void auto.bewaarNu()}
             maxLength={maxLengte} rows={4} disabled={uit} className={`${INVOER} py-2`}
           />
         ) : (
           <input
-            value={tekst} onChange={(e) => setTekst(e.target.value)} onBlur={bijVerlaten}
+            value={tekst} onChange={(e) => setTekst(e.target.value)} onBlur={() => void auto.bewaarNu()}
             maxLength={maxLengte} disabled={uit} className={`${INVOER} min-h-aanraak`}
             {...(getal ? { type: "number", inputMode: "numeric" as const, min: 0 } : { type: "text" })}
           />

@@ -31,4 +31,7 @@ jobs:
           path: export/
           retention-days: 90
       - name: Blijf-actief aanroepen
-        run: curl --fail --silent --show-error -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" https://back-pack-one.vercel.app/api/blijf-actief
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail --silent --show-error -H "x-cron-secret: $CRON_SECRET" https://back-pack-one.vercel.app/api/blijf-actief

@@ -28,7 +28,18 @@ export function Kopbalk({ profiel }: { profiel: Profiel }) {
             <p className="truncate text-lg leading-tight">
               {themaNaam ? <span className="font-heading font-bold text-kop">{themaNaam}</span> : <Woordmerk />}
             </p>
-            <p className="truncate text-sm font-medium text-zacht">{profiel.label}</p>
+            {profiel.soort === "docent" ? (
+              // De clusterkeuze staat op het startscherm; vanaf elk scherm kom je er met één tik.
+              <Link
+                href="/#cluster"
+                aria-label={`${profiel.label}, cluster wisselen`}
+                className="block truncate text-sm font-medium text-zacht underline"
+              >
+                {profiel.label}
+              </Link>
+            ) : (
+              <p className="truncate text-sm font-medium text-zacht">{profiel.label}</p>
+            )}
           </div>
         </div>
       </div>

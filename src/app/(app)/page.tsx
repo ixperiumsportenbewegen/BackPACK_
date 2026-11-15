@@ -71,7 +71,7 @@ export default async function OnzeMeerdaagse() {
   return (
     <div className="flex flex-col gap-6">
       {profiel.soort === "docent" && (
-        <section aria-label="Cluster kiezen">
+        <section id="cluster" aria-label="Cluster kiezen" className="scroll-mt-24">
           <p className="mb-2 text-sm font-medium text-zacht">Cluster</p>
           <div className="flex gap-2">
             {profiel.alleClusters.map((c) => {

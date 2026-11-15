@@ -11,7 +11,8 @@ export interface LabelInvoer {
 export function accountLabel(i: LabelInvoer): string {
   switch (i.soort) {
     case "docent":
-      return "Docent";
+      // De docent bekijkt een gekozen cluster; dat staat erbij zodat je weet waar je werkt.
+      return i.clusterCode ? `Docent · ${i.clusterCode}` : "Docent";
     case "stuurgroep":
       return `${i.clusterCode} · ${i.stuurgroeprolNaam}`;
     case "projectgroep":

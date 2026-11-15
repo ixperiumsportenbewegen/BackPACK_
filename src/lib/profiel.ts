@@ -62,7 +62,7 @@ export const getProfiel = cache(async (): Promise<Profiel | null> => {
     gebruikersnaam: a.gebruikersnaam,
     soort,
     label: accountLabel({
-      soort, clusterCode: eigenCluster?.code, projectgroepNaam: groep?.naam, stuurgroeprolNaam: rol?.naam,
+      soort, clusterCode: soort === "docent" ? cluster?.code : eigenCluster?.code, projectgroepNaam: groep?.naam, stuurgroeprolNaam: rol?.naam,
     }),
     cluster,
     alleClusters,

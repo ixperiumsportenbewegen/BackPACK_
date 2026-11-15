@@ -52,3 +52,17 @@ test("de eigenaar van een veld staat per sectie in een uitklapblok en niet bij e
   await expect(p.getByText(/Alleen invullen als je materiaal of budget nodig hebt/)).toBeVisible();
   await s.ctx.close();
 });
+
+test("sectie A vraagt eerst naar de locatie en legt uit wat het aantal deelnemers is", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "vd-groep-1");
+  const p = s.page;
+  await p.goto("/avf/A");
+  const locatie = p.getByRole("radiogroup", { name: /Op welke locatie vindt de belevenis plaats/ });
+  const titel = p.getByLabel("Titel van de belevenis");
+  await expect(locatie).toBeVisible();
+  const yLocatie = (await locatie.boundingBox())!.y;
+  const yTitel = (await titel.boundingBox())!.y;
+  expect(yLocatie).toBeLessThan(yTitel);
+  await expect(p.getByText(/niet de organiserende studenten van jullie eigen groep/)).toBeVisible();
+  await s.ctx.close();
+});

@@ -69,6 +69,7 @@ function Velden({ velden, avf }: { velden: AvfVeld[]; avf: AvfGegevens }) {
   );
 }
 
+const LOCATIE_VELDEN = new Set(["locatie_keuze", "locatie_detail"]);
 const EENVOUDIG = new Set(["tekst", "lang", "getal", "keuze", "meerkeuze", "jaNee"]);
 
 export default async function SectiePagina({
@@ -118,7 +119,9 @@ export default async function SectiePagina({
             Het tijdvak bepaalt de stuurgroep. De locatie (camping of bivak) kiezen jullie hieronder zelf.
           </p>
         </section>
-        <Velden velden={eenvoudig} avf={avf} />
+        {/* De locatie staat vooraan: die bepaalt welke materialen er beschikbaar zijn (sectie F). */}
+        <Velden velden={eenvoudig.filter((v) => LOCATIE_VELDEN.has(v.sleutel))} avf={avf} />
+        <Velden velden={eenvoudig.filter((v) => !LOCATIE_VELDEN.has(v.sleutel))} avf={avf} />
         <section aria-label="Zo zien andere groepen jullie belevenis" className="flex flex-col gap-2">
           <h2 className="text-xl">Zo zien andere groepen jullie belevenis</h2>
           <p className="text-sm text-zacht">Dit zijn de enige gegevens die andere projectgroepen en studenten van jullie AVF zien.</p>

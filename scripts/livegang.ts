@@ -15,6 +15,9 @@
  *   npm run livegang -- --droog                 alleen laten zien wat er zou gebeuren
  *   npm run livegang                            VD en VC, met bevestiging (typ LIVEGANG)
  *   npm run livegang -- --cluster=TEST          oefenen op het fictieve cluster TEST (daarna: npm run seed)
+ *   npm run livegang -- --cluster=VD --zonder-wachtwoorden
+ *                                               alleen de gegevens van VD leegmaken; de wachtwoorden blijven gelijk,
+ *                                               zodat wie nu test niet wordt uitgelogd
  *
  * Gebruikt de service role key: alleen draaien op een vertrouwde computer, en alleen door Bart.
  */
@@ -39,6 +42,8 @@ const vlag = (naam: string) => argumenten.includes(`--${naam}`);
 const waarde = (naam: string) => argumenten.find((a) => a.startsWith(`--${naam}=`))?.split("=")[1];
 
 const droog = vlag("droog");
+/** Alleen de gegevens leegmaken; de wachtwoorden en sessies blijven zoals ze zijn (voor wie nu nog test). */
+const zonderWachtwoorden = vlag("zonder-wachtwoorden");
 const clusterCodes = (waarde("cluster") ?? "VD,VC").split(",").map((c) => c.trim().toUpperCase()).filter(Boolean);
 const geldig = ["VD", "VC", "TEST"];
 if (clusterCodes.length === 0 || clusterCodes.some((c) => !geldig.includes(c))) {
@@ -121,6 +126,15 @@ const LEGE_AVF = {
   goedgekeurd_door_account: null,
 };
 
+/** De rolverdeling van de projectgroepen en de namen van de stuurgroepleden terug naar leeg. */
+async function maakNamenLeeg(c: Cluster) {
+  const groepen = (await ok(admin.from("projectgroep").select("id").eq("cluster_id", c.id), "projectgroepen")) as { id: string }[];
+  if (groepen.length) {
+    await ok(admin.from("projectgroep_rol").update({ namen: null }).in("projectgroep_id", groepen.map((g) => g.id)), "rolverdeling");
+  }
+  await ok(admin.from("stuurgroeprol").update({ studenten: null }).eq("cluster_id", c.id), "namen stuurgroep");
+}
+
 async function maakSchoon(c: Cluster, ids: string[]) {
   console.log(`\n== ${c.code}: opruimen ==`);
   // 1. bestanden in Storage
@@ -155,11 +169,7 @@ async function maakSchoon(c: Cluster, ids: string[]) {
   await ok(admin.from("meerdaagsethema").update({
     naam: null, verhaal: null, slogan: null, accentkleur: null, sfeerbeeld_pad: null, logo_pad: null, bijgewerkt_door_naam: null,
   }).eq("cluster_id", c.id), "thema terugzetten");
-  const groepen = (await ok(admin.from("projectgroep").select("id").eq("cluster_id", c.id), "projectgroepen")) as { id: string }[];
-  if (groepen.length) {
-    await ok(admin.from("projectgroep_rol").update({ namen: null }).in("projectgroep_id", groepen.map((g) => g.id)), "rolverdeling");
-  }
-  await ok(admin.from("stuurgroeprol").update({ studenten: null }).eq("cluster_id", c.id), "namen stuurgroep");
+  await maakNamenLeeg(c);
 
   // 4. deadlines (testdata: de stuurgroep stelt ze na de livegang zelf in) en het logboek van dit cluster (na alle wijzigingen
   //    hierboven, want die loggen zelf ook)
@@ -214,7 +224,7 @@ async function main() {
     per.set(c.code, o);
     console.log(`${c.naam} (${c.code}): ${o.avfs} AVF's (${o.onderdelen} onderdelen, ${o.versies} versies, ${o.verzoeken} verbeterverzoeken, ${o.themachecks} themachecks),`);
     console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
-    console.log(`  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
+    console.log(zonderWachtwoorden ? `  ${o.accounts} accounts houden hun wachtwoord (--zonder-wachtwoorden).` : `  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
   }
   console.log("\nBlijft staan: de materialenlijst, het programma (tijden en activiteiten), de links, het clusterbudget, het docentaccount en cluster TEST.");
 
@@ -237,7 +247,12 @@ async function main() {
   writeFileSync(path.join("export", exportBestandsnaam("xlsx", "voor-livegang")), await exportNaarExcel(data));
   console.log(`\nExport gemaakt: ${jsonPad} (en een Excel-bestand ernaast).`);
 
-  // 2. Opruimen
+  // 2. Opruimen. De links onthouden we eerst: de seed hieronder schrijft ze anders terug naar de waarde uit seed/basis.json.
+  const linksVoor = new Map<string, { teams_link: string | null; forms_link: string | null }>();
+  for (const c of clusters) {
+    const { data } = await admin.from("cluster").select("teams_link, forms_link").eq("id", c.id).single();
+    linksVoor.set(c.id, { teams_link: data?.teams_link ?? null, forms_link: data?.forms_link ?? null });
+  }
   for (const c of clusters) await maakSchoon(c, per.get(c.code)!.ids);
 
   // 3. Markering: na de livegang laadt seed het voorbeeld-AVF niet meer in VD
@@ -250,7 +265,25 @@ async function main() {
   const seed = spawnSync("npx", ["tsx", "scripts/seed.ts"], { stdio: "inherit", shell: true });
   if (seed.status !== 0) throw new Error("npm run seed is mislukt");
 
-  // 5. Nieuwe wachtwoorden
+  // De seed zet ook de links, de voorbeeldnamen van de rolverdeling en de stuurgroepleden terug uit seed/basis.json en logt dat.
+  // Daarom hier opnieuw: links terug zoals ze waren, namen leeg, logboek leeg.
+  console.log("\n== Links, namen en logboek na de seed herstellen ==");
+  for (const c of clusters) {
+    const voor = linksVoor.get(c.id)!;
+    await ok(admin.from("cluster").update(voor).eq("id", c.id), "links terugzetten");
+    await maakNamenLeeg(c);
+    await ok(admin.from("wijziging").delete().eq("cluster_id", c.id), "logboek");
+    console.log(`  ${c.code}: links zoals voor de livegang, namen en logboek leeg`);
+  }
+
+  // 5. Nieuwe wachtwoorden (tenzij je ze bewust laat staan)
+  if (zonderWachtwoorden) {
+    console.log("\n== Wachtwoorden ==\n  Ongewijzigd (--zonder-wachtwoorden): de bestaande wachtwoorden en sessies blijven geldig.");
+    console.log("\nKlaar. Volgende stappen:");
+    console.log("  1. Controleer de website als student (bijvoorbeeld vd-student) en als docent.");
+    console.log("  2. Bewaar de export in export/ op een veilige plek.");
+    return;
+  }
   await nieuweWachtwoorden(clusters);
 
   console.log("\nKlaar. Volgende stappen:");

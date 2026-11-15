@@ -151,7 +151,7 @@ export default async function OnzeMeerdaagse() {
       {profiel.soort === "projectgroep" && (
         <section aria-label="Snel naar" className="grid gap-3 sm:grid-cols-2">
           <Link href="/meer/rolverdeling" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
-            Rolverdeling invullen <ChevronRight aria-hidden className="size-5" />
+            {eigenAvf && eigenAvf.inhoud.rollenIngevuld >= 6 ? "Rolverdeling bekijken" : "Rolverdeling invullen"} <ChevronRight aria-hidden className="size-5" />
           </Link>
           <Link href="/budget" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
             Budget <ChevronRight aria-hidden className="size-5" />

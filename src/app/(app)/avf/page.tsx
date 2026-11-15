@@ -43,7 +43,7 @@ export default async function AvfOverzicht() {
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <AvfStatusLabel status={avf.status} />
           <span className="font-bold text-kop">
-            {leeg ? "Jullie BackPACK_ is nog leeg. Begin met sectie A." : `${compleet} van ${totaal} vakken ingepakt`}
+            {leeg ? "Jullie BackPACK_ is nog leeg. Begin met sectie A." : `${compleet} van ${totaal} secties ingepakt`}
           </span>
         </div>
         <div className="mt-3 border-t border-rand pt-3">

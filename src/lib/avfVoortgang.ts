@@ -211,7 +211,7 @@ export function voortgangPerSectie(inhoud: AvfInhoud): SectieVoortgang[] {
   return SECTIES.map((s) => sectieVoortgang(s.code, inhoud));
 }
 
-/** Bijvoorbeeld "5 van 7 vakken ingepakt" (sectie F telt nog niet mee). */
+/** Bijvoorbeeld "5 van 7 secties ingepakt" (sectie F telt nog niet mee). */
 export function samenvatting(voortgang: SectieVoortgang[]): { compleet: number; totaal: number } {
   const meetellend = voortgang.filter((v) => v.status !== "nvt");
   return { compleet: meetellend.filter((v) => v.status === "compleet").length, totaal: meetellend.length };

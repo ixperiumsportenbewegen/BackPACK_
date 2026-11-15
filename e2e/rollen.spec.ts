@@ -122,7 +122,7 @@ test("startscherm: zes belevenissenkaarten; stand per rol alleen voor stuurgroep
   const groep = await nieuweSessie(browser, "vd-groep-1");
   await expect(groep.page.locator("main article")).toHaveCount(6);
   await expect(groep.page.getByRole("heading", { name: "Stand van zaken per rol" })).toHaveCount(0);
-  await expect(groep.page.getByRole("link", { name: /Rolverdeling invullen/ })).toBeVisible();
+  await expect(groep.page.getByRole("link", { name: /Rolverdeling (invullen|bekijken)/ })).toBeVisible();
   await groep.ctx.close();
 
   const student = await nieuweSessie(browser, "vd-student");

@@ -64,7 +64,7 @@ test("het voorbeeld-AVF is compleet en staat in het juiste tijdvak", async ({ br
   const s = await nieuweSessie(browser, "vd-groep-1");
   await s.page.goto("/avf");
   await expect(s.page.getByRole("heading", { name: "Oer-Olympische Spelen" })).toBeVisible();
-  await expect(s.page.getByText(/(7 van 7|8 van 8) vakken ingepakt/)).toBeVisible();
+  await expect(s.page.getByText(/(7 van 7|8 van 8) secties ingepakt/)).toBeVisible();
   await expect(s.page.getByText("maandag 28 juni · 19:30–21:00").first()).toBeVisible();
   await expect(s.page.getByText("Veld naast de camping").first()).toBeVisible();
   for (const code of ["A", "B", "C", "D", "E", "F", "G", "H"]) {

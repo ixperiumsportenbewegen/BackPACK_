@@ -40,3 +40,18 @@ test("een stuurgroep ziet het compacte thema-blok met de knop Thema kiezen", asy
   expect(box.height).toBeLessThan(260);
   await s.ctx.close();
 });
+
+test("de knop bij de rolverdeling zegt invullen zolang er een rol zonder naam is, en daarna bekijken", async ({ browser }) => {
+  const VD = await clusterId("VD");
+  for (const [gebruiker, nummer] of [["vd-groep-1", 1], ["vd-groep-6", 6]] as const) {
+    const { data: g } = await admin.from("projectgroep").select("id").eq("cluster_id", VD).eq("nummer", nummer).single();
+    const { data: rollen } = await admin.from("projectgroep_rol").select("namen").eq("projectgroep_id", g!.id);
+    const volledig = (rollen ?? []).filter((r) => (r.namen ?? "").trim() !== "").length >= 6;
+
+    const s = await nieuweSessie(browser, gebruiker);
+    await s.page.goto("/");
+    const naam = volledig ? "Rolverdeling bekijken" : "Rolverdeling invullen";
+    await expect(s.page.getByRole("link", { name: naam })).toBeVisible();
+    await s.ctx.close();
+  }
+});

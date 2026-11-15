@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 const SLEUTEL = "backpack_beoordelaarnaam";
+const NAAM_GEWIJZIGD = "backpack-naam-gewijzigd";
 
 /** Onthoudt per telefoon de naam van wie beoordeelt of indient (er zijn alleen gedeelde accounts). */
 export function useNaam(sleutel: string = SLEUTEL): [string, (n: string) => void] {
@@ -15,6 +16,13 @@ export function useNaam(sleutel: string = SLEUTEL): [string, (n: string) => void
     } catch {
       /* opslag niet beschikbaar */
     }
+    // Staat dezelfde naam op dezelfde pagina op meer plekken (beoordelen, verzoek, themacheck), dan lopen ze mee.
+    function bijWijziging(e: Event) {
+      const d = (e as CustomEvent<{ sleutel: string; naam: string }>).detail;
+      if (d?.sleutel === sleutel) setNaam(d.naam);
+    }
+    window.addEventListener(NAAM_GEWIJZIGD, bijWijziging);
+    return () => window.removeEventListener(NAAM_GEWIJZIGD, bijWijziging);
   }, [sleutel]);
   function wijzig(n: string) {
     setNaam(n);
@@ -23,6 +31,7 @@ export function useNaam(sleutel: string = SLEUTEL): [string, (n: string) => void
     } catch {
       /* niet erg */
     }
+    window.dispatchEvent(new CustomEvent(NAAM_GEWIJZIGD, { detail: { sleutel, naam: n } }));
   }
   return [naam, wijzig];
 }

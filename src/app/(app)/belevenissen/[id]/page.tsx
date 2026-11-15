@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
 import { AfdrukKnop } from "@/components/avf/AfdrukKnop";
 import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { AvfLeesweergave } from "@/components/avf/AvfLeesweergave";
@@ -118,8 +118,25 @@ export default async function AvfLezen({
         </section>
       ) : (
         <>
+          {/* Eerst het AVF zelf lezen; het besluit en de themachecks staan eronder. Hier alleen een korte stand en een sprong. */}
           {beoordelen && (
-            <div className="print:hidden flex flex-col gap-4">
+            <a
+              href="#beoordelen"
+              className="print:hidden flex min-h-aanraak items-center justify-between gap-3 rounded-han border-2 border-kop bg-vlak px-4 py-2 font-bold text-kop"
+              data-testid="naar-beoordelen"
+            >
+              <span>
+                Beoordelen · {verzoeken.filter((v) => v.status === "open").length} open · {verzoeken.filter((v) => v.status === "aangepast").length} aangepast
+              </span>
+              <ChevronDown aria-hidden className="size-5 shrink-0" />
+            </a>
+          )}
+          <AvfLeesweergave
+            avf={avf}
+            verzoeken={beoordelen ? { avfId: avf.id, actief: avf.status !== "in_ontwikkeling", verzoeken, focus: zoek.sectie ? { sectie: zoek.sectie.toUpperCase(), rol: zoek.rol ?? null, veld: zoek.veld ?? null } : undefined } : undefined}
+          />
+          {beoordelen && (
+            <div id="beoordelen" className="print:hidden flex scroll-mt-24 flex-col gap-4">
               <BeoordelingsPaneel
                 avfId={avf.id} status={avf.status} opnieuw={avf.opnieuwTeControleren}
                 open={verzoeken.filter((v) => v.status === "open").length}
@@ -130,10 +147,6 @@ export default async function AvfLezen({
               <ThemacheckBlok avfId={avf.id} rollen={rollen} checks={checks} eigenRol={profiel?.stuurgroeprol?.code ?? null} actief={avf.status !== "in_ontwikkeling"} />
             </div>
           )}
-          <AvfLeesweergave
-            avf={avf}
-            verzoeken={beoordelen ? { avfId: avf.id, actief: avf.status !== "in_ontwikkeling", verzoeken, focus: zoek.sectie ? { sectie: zoek.sectie.toUpperCase(), rol: zoek.rol ?? null, veld: zoek.veld ?? null } : undefined } : undefined}
-          />
         </>
       )}
 

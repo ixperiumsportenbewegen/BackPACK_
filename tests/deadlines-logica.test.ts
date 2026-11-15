@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  DEADLINE_CODES, DEADLINE_ONDERDELEN, deadlineNiveau, deadlineStand, deadlineWaarschuwing, formatDeadline,
+  DEADLINE_CODES, DEADLINE_ONDERDELEN, deadlineNiveau, deadlineStand, deadlineWaarschuwing, formatDeadline, herinneringTekst,
   momentNaarNl, nlNaarMoment, resterendTekst, sorteerDeadlines,
 } from "@/lib/deadlines";
 import { legeInhoud } from "@/lib/avfVoortgang";
@@ -147,6 +147,23 @@ describe("wanneer is een groep klaar", () => {
 
   it("een onbekend onderdeel is nooit klaar", () => {
     expect(deadlineStand("Z", leeg()).klaar).toBe(false);
+  });
+});
+
+describe("herinnering voor Teams", () => {
+  const nu = d("2026-12-01T10:00:00Z");
+  it("noemt het onderdeel, de datum, hoe lang nog en wie nog open staat", () => {
+    const t = herinneringTekst({ onderdeel: "D", moment: d("2026-12-04T16:00:00Z"), toelichting: "Daarna beoordelen we." }, ["Projectgroep 2", "Projectgroep 5"], nu);
+    expect(t).toContain("Sectie D · Kop, romp en staart moet vrijdag 4 december · 17:00 klaar zijn (nog 3 dagen).");
+    expect(t).toContain("Waarom deze datum: Daarna beoordelen we.");
+    expect(t).toContain("Nog open: Projectgroep 2, Projectgroep 5.");
+  });
+
+  it("zegt na de deadline dat het klaar had moeten zijn, en laat lege regels weg", () => {
+    const t = herinneringTekst({ onderdeel: "indienen", moment: d("2026-11-27T16:00:00Z"), toelichting: null }, [], nu);
+    expect(t).toContain("AVF indienen had vrijdag 27 november · 17:00 klaar moeten zijn (4 dagen te laat).");
+    expect(t).not.toContain("Waarom");
+    expect(t).not.toContain("Nog open");
   });
 });
 

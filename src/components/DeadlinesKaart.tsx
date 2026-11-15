@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { CalendarClock, CheckCircle2, ChevronRight } from "lucide-react";
 import { DeadlineBadge } from "@/components/DeadlineBadge";
+import { KopieerKnop } from "@/components/KopieerKnop";
 import { laadAvf, laadKaarten, type AvfGegevens } from "@/lib/avfData";
 import { laadDeadlines } from "@/lib/deadlineData";
 import {
-  deadlineNiveau, deadlineStand, formatDeadline, naamVanOnderdeel, resterendTekst, type DeadlineRij,
+  deadlineNiveau, deadlineStand, formatDeadline, herinneringTekst, naamVanOnderdeel, resterendTekst, type DeadlineRij,
 } from "@/lib/deadlines";
 import type { Profiel } from "@/lib/profiel";
 
@@ -103,6 +104,11 @@ export async function DeadlinesKaart({ profiel, eigenAvf }: { profiel: Profiel; 
                   </p>
                 )}
                 {r.deadline.toelichting && <p className="text-sm text-zacht">{r.deadline.toelichting}</p>}
+                {r.groepen && (
+                  <div className="mt-1">
+                    <KopieerKnop klein label="Kopieer herinnering voor Teams" tekst={herinneringTekst(r.deadline, r.groepen.open, nu)} />
+                  </div>
+                )}
               </li>
             );
           })}

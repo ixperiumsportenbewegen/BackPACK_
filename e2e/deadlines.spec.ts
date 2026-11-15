@@ -11,11 +11,19 @@ test.describe.configure({ mode: "serial" });
 
 const NAAM = "Testpersoon";
 let TEST = "";
+let bewaard: Record<string, unknown>[] = [];
 
+/** Haalt alle deadlines van TEST weg (ook die van iemand die aan het oefenen was; die zet afterAll terug). */
 async function opschonen() {
   if (!TEST) return;
-  await admin.from("deadline").delete().eq("cluster_id", TEST).eq("gezet_door_naam", NAAM);
+  await admin.from("deadline").delete().eq("cluster_id", TEST);
   await admin.from("wijziging").delete().eq("tabel", "deadline").eq("naam", NAAM);
+}
+
+async function terugzetten() {
+  if (!TEST) return;
+  await opschonen();
+  if (bewaard.length) await admin.from("deadline").insert(bewaard);
 }
 
 const rij = async (onderdeel: string) =>
@@ -23,9 +31,10 @@ const rij = async (onderdeel: string) =>
 
 test.beforeAll(async () => {
   TEST = await clusterId("TEST");
+  bewaard = (await admin.from("deadline").select("*").eq("cluster_id", TEST)).data ?? [];
   await opschonen();
 });
-test.afterAll(opschonen);
+test.afterAll(terugzetten);
 
 test("de stuurgroep stelt een deadline in, verschuift hem en verwijdert hem", async ({ browser }) => {
   const s = await nieuweSessie(browser, "test-stuur");
@@ -161,6 +170,7 @@ test("de kaart op het startscherm toont hoe lang het nog duurt, in volgorde en m
 
   // een student ziet geen eigen stand en geen knop om in te stellen
   await expect(kaart.getByText(/Jullie stand/)).toHaveCount(0);
+  await expect(kaart.getByRole("button", { name: /Kopieer herinnering/ })).toHaveCount(0);
   await expect(kaart.getByRole("link", { name: "Deadlines beheren" })).toHaveCount(0);
   await s.ctx.close();
 });
@@ -188,11 +198,20 @@ test("een projectgroep ziet de eigen stand; wat klaar is staat apart", async ({ 
 
 test("de stuurgroep ziet hoeveel groepen klaar zijn en wie nog open staat", async ({ browser }) => {
   const s = await nieuweSessie(browser, "test-stuur");
+  await s.ctx.grantPermissions(["clipboard-read", "clipboard-write"]);
   await s.page.goto("/");
   const d = s.page.getByTestId("deadlines-kaart").getByTestId("deadline-D");
   await expect(d).toContainText("1 van 2 groepen klaar");
   await expect(d).toContainText("Nog open: Testgroep 2");
   await expect(s.page.getByTestId("deadlines-kaart").getByRole("link", { name: "Deadlines beheren" })).toBeVisible();
+
+  // een herinnering voor Teams: kant-en-klare tekst, met wie nog open staat
+  await d.getByRole("button", { name: "Kopieer herinnering voor Teams" }).click();
+  await expect(d.getByRole("button", { name: "Gekopieerd" })).toBeVisible();
+  const tekst = await s.page.evaluate(() => navigator.clipboard.readText());
+  expect(tekst).toContain("Sectie D · Kop, romp en staart moet");
+  expect(tekst).toContain("Nog open: Testgroep 2.");
+  expect(tekst).toContain(UNIEK);
   await s.ctx.close();
 });
 

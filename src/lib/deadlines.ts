@@ -167,3 +167,26 @@ export function sorteerDeadlines<T extends { moment: Date; onderdeel: string }>(
   const volgorde = (o: string) => DEADLINE_CODES.indexOf(o as DeadlineOnderdeel);
   return [...rijen].sort((a, b) => a.moment.getTime() - b.moment.getTime() || volgorde(a.onderdeel) - volgorde(b.onderdeel));
 }
+
+// ------------------------------------------------------------- herinnering voor Teams
+
+/**
+ * Een kant-en-klare tekst voor een Teams-bericht (er zijn geen pushmeldingen in de app). Alleen groepsnamen,
+ * geen persoonsgegevens.
+ */
+export function herinneringTekst(
+  d: { onderdeel: string; moment: Date; toelichting: string | null }, openGroepen: string[], nu: Date = new Date(),
+): string {
+  const naam = naamVanOnderdeel(d.onderdeel);
+  const wanneer = formatDeadline(d.moment);
+  const rest = resterendTekst(d.moment, nu);
+  const regels = [
+    d.moment.getTime() > nu.getTime()
+      ? `Herinnering: ${naam} moet ${wanneer} klaar zijn (${rest}).`
+      : `Herinnering: ${naam} had ${wanneer} klaar moeten zijn (${rest}).`,
+  ];
+  if (d.toelichting) regels.push(`Waarom deze datum: ${d.toelichting}`);
+  if (openGroepen.length > 0) regels.push(`Nog open: ${openGroepen.join(", ")}.`);
+  regels.push("Kijk in BackPACK_ op het startscherm voor jullie stand.");
+  return regels.join("\n");
+}

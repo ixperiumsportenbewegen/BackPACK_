@@ -1,7 +1,7 @@
 import { SubmitKnop } from "@/components/SubmitKnop";
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
-import { CalendarDays, FileText, Package, Settings, Users } from "lucide-react";
+import { CalendarDays, FileText, Package, Palette, Settings, Users } from "lucide-react";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -35,6 +35,16 @@ export default async function Meer() {
         >
           <Settings aria-hidden className="size-5" strokeWidth={1.75} />
           Beheer: wachtwoorden, links en export
+        </Link>
+      )}
+
+      {(profiel.soort === "stuurgroep" || profiel.soort === "docent") && (
+        <Link
+          href="/stuurgroep/beleving-thema"
+          className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"
+        >
+          <Palette aria-hidden className="size-5" strokeWidth={1.75} />
+          Meerdaagsethema instellen
         </Link>
       )}
 

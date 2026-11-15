@@ -25,3 +25,13 @@ test("de rollen staan in één scrollbare rij en de gekozen rol is in beeld", as
   await expect(balk.locator('[aria-current="page"]')).toBeInViewport();
   await s.ctx.close();
 });
+
+test("onder Meer staat voor de stuurgroep en de docent een knop om het thema in te stellen, voor een student niet", async ({ browser }) => {
+  for (const [gebruiker, verwacht] of [["vd-stuur-beleving", 1], ["docent", 1], ["vd-groep-6", 0], ["vd-student", 0]] as const) {
+    const s = await nieuweSessie(browser, gebruiker);
+    await s.page.goto("/meer");
+    await expect(s.page.getByRole("heading", { name: "Meer", level: 1 })).toBeVisible();
+    await expect(s.page.getByRole("link", { name: "Meerdaagsethema instellen" }), gebruiker).toHaveCount(verwacht);
+    await s.ctx.close();
+  }
+});

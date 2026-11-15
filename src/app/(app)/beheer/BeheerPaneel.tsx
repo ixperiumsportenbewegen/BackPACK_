@@ -122,6 +122,15 @@ function Links({ c }: { c: ClusterBeheer }) {
   return (
     <form onSubmit={bewaar} className="flex flex-col gap-3 rounded-han border border-rand bg-vlak p-4">
       <h3 className="text-lg font-bold text-kop">Links van {c.naam}</h3>
+      {(!c.teamsLink || !c.formsLink) && (
+        <div className="rounded-han border-2 border-kop bg-vlak p-3 text-kop" data-testid={`links-ontbreken-${c.code}`}>
+          <p className="font-bold">Nog niet ingesteld</p>
+          <ul className="mt-1 list-disc pl-5 text-sm">
+            {!c.teamsLink && <li>Teams-link: de Teams-knop onder Meer blijft verborgen voor dit cluster.</li>}
+            {!c.formsLink && <li>Forms-link: bij Budget staat dat de link nog niet is ingesteld.</li>}
+          </ul>
+        </div>
+      )}
       <label className="flex flex-col gap-1 font-medium text-kop">
         Teams-link
         <input value={teams} onChange={(e) => setTeams(e.target.value)} placeholder="https://teams.microsoft.com/…" inputMode="url" autoComplete="off" className={`${INVOER} font-normal`} />

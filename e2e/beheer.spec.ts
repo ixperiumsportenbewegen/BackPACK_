@@ -164,3 +164,22 @@ test("blijf-actief antwoordt alleen met de geheime sleutel", async ({ request })
   const bearer = await request.get("/api/blijf-actief", { headers: { authorization: `Bearer ${sleutel}` } });
   expect(bearer.status()).toBe(200);
 });
+
+test("Beheer meldt welke links van een cluster nog niet zijn ingesteld", async ({ browser }) => {
+  await admin.from("cluster").update({ teams_link: null, forms_link: null }).eq("id", TEST);
+  const docent = await nieuweSessie(browser, "docent");
+  const p = docent.page;
+  await p.goto("/beheer");
+  const melding = p.getByTestId("links-ontbreken-TEST");
+  await expect(melding).toContainText("Teams-link");
+  await expect(melding).toContainText("Forms-link");
+
+  const sectie = p.locator("section").filter({ has: p.getByRole("heading", { name: /Oefencluster/ }) });
+  await sectie.getByLabel("Teams-link").fill("https://teams.microsoft.com/l/team/e2e-melding");
+  await sectie.getByRole("button", { name: "Links opslaan" }).click();
+  await expect(sectie.getByText("Opgeslagen", { exact: true })).toBeVisible();
+  // alleen de Forms-link ontbreekt nog
+  await expect(melding).not.toContainText("Teams-link");
+  await expect(melding).toContainText("Forms-link");
+  await docent.ctx.close();
+});

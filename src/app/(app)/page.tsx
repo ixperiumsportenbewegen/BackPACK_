@@ -33,7 +33,8 @@ export default async function OnzeMeerdaagse() {
     (a, b) => STUURGROEPROL_VOLGORDE.indexOf(a.code) - STUURGROEPROL_VOLGORDE.indexOf(b.code),
   );
   const standen = toonStand && profiel.cluster ? Object.values(await laadStanden(profiel.cluster.id)) : [];
-  const wachten = standen.filter((s) => s.status === "ingediend" || s.opnieuwTeControleren).length;
+  const terFeedback = standen.filter((s) => s.status === "ingediend" && s.tussentijds).length;
+  const wachten = standen.filter((s) => (s.status === "ingediend" && !s.tussentijds) || s.opnieuwTeControleren).length;
   const openVerzoeken = standen.reduce((n, s) => n + s.open, 0);
   const zonderLocatie = toonStand && profiel.cluster
     ? ((await supabase.from("avf").select("id").eq("cluster_id", profiel.cluster.id).is("locatie_keuze", null)).data ?? []).length
@@ -60,6 +61,7 @@ export default async function OnzeMeerdaagse() {
     if (code !== "programma_kwaliteit" && code !== "projectleiding") return "Nog niets te melden";
     const delen = [
       wachten > 0 ? `${wachten} ${wachten === 1 ? "AVF wacht" : "AVF's wachten"} op beoordeling` : null,
+      terFeedback > 0 ? `${terFeedback} ${terFeedback === 1 ? "AVF is" : "AVF's zijn"} ter feedback ingediend` : null,
       openVerzoeken > 0 ? `${openVerzoeken} open ${openVerzoeken === 1 ? "verbeterverzoek" : "verbeterverzoeken"}` : null,
     ].filter(Boolean);
     return delen.length ? delen.join(" · ") : "Niets te beoordelen";

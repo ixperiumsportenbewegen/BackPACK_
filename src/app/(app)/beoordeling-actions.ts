@@ -58,6 +58,36 @@ export async function avfIndienen(naam: string, samenvatting: string, openBevest
   }
 }
 
+/**
+ * Dient het eigen AVF in ter feedback: mag onvolledig zijn. De stuurgroep geeft feedback en geeft het AVF daarna terug.
+ * Zie de functie `avf_ter_feedback_indienen` in de database.
+ */
+export async function avfTerFeedbackIndienen(naam: string, samenvatting: string, openBevestigd: boolean): Promise<IndienResultaat> {
+  const profiel = await getProfiel();
+  if (!profiel || profiel.soort !== "projectgroep" || !profiel.projectgroep) return { status: "fout", melding: "Alleen de projectgroep zelf kan indienen." };
+  if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
+  const supabase = await maakServerClient();
+  const { data: avf } = await supabase.from("avf").select("id").eq("projectgroep_id", profiel.projectgroep.id).maybeSingle();
+  if (!avf) return { status: "fout", melding: FOUT };
+
+  const { data, error } = await supabase.rpc("avf_ter_feedback_indienen", {
+    p_avf_id: avf.id, p_naam: naam.trim().slice(0, 60), p_samenvatting: samenvatting.trim().slice(0, 1000), p_open_bevestigd: openBevestigd,
+  });
+  if (error) return { status: "fout", melding: FOUT };
+  const res = data as Rpc;
+  if (res.ok) {
+    ververs();
+    return { status: "ok", versie: res.versie ?? 1 };
+  }
+  switch (res.reden) {
+    case "naam": return { status: "fout", melding: NAAM_NODIG };
+    case "samenvatting": return { status: "fout", melding: "Beschrijf kort wat jullie hebben ingevuld of aangepast en waar jullie feedback op willen." };
+    case "status": return { status: "fout", melding: "Dit AVF kan nu niet worden ingediend. Misschien is het al ingediend. Ververs de pagina." };
+    case "open_verzoeken": return { status: "open_verzoeken", verzoeken: res.verzoeken ?? [] };
+    default: return { status: "fout", melding: FOUT };
+  }
+}
+
 export async function aanpassingVragen(avfId: string, naam: string): Promise<Resultaat> {
   const supabase = await beoordelaar();
   if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan beoordelen." };
@@ -86,6 +116,7 @@ export async function goedkeuren(avfId: string, naam: string, openBevestigd: boo
     return { status: "ok" };
   }
   if (res.reden === "open_verzoeken") return { status: "open_verzoeken", aantal: res.aantal ?? 0 };
+  if (res.reden === "tussentijds") return { status: "fout", melding: "Dit AVF is ter feedback ingediend en nog niet compleet. Geef het terug aan de groep. Goedkeuren kan nadat de groep het definitief heeft ingediend." };
   if (res.reden === "status") return { status: "fout", melding: "Dit AVF is niet ingediend (of al goedgekeurd), dus er valt niets goed te keuren." };
   return { status: "fout", melding: FOUT };
 }

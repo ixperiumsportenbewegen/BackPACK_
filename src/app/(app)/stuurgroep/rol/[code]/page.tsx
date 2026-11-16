@@ -196,7 +196,7 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
                     <h3 className="text-lg font-bold text-kop">{a.inhoud.titel?.trim() || "Nog geen titel"}</h3>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <AvfStatusLabel status={a.status} />
+                    <AvfStatusLabel status={a.status} tussentijds={a.tussentijds} />
                     {a.opnieuwTeControleren && <OpnieuwLabel />}
                   </div>
                 </div>

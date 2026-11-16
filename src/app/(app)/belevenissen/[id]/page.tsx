@@ -83,7 +83,7 @@ export default async function AvfLezen({
           {thema?.slogan && <p className="font-medium text-kop">{thema.slogan}</p>}
           <p className="mt-1 text-tekst">{avf.projectgroepNaam}</p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <AvfStatusLabel status={avf.status} />
+            <AvfStatusLabel status={avf.status} tussentijds={avf.tussentijds} />
             {avf.opnieuwTeControleren && <OpnieuwLabel />}
             <span className="text-tekst">{avf.tijdvak ? formatTijdvak(avf.tijdvak) : "Nog niet ingepland"}</span>
             {avf.locatie && <span className="text-tekst">· {avf.locatie}</span>}
@@ -107,7 +107,10 @@ export default async function AvfLezen({
           <ol className="flex flex-col gap-3">
             {versies.map((v) => (
               <li key={v.id} className="rounded-han border border-rand bg-vlak p-4">
-                <p className="font-bold text-kop">Versie {v.versie}</p>
+                <p className="flex flex-wrap items-center gap-2 font-bold text-kop">
+                  Versie {v.versie}
+                  {v.tussentijds && <span className="rounded-han bg-ingediend px-2 py-0.5 text-xs font-bold text-black">Ter feedback</span>}
+                </p>
                 <p className="text-sm text-zacht">Ingediend door {v.ingediendDoorNaam} · {formatMoment(v.createdAt)}</p>
                 <p className="mt-1 whitespace-pre-wrap text-tekst">
                   {v.wijzigingssamenvatting ?? (v.versie === 1 ? "Eerste indiening." : "Geen samenvatting.")}
@@ -138,10 +141,10 @@ export default async function AvfLezen({
           {beoordelen && (
             <div id="beoordelen" className="print:hidden flex scroll-mt-24 flex-col gap-4">
               <BeoordelingsPaneel
-                avfId={avf.id} status={avf.status} opnieuw={avf.opnieuwTeControleren}
+                avfId={avf.id} status={avf.status} opnieuw={avf.opnieuwTeControleren} tussentijds={avf.tussentijds}
                 open={verzoeken.filter((v) => v.status === "open").length}
                 aangepast={verzoeken.filter((v) => v.status === "aangepast").length}
-                ingediend={avfRij?.ingediend_op ? `Versie ${avf.versie} ingediend door ${avfRij.ingediend_door_naam ?? "onbekend"} · ${formatMoment(avfRij.ingediend_op)}` : null}
+                ingediend={avfRij?.ingediend_op ? `Versie ${avf.versie}${avf.tussentijds ? " ter feedback" : ""} ingediend door ${avfRij.ingediend_door_naam ?? "onbekend"} · ${formatMoment(avfRij.ingediend_op)}` : null}
                 goedgekeurd={avfRij?.goedgekeurd_op ? `Goedgekeurd door ${avfRij.goedgekeurd_door_naam ?? "onbekend"} · ${formatMoment(avfRij.goedgekeurd_op)}` : null}
               />
               <ThemacheckBlok avfId={avf.id} rollen={rollen} checks={checks} eigenRol={profiel?.stuurgroeprol?.code ?? null} actief={avf.status !== "in_ontwikkeling"} />

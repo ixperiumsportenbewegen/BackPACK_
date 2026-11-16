@@ -36,14 +36,20 @@ export default async function IndienenPagina() {
       </Link>
       <h1 className="text-3xl">AVF indienen</h1>
       <div className="flex flex-wrap items-center gap-2">
-        <AvfStatusLabel status={avf.status} />
+        <AvfStatusLabel status={avf.status} tussentijds={avf.tussentijds} />
         <span className="text-zacht">{avf.inhoud.titel?.trim() || "Nog geen titel"}</span>
       </div>
 
-      {avf.status === "ingediend" && (
+      {avf.status === "ingediend" && !avf.tussentijds && (
         <p role="status" className="flex items-start gap-2 rounded-han border-2 border-kop bg-vlak p-4 font-medium text-kop">
           <Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" />
           Jullie AVF is ingediend (versie {avf.versie}). De stuurgroep gaat het beoordelen. Jullie krijgen op deze plek te zien of er aanpassingen nodig zijn.
+        </p>
+      )}
+      {avf.status === "ingediend" && avf.tussentijds && (
+        <p role="status" className="flex items-start gap-2 rounded-han border-2 border-kop bg-vlak p-4 font-medium text-kop">
+          <Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" />
+          Jullie AVF is ter feedback ingediend (versie {avf.versie}). De stuurgroep leest wat er al staat, geeft feedback en geeft het daarna terug. Dan kunnen jullie verder en opnieuw indienen, ter feedback of definitief.
         </p>
       )}
       {avf.status === "ingediend" && (
@@ -51,6 +57,7 @@ export default async function IndienenPagina() {
           <h2 className="text-xl">Jullie indiening</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
             <dt className="font-medium text-zacht">Titel</dt><dd className="font-bold text-kop">{avf.inhoud.titel?.trim() || "Nog geen titel"}</dd>
+            <dt className="font-medium text-zacht">Soort</dt><dd className="text-tekst">{avf.tussentijds ? "Ter feedback (nog niet definitief)" : "Definitief"}</dd>
             <dt className="font-medium text-zacht">Versie</dt><dd className="text-tekst">{avf.versie}</dd>
             <dt className="font-medium text-zacht">Ingediend door</dt><dd className="text-tekst">{indiening?.ingediend_door_naam ?? "onbekend"}</dd>
             <dt className="font-medium text-zacht">Wanneer</dt><dd className="text-tekst">{indiening?.ingediend_op ? formatMoment(indiening.ingediend_op) : "onbekend"}</dd>
@@ -71,13 +78,16 @@ export default async function IndienenPagina() {
       {avf.status === "aanpassing_gevraagd" && (
         <p role="status" className="flex items-start gap-2 rounded-han border-2 border-actie bg-vlak p-4 font-medium text-kop">
           <CircleAlert aria-hidden className="mt-0.5 size-5 shrink-0" />
-          De stuurgroep vraagt om aanpassingen. Lees de verbeterverzoeken in de secties, pas aan en dien daarna opnieuw in.
+          {avf.tussentijds
+            ? "De stuurgroep heeft feedback gegeven. Lees de verbeterverzoeken in de secties (als die er zijn), ga verder en dien daarna opnieuw in, ter feedback of definitief."
+            : "De stuurgroep vraagt om aanpassingen. Lees de verbeterverzoeken in de secties, pas aan en dien daarna opnieuw in."}
         </p>
       )}
 
       {kanIndienen && (
         <section className="rounded-han border border-rand bg-vlak p-4" aria-label="Controlelijst">
           <h2 className="text-xl">Controlelijst</h2>
+          {problemen.length > 0 && <p className="mt-1 text-sm text-zacht">Voor definitief indienen moet alles zijn ingevuld. Ter feedback indienen kan altijd.</p>}
           {problemen.length === 0 ? (
             <p className="mt-1 flex items-center gap-2 font-bold text-kop">
               <CheckCircle2 aria-hidden className="size-5" /> Alle verplichte velden zijn ingevuld.
@@ -118,7 +128,7 @@ export default async function IndienenPagina() {
         </section>
       )}
 
-      {kanIndienen && problemen.length === 0 && <IndienenFormulier versie={avf.versie} openVerzoeken={open} />}
+      {kanIndienen && <IndienenFormulier versie={avf.versie} openVerzoeken={open} kanDefinitief={problemen.length === 0} />}
     </div>
   );
 }

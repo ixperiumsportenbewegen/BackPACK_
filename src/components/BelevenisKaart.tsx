@@ -11,8 +11,15 @@ const STATUS: Record<AvfStatus, { tekst: string; klasse: string; icoon: typeof C
   goedgekeurd: { tekst: "Goedgekeurd", klasse: "bg-goedgekeurd text-black", icoon: CheckCircle2 },
 };
 
-export function AvfStatusLabel({ status }: { status: AvfStatus }) {
-  const s = STATUS[status];
+/**
+ * Het statuslabel. Is de laatste indiening ter feedback (`tussentijds`), dan staat er "Ter feedback ingediend" en na het
+ * teruggeven "Feedback teruggegeven". Andere groepen en studenten zien alleen de gewone status (publieke kaart).
+ */
+export function AvfStatusLabel({ status, tussentijds = false }: { status: AvfStatus; tussentijds?: boolean }) {
+  const s =
+    tussentijds && status === "ingediend" ? { ...STATUS.ingediend, tekst: "Ter feedback ingediend" }
+    : tussentijds && status === "aanpassing_gevraagd" ? { ...STATUS.aanpassing_gevraagd, tekst: "Feedback teruggegeven" }
+    : STATUS[status];
   const Icoon = s.icoon;
   return (
     <span className={`inline-flex items-center gap-1 rounded-han px-2 py-0.5 text-xs font-bold ${s.klasse}`}>

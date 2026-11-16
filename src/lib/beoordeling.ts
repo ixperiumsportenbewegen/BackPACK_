@@ -22,6 +22,8 @@ export interface Versie {
   versie: number;
   ingediendDoorNaam: string;
   wijzigingssamenvatting: string | null;
+  /** Deze indiening was ter feedback (niet definitief). */
+  tussentijds: boolean;
   createdAt: string;
 }
 
@@ -37,6 +39,8 @@ export interface AvfStand {
   avfId: string;
   status: "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
   opnieuwTeControleren: boolean;
+  /** De laatste indiening was ter feedback (nog niet definitief). */
+  tussentijds: boolean;
   versie: number;
   open: number;
   aangepast: number;
@@ -88,11 +92,11 @@ export async function laadVerzoekenVoorGroep(avfId: string, status: string): Pro
 export async function laadVersies(avfId: string): Promise<Versie[]> {
   const supabase = await maakServerClient();
   const { data } = await supabase
-    .from("avf_versie").select("id, versie, ingediend_door_naam, wijzigingssamenvatting, created_at")
+    .from("avf_versie").select("id, versie, ingediend_door_naam, wijzigingssamenvatting, tussentijds, created_at")
     .eq("avf_id", avfId).order("versie", { ascending: false });
   return (data ?? []).map((v) => ({
     id: v.id, versie: v.versie, ingediendDoorNaam: v.ingediend_door_naam,
-    wijzigingssamenvatting: v.wijzigingssamenvatting, createdAt: v.created_at,
+    wijzigingssamenvatting: v.wijzigingssamenvatting, tussentijds: Boolean(v.tussentijds), createdAt: v.created_at,
   }));
 }
 
@@ -109,12 +113,12 @@ export async function laadThemachecks(avfId: string): Promise<Themacheck[]> {
 export async function laadStanden(clusterId: string): Promise<Record<string, AvfStand>> {
   const supabase = await maakServerClient();
   const [{ data: avfs }, verzoeken] = await Promise.all([
-    supabase.from("avf").select("id, status, opnieuw_te_controleren, versie").eq("cluster_id", clusterId),
+    supabase.from("avf").select("id, status, opnieuw_te_controleren, tussentijds, versie").eq("cluster_id", clusterId),
     laadVerzoekenCluster(clusterId),
   ]);
   const standen: Record<string, AvfStand> = {};
   for (const a of avfs ?? []) {
-    standen[a.id] = { avfId: a.id, status: a.status, opnieuwTeControleren: a.opnieuw_te_controleren, versie: a.versie, open: 0, aangepast: 0 };
+    standen[a.id] = { avfId: a.id, status: a.status, opnieuwTeControleren: a.opnieuw_te_controleren, tussentijds: Boolean(a.tussentijds), versie: a.versie, open: 0, aangepast: 0 };
   }
   for (const v of verzoeken) {
     const s = standen[v.avfId];

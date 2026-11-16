@@ -123,6 +123,8 @@ export function deadlineWaarschuwing(moment: Date, nu: Date = new Date()): strin
 
 export interface AvfVoorDeadline {
   status: "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
+  /** De laatste indiening was ter feedback: telt niet als "AVF ingediend". */
+  tussentijds?: boolean;
   inhoud: AvfInhoud;
 }
 
@@ -135,8 +137,9 @@ export interface DeadlineStand {
 /** Of een projectgroep klaar is voor een onderdeel, en wat er nog open staat. */
 export function deadlineStand(onderdeel: DeadlineOnderdeel | string, avf: AvfVoorDeadline): DeadlineStand {
   if (onderdeel === "indienen") {
-    const klaar = avf.status === "ingediend" || avf.status === "goedgekeurd";
-    return { klaar, tekst: klaar ? "ingediend" : "nog niet ingediend" };
+    const terFeedback = avf.status === "ingediend" && Boolean(avf.tussentijds);
+    const klaar = (avf.status === "ingediend" && !terFeedback) || avf.status === "goedgekeurd";
+    return { klaar, tekst: klaar ? "ingediend" : terFeedback ? "ter feedback ingediend, nog niet definitief" : "nog niet ingediend" };
   }
   if (onderdeel === "materiaal") {
     const aantal = (avf.inhoud.materialenAantal ?? 0) + (avf.inhoud.eigenMaterialenAantal ?? 0);

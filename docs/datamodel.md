@@ -115,6 +115,7 @@ Eén per projectgroep (`projectgroep_id` uniek). Velden van sectie A staan als k
 | status | enum `avf_status` | `in_ontwikkeling`, `ingediend`, `aanpassing_gevraagd`, `goedgekeurd` |
 | opnieuw_te_controleren | boolean | true na wezenlijke wijziging na goedkeuring; status blijft `goedgekeurd` |
 | versie | int | ophogen bij elke indiening |
+| tussentijds | boolean | true als de laatste indiening ter feedback was (onvolledig toegestaan); `avf_indienen` zet het weer op false. Goedkeuren kan alleen als dit false is |
 | **A** titel | text | |
 | verschijningsvorm | text | één of meer van Spel, Wedstrijd, Avontuur, Gezondheid, Recreatie, Show, gescheiden door ", " (afgedwongen met een check) |
 | publieke_samenvatting | text | zonder spoilers |
@@ -175,6 +176,7 @@ Bevroren kopie bij elke indiening.
 | inhoud | jsonb | volledige momentopname van avf, fasen, onderdelen, materialen en financieel plan |
 | ingediend_door_naam | text | |
 | wijzigingssamenvatting | text | verplicht vanaf versie 2 |
+| tussentijds | boolean | deze indiening was ter feedback (niet definitief) |
 
 ### verbeterverzoek
 | veld | type | opmerking |

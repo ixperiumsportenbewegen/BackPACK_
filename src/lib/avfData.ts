@@ -43,6 +43,8 @@ export interface AvfGegevens {
   projectgroepNummer: number;
   status: "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
   opnieuwTeControleren: boolean;
+  /** De laatste indiening was ter feedback (nog niet definitief). */
+  tussentijds: boolean;
   versie: number;
   locatie: string | null;
   tijdvak: Tijdvak | null;
@@ -131,6 +133,7 @@ export async function laadAvf(avfId: string): Promise<AvfGegevens | null> {
     projectgroepNummer: pg.nummer,
     status: a.status,
     opnieuwTeControleren: a.opnieuw_te_controleren,
+    tussentijds: Boolean(a.tussentijds),
     versie: a.versie,
     locatie: locatieTekst(a.locatie_keuze, a.locatie_detail),
     tijdvak: (regel.data as Tijdvak | null) ?? null,

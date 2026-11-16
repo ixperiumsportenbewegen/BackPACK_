@@ -45,7 +45,7 @@ export default async function AvfOverzicht() {
         <p className="text-sm font-medium text-zacht">{avf.projectgroepNaam}</p>
         <h2 className="text-2xl">{avf.inhoud.titel?.trim() || "Nog geen titel"}</h2>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <AvfStatusLabel status={avf.status} />
+          <AvfStatusLabel status={avf.status} tussentijds={avf.tussentijds} />
           <span className="font-bold text-kop">
             {leeg ? "Jullie BackPACK_ is nog leeg. Begin met sectie A." : `${compleet} van ${totaal} secties ingepakt`}
           </span>
@@ -61,8 +61,10 @@ export default async function AvfOverzicht() {
           </p>
           <p className="mt-1 text-sm text-zacht">Het tijdvak bepaalt de stuurgroep. De locatie (camping of bivak) kiezen jullie zelf in sectie A.</p>
         </div>
-        {avf.status === "ingediend" && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd. De stuurgroep beoordeelt het.</p>}
-        {avf.status === "aanpassing_gevraagd" && <p className="mt-3 font-medium text-kop">De stuurgroep vraagt om aanpassingen. Zie de secties met een open verbeterverzoek.</p>}
+        {avf.status === "ingediend" && !avf.tussentijds && <p className="mt-3 font-medium text-kop">Dit AVF is ingediend en kan niet meer worden gewijzigd. De stuurgroep beoordeelt het.</p>}
+        {avf.status === "ingediend" && avf.tussentijds && <p className="mt-3 font-medium text-kop">Dit AVF is ter feedback ingediend en kan nu niet worden gewijzigd. De stuurgroep geeft feedback en geeft het daarna terug. Daarna kunnen jullie verder.</p>}
+        {avf.status === "aanpassing_gevraagd" && avf.tussentijds && <p className="mt-3 font-medium text-kop">De stuurgroep heeft feedback gegeven. Lees de verbeterverzoeken in de secties en ga verder. Daarna kunnen jullie opnieuw ter feedback of definitief indienen.</p>}
+        {avf.status === "aanpassing_gevraagd" && !avf.tussentijds && <p className="mt-3 font-medium text-kop">De stuurgroep vraagt om aanpassingen. Zie de secties met een open verbeterverzoek.</p>}
         {avf.opnieuwTeControleren && <p className="mt-3 font-medium text-kop">Opnieuw te controleren: jullie hebben iets belangrijks gewijzigd na de goedkeuring.</p>}
       </section>
 
@@ -71,7 +73,7 @@ export default async function AvfOverzicht() {
       </Link>
 
       <Link href="/avf/indienen" className="flex min-h-aanraak items-center justify-between gap-2 rounded-han bg-merk px-4 font-bold text-op-merk">
-        <span className="flex items-center gap-2"><Send aria-hidden className="size-5" /> {avf.status === "ingediend" ? "Stand van het indienen" : avf.status === "goedgekeurd" ? "Status van de goedkeuring" : "Indienen"}</span>
+        <span className="flex items-center gap-2"><Send aria-hidden className="size-5" /> {avf.status === "ingediend" ? (avf.tussentijds ? "Stand van de feedback" : "Stand van het indienen") : avf.status === "goedgekeurd" ? "Status van de goedkeuring" : "Indienen (ook ter feedback)"}</span>
         <ChevronRight aria-hidden className="size-5" />
       </Link>
 

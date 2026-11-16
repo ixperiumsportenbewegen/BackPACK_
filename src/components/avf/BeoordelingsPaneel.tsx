@@ -10,11 +10,13 @@ type Status = "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgek
 
 /** Knoppen "Aanpassing vragen" en "Goedkeuren" met naam, voor stuurgroep en docent. */
 export function BeoordelingsPaneel({
-  avfId, status, opnieuw, open, aangepast, ingediend, goedgekeurd,
+  avfId, status, opnieuw, tussentijds, open, aangepast, ingediend, goedgekeurd,
 }: {
   avfId: string;
   status: Status;
   opnieuw: boolean;
+  /** De laatste indiening was ter feedback: de stuurgroep geeft het AVF terug in plaats van het goed te keuren. */
+  tussentijds: boolean;
   open: number;
   aangepast: number;
   ingediend: string | null;
@@ -26,8 +28,11 @@ export function BeoordelingsPaneel({
   const [fout, setFout] = useState<string | null>(null);
   const [bevestigOpen, setBevestigOpen] = useState<number | null>(null);
 
+  const terFeedback = status === "ingediend" && tussentijds;
   const kanVragen = status === "ingediend" || status === "goedgekeurd";
-  const kanGoedkeuren = status === "ingediend" || (status === "goedgekeurd" && opnieuw);
+  const kanGoedkeuren = (status === "ingediend" && !tussentijds) || (status === "goedgekeurd" && opnieuw);
+  // Bij een indiening ter feedback mag de stuurgroep ook zonder verbeterverzoek teruggeven.
+  const kanTerugGeven = kanVragen && (open > 0 || terFeedback);
 
   async function vraag() {
     setFout(null);
@@ -56,6 +61,12 @@ export function BeoordelingsPaneel({
 
       {status === "in_ontwikkeling" && (
         <p className="flex items-start gap-2 text-tekst"><Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" /> De groep is nog bezig. Beoordelen kan zodra het AVF is ingediend.</p>
+      )}
+      {terFeedback && (
+        <p className="flex items-start gap-2 text-tekst">
+          <Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" />
+          Dit AVF is ter feedback ingediend en nog niet compleet. Lees wat er al staat en plaats verbeterverzoeken. Geef het daarna terug aan de groep. Goedkeuren kan pas na een definitieve indiening.
+        </p>
       )}
       {status === "aanpassing_gevraagd" && (
         <p className="flex items-start gap-2 text-tekst"><Hourglass aria-hidden className="mt-0.5 size-5 shrink-0" /> De groep past het AVF aan. Je ziet het hier weer zodra het opnieuw is ingediend.</p>
@@ -94,15 +105,16 @@ export function BeoordelingsPaneel({
             )}
             {kanVragen && (
               <button
-                type="button" disabled={bezig || open === 0} onClick={vraag}
+                type="button" disabled={bezig || !kanTerugGeven} onClick={vraag}
                 className="min-h-aanraak rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60"
               >
-                Aanpassing vragen
+                {terFeedback ? "Feedback teruggeven" : "Aanpassing vragen"}
               </button>
             )}
           </div>
-          {kanVragen && open > 0 && <p className="text-sm text-zacht">De groep ziet de verbeterverzoeken pas nadat je op Aanpassing vragen hebt getikt.</p>}
-          {kanVragen && open === 0 && <p className="text-sm text-zacht">Aanpassing vragen kan zodra je minstens één verbeterverzoek hebt geplaatst bij een sectie of onderdeel.</p>}
+          {kanVragen && open > 0 && <p className="text-sm text-zacht">De groep ziet de verbeterverzoeken pas nadat je op {terFeedback ? "Feedback teruggeven" : "Aanpassing vragen"} hebt getikt.</p>}
+          {kanVragen && open === 0 && !terFeedback && <p className="text-sm text-zacht">Aanpassing vragen kan zodra je minstens één verbeterverzoek hebt geplaatst bij een sectie of onderdeel.</p>}
+          {terFeedback && open === 0 && <p className="text-sm text-zacht">Je kunt ook teruggeven zonder verbeterverzoek, bijvoorbeeld als het er goed uitziet. De groep kan dan verder.</p>}
         </>
       )}
     </section>

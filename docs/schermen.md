@@ -60,6 +60,11 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 - Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting. De controlelijst begint met een samenvatting ("Nog 12 punten open in 5 secties"). Elke sectie klapt in als er meer dan drie punten openstaan, en elk punt linkt naar de plek waar je het invult (sectie D opent de juiste fase, de rolverdeling staat onder Meer).
 - Knop **Afdrukken / PDF**: printvriendelijke weergave van het volledige AVF (PDF-01).
 
+### Tussentijds indienen ter feedback (projectgroep en stuurgroep)
+Op de indienpagina staan twee keuzes. **Ter feedback indienen** kan altijd, ook met een onvolledig AVF: naam en een korte toelichting (wat is ingevuld of aangepast, waar willen jullie feedback op?) zijn verplicht; het financieel plan gaat niet mee. **Definitief indienen** kan alleen als de controlelijst groen is (zoals voorheen). Het AVF is daarna vergrendeld, en de status is "Ter feedback ingediend" (alleen zichtbaar voor de eigen groep en de stuurgroep; andere groepen zien "Ingediend").
+
+De stuurgroep leest wat er staat en plaatst verbeterverzoeken; de knop heet dan **Feedback teruggeven** en werkt ook zonder verbeterverzoek. Goedkeuren is niet mogelijk bij een indiening ter feedback. De groep ziet "Feedback teruggegeven", leest de verbeterverzoeken, werkt verder en dient opnieuw ter feedback of definitief in. Dat kan onbeperkt vaak; elke indiening is een versie (tabblad Versies toont het label "Ter feedback"). Een indiening ter feedback telt niet als "AVF indienen" bij de deadlines; op het stuurgroepdashboard staat het apart ("x AVF's zijn ter feedback ingediend").
+
 ### Na het indienen (projectgroep)
 De indienpagina toont een samenvatting (titel, versie, door wie, wanneer) en de knop "Jullie AVF lezen"; bij een gevraagde aanpassing staan de verbeterverzoeken in de secties en op het startscherm.
 

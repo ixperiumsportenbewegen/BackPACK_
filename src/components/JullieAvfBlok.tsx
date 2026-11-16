@@ -29,7 +29,7 @@ export async function JullieAvfBlok({ avf, kop = "h2" }: { avf: AvfGegevens; kop
       <Kop className="text-xl">Jullie AVF</Kop>
       <p className="mt-1 text-lg font-bold text-kop">{avf.inhoud.titel?.trim() || "Nog geen titel"}</p>
       <div className="mt-1 flex flex-wrap items-center gap-2">
-        <AvfStatusLabel status={avf.status} />
+        <AvfStatusLabel status={avf.status} tussentijds={avf.tussentijds} />
         {avf.opnieuwTeControleren && <OpnieuwLabel />}
         <span className="font-medium text-kop">{leeg ? "Jullie BackPACK_ is nog leeg. Begin met sectie A." : `${compleet} van ${totaal} secties ingepakt`}</span>
       </div>

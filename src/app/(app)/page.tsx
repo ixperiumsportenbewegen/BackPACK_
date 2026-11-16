@@ -94,9 +94,6 @@ export default async function OnzeMeerdaagse() {
         </section>
       )}
 
-      {/* Zonder thema is het eigen AVF het belangrijkste: dat staat dan bovenaan. */}
-      {eigenAvf && !heeftThema && <JullieAvfBlok avf={eigenAvf} />}
-
       <section className="relative overflow-hidden rounded-han bg-kop text-white" data-testid="thema-blok">
         {sfeer && <img src={sfeer} alt="" className="absolute inset-0 size-full object-cover opacity-60" />}
         <div className={`relative flex ${heeftThema ? "min-h-56" : "min-h-28"} flex-col justify-end gap-2 bg-gradient-to-t from-black/80 to-transparent p-4`}>
@@ -120,6 +117,9 @@ export default async function OnzeMeerdaagse() {
         </div>
       </section>
 
+      {/* Het eigen AVF van een projectgroep staat direct onder het themablok, dat als titelbanner dient. */}
+      {eigenAvf && <JullieAvfBlok avf={eigenAvf} />}
+
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="text-sm font-medium text-zacht">Ardennen-meerdaagse · 28–30 juni 2027</p>
         <p className="mt-1 font-heading text-3xl font-bold text-kop">
@@ -128,8 +128,6 @@ export default async function OnzeMeerdaagse() {
       </section>
 
       <DeadlinesKaart profiel={profiel} eigenAvf={eigenAvf} />
-
-      {eigenAvf && heeftThema && <JullieAvfBlok avf={eigenAvf} />}
 
       <section aria-labelledby="belevenissen-kop" className="flex flex-col gap-3">
         <div className="flex items-end justify-between">
@@ -152,7 +150,7 @@ export default async function OnzeMeerdaagse() {
 
       {profiel.soort === "projectgroep" && (
         <section aria-label="Snel naar" className="grid gap-3 sm:grid-cols-2">
-          <Link href="/meer/rolverdeling" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+          <Link href="/avf/A#rolverdeling" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
             {eigenAvf && eigenAvf.inhoud.rollenIngevuld >= 6 ? "Rolverdeling bekijken" : "Rolverdeling invullen"} <ChevronRight aria-hidden className="size-5" />
           </Link>
           <Link href="/budget" className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">

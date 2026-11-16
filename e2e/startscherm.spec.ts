@@ -1,15 +1,15 @@
 /**
- * Startscherm van een projectgroep: zolang het meerdaagsethema niet is gekozen, staat het eigen AVF bovenaan
- * en is het thema-blok compact. Gebruikt het fictieve cluster TEST.
+ * Startscherm van een projectgroep: het eigen AVF staat direct onder het thema-blok (de titelbanner), ook als het
+ * thema nog niet is gekozen; zonder thema is dat blok compact. Gebruikt het fictieve cluster TEST.
  */
 import { expect, test } from "@playwright/test";
 import { admin, clusterId } from "../tests/helpers";
 import { nieuweSessie } from "./helpers";
 
-test("zonder thema staat het eigen AVF boven een compact thema-blok", async ({ browser }) => {
+test("het eigen AVF staat direct onder het thema-blok; zonder thema is dat blok compact", async ({ browser }) => {
   const TEST = await clusterId("TEST");
   const { data: thema } = await admin.from("meerdaagsethema").select("naam").eq("cluster_id", TEST).maybeSingle();
-  test.skip(Boolean(thema?.naam), "TEST heeft een thema; deze test gaat over het scherm zonder thema");
+  const heeftThema = Boolean(thema?.naam);
 
   const s = await nieuweSessie(browser, "test-groep-1");
   await s.page.goto("/");
@@ -20,11 +20,13 @@ test("zonder thema staat het eigen AVF boven een compact thema-blok", async ({ b
 
   const avfBox = (await avf.boundingBox())!;
   const themaBox = (await themaBlok.boundingBox())!;
-  expect(avfBox.y).toBeLessThan(themaBox.y);
-  // compact: duidelijk lager dan het volledige thema-blok (min-h-56 = 224 px)
-  expect(themaBox.height).toBeLessThan(224);
-  // het AVF begint binnen het eerste scherm van een telefoon
-  expect(avfBox.y).toBeLessThan(400);
+  // het AVF staat onder het themablok, aansluitend erop
+  expect(avfBox.y).toBeGreaterThan(themaBox.y + themaBox.height - 1);
+  expect(avfBox.y).toBeLessThan(themaBox.y + themaBox.height + 60);
+  // zonder thema is het blok compact: duidelijk lager dan het volledige thema-blok (min-h-56 = 224 px)
+  if (!heeftThema) expect(themaBox.height).toBeLessThan(224);
+  // het AVF begint binnen het eerste scherm van een telefoon (met het compacte themablok erboven)
+  if (!heeftThema) expect(avfBox.y).toBeLessThan(500);
   await s.ctx.close();
 });
 

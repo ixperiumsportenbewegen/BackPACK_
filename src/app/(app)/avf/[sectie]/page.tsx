@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AvfEditor } from "@/components/avf/AvfEditor";
 import { FaseEditor } from "@/components/avf/FaseEditor";
@@ -8,6 +7,10 @@ import { EnkeleKeuzeVeld, JaNeeVeld, MeerKeuzeVeld, TekstVeld } from "@/componen
 import { EhboBlok, WeerEditor } from "@/components/avf/WeerEditor";
 import { StapNavigatie } from "@/components/avf/StapNavigatie";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
+import { NamenRegel } from "@/components/NamenRegel";
+import { PROJECTGROEPROLLEN } from "@/config/projectgroeprollen";
+import { maakServerClient } from "@/lib/supabase/server";
+import { projectgroepRolOpslaan } from "../../namen-actions";
 import { VerzoekenLijst } from "@/components/avf/Verzoeken";
 import { laadVerzoekenVoorGroep } from "@/lib/beoordeling";
 import { MaterialenEditor } from "@/components/avf/MaterialenEditor";
@@ -113,8 +116,34 @@ export default async function SectiePagina({
 
   if (code === "A") {
     const eenvoudig = veldenVanSectie("A", "avf").filter((v) => EENVOUDIG.has(v.veldtype));
+    // De rolverdeling staat bovenaan: dat is het eerste wat een projectgroep kan doen.
+    const { data: rolRijen } = await (await maakServerClient())
+      .from("projectgroep_rol").select("rol, namen, updated_at").eq("projectgroep_id", avf.projectgroepId);
+    const rolPerCode = new Map((rolRijen ?? []).map((r) => [r.rol as string, r]));
     inhoudBlok = (
       <>
+        <details id="rolverdeling" open={inhoud.rollenIngevuld < 6} className="scroll-mt-24 rounded-han border border-rand bg-vlak p-4">
+          <summary className="flex min-h-aanraak cursor-pointer flex-col justify-center">
+            <span className="text-xl font-bold text-kop">Rolverdeling: wie doet wat?</span>
+            <span className="text-tekst">{inhoud.rollenIngevuld} van de 6 rollen hebben een naam.</span>
+          </summary>
+          <p className="mt-2 text-sm text-zacht">
+            Elke rol in jullie projectgroep heeft een verantwoordelijke. Eén naam per veld; er komt steeds een leeg veld bij.
+            Voor indienen moeten alle zes rollen een naam hebben. Eigenaar: {rolNaam("projectleider")}. Wijzigingen worden direct opgeslagen.
+          </p>
+          <div className="mt-3 flex flex-col gap-3">
+            {PROJECTGROEPROLLEN.map((rol) => {
+              const rij = rolPerCode.get(rol.code);
+              if (!rij) return null;
+              return (
+                <NamenRegel
+                  key={rol.code} label={rol.naam} uitleg={rol.taken} beginNamen={rij.namen} beginUpdatedAt={rij.updated_at}
+                  kanBewerken opslaan={projectgroepRolOpslaan.bind(null, rol.code)}
+                />
+              );
+            })}
+          </div>
+        </details>
         <section className="rounded-han border border-rand bg-vlak p-4">
           <h2 className="text-xl">Jullie tijdvak</h2>
           {avf.tijdvak ? (
@@ -225,14 +254,6 @@ export default async function SectiePagina({
     const velden = AVF_VELDEN.filter((v) => v.sectie === "G" && EENVOUDIG.has(v.veldtype));
     inhoudBlok = (
       <>
-        <section className="rounded-han border border-rand bg-vlak p-4">
-          <h2 className="text-xl">Rolverdeling</h2>
-          <p className="mt-1 text-tekst">{inhoud.rollenIngevuld} van de 6 rollen hebben een naam.</p>
-          <p className="text-sm text-zacht">Eigenaar: {rolNaam("projectleider")}. Voor indienen moeten alle zes rollen een naam hebben.</p>
-          <Link href="/meer/rolverdeling" className="mt-2 flex min-h-aanraak items-center font-bold text-kop underline">
-            Rolverdeling invullen
-          </Link>
-        </section>
         <Velden velden={velden} avf={avf} />
       </>
     );

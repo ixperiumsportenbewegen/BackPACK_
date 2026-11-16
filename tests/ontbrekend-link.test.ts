@@ -15,8 +15,8 @@ describe("ontbrekendLink: waar een ontbrekend punt wordt ingevuld", () => {
     expect(ontbrekendLink("D", "staart.onderdelen")).toBe("/avf/D?fase=staart");
   });
 
-  it("de rolverdeling staat onder Meer", () => {
-    expect(ontbrekendLink("G", "projectgroep_rol")).toBe("/meer/rolverdeling");
+  it("de rolverdeling staat bovenaan sectie A", () => {
+    expect(ontbrekendLink("A", "projectgroep_rol")).toBe("/avf/A#rolverdeling");
   });
 
   it("een onbekende sleutel in D valt terug op de sectie", () => {

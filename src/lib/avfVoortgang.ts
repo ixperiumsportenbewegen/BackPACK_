@@ -121,11 +121,15 @@ function sectieA_B_C_G_H(sectie: SectieCode, inhoud: AvfInhoud): { ontbrekend: O
 
   if (sectie === "C" && isGevuld(leesWaarde(inhoud, "doelen.persoonlijk"))) gevuldAny = true;
 
-  if (sectie === "G") {
+  // De rolverdeling hoort bij sectie A: het eerste dat een projectgroep kan doen.
+  if (sectie === "A") {
     if (inhoud.rollenIngevuld > 0) gevuldAny = true;
     if (inhoud.rollenIngevuld < 6) {
       ontbrekend.push({ sleutel: "projectgroep_rol", melding: "Rolverdeling: elke van de zes rollen heeft een naam nodig" });
     }
+  }
+
+  if (sectie === "G") {
     const allergie = leesWaarde(inhoud, "organisatie.allergieen_rekening_gehouden");
     if (isGevuld(allergie)) gevuldAny = true;
     if (isGevuld(leesWaarde(inhoud, "organisatie.catering")) && !isGevuld(allergie)) {
@@ -218,11 +222,11 @@ export function samenvatting(voortgang: SectieVoortgang[]): { compleet: number; 
 }
 
 /**
- * Waar je een ontbrekend punt invult. Sectie D opent de juiste fase, de rolverdeling staat onder Meer,
+ * Waar je een ontbrekend punt invult. Sectie D opent de juiste fase, de rolverdeling staat bovenaan sectie A,
  * alle andere punten staan in hun sectie.
  */
 export function ontbrekendLink(sectie: SectieCode, sleutel: string): string {
-  if (sleutel === "projectgroep_rol") return "/meer/rolverdeling";
+  if (sleutel === "projectgroep_rol") return "/avf/A#rolverdeling";
   if (sectie === "D") {
     const fase = sleutel.split(".")[0];
     if ((FASEN as string[]).includes(fase)) return `/avf/D?fase=${fase}`;

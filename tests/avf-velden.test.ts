@@ -161,10 +161,21 @@ describe("voortgang per sectie", () => {
     expect(sectieVoortgang("E", geenRisico).ontbrekend.map((o) => o.melding)).toContain("Minstens één risico met maatregel");
   });
 
-  it("G vraagt de thema-bijdrage, alle zes rollen en de allergievraag bij catering", () => {
+  it("A vraagt ook alle zes rollen van de rolverdeling (bovenaan sectie A), G niet meer", () => {
+    const i = volledig();
+    expect(sectieVoortgang("A", i).status).toBe("compleet");
+    const vijf = sectieVoortgang("A", { ...i, rollenIngevuld: 5 });
+    expect(vijf.status).toBe("onvolledig");
+    expect(vijf.ontbrekend.map((o) => o.sleutel)).toContain("projectgroep_rol");
+    expect(sectieVoortgang("A", { ...i, rollenIngevuld: 0 }).ontbrekend.map((o) => o.sleutel)).toContain("projectgroep_rol");
+    // sectie G gaat niet meer over de rolverdeling
+    expect(sectieVoortgang("G", { ...i, rollenIngevuld: 0 }).status).toBe("compleet");
+    expect(sectieVoortgang("G", { ...i, rollenIngevuld: 0 }).ontbrekend.map((o) => o.sleutel)).not.toContain("projectgroep_rol");
+  });
+
+  it("G vraagt de thema-bijdrage en de allergievraag bij catering", () => {
     const i = volledig();
     expect(sectieVoortgang("G", i).status).toBe("compleet");
-    expect(sectieVoortgang("G", { ...i, rollenIngevuld: 5 }).status).toBe("onvolledig");
     const zonderAllergie = { ...i, organisatie: { ...i.organisatie, allergieen_rekening_gehouden: undefined } };
     expect(sectieVoortgang("G", zonderAllergie).ontbrekend.map((o) => o.sleutel)).toContain("organisatie.allergieen_rekening_gehouden");
     const zonderCatering = { ...i, organisatie: { bijdrage_thema: "x" } };

@@ -24,8 +24,10 @@ test("de controlelijst toont een samenvatting en linkt elk punt naar de juiste p
   await expect(kop).toHaveAttribute("href", "/avf/D?fase=kop");
   await expect(sectieD.getByRole("link", { name: /Staart: organisatievorm/ })).toHaveAttribute("href", "/avf/D?fase=staart");
 
-  // de rolverdeling staat onder Meer
-  await expect(p.getByRole("link", { name: /Rolverdeling: elke van de zes rollen/ })).toHaveAttribute("href", "/meer/rolverdeling");
+  // de rolverdeling staat bovenaan sectie A (die klapt dicht als er meer dan drie punten openstaan)
+  const sectieA = p.locator("details").filter({ hasText: /Sectie A · Basisgegevens/ });
+  if ((await sectieA.getAttribute("open")) === null) await sectieA.locator("summary").click();
+  await expect(p.getByRole("link", { name: /Rolverdeling: elke van de zes rollen/ })).toHaveAttribute("href", "/avf/A#rolverdeling");
 
   await kop.click();
   await expect(p).toHaveURL(/\/avf\/D\?fase=kop/);

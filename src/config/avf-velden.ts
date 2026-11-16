@@ -45,13 +45,13 @@ export interface AvfVeld {
 }
 
 export const SECTIES: { code: SectieCode; naam: string; uitleg: string }[] = [
-  { code: "A", naam: "Basisgegevens", uitleg: "Titel, korte omschrijving voor andere groepen, organisatoren en contactpersoon." },
+  { code: "A", naam: "Basisgegevens", uitleg: "Rolverdeling, titel, korte omschrijving voor andere groepen, organisatoren en contactpersoon." },
   { code: "B", naam: "Beginsituatie", uitleg: "Wie doet er mee en wat kunnen ze al?" },
   { code: "C", naam: "Doelen", uitleg: "Wat moeten deelnemers aan het einde kunnen of hebben ervaren?" },
   { code: "D", naam: "Kop, romp en staart", uitleg: "Het verloop van de belevenis in drie fasen met onderdelen." },
   { code: "E", naam: "Veiligheid, EHBO en weer", uitleg: "Risico's, het weer en eerste hulp." },
   { code: "F", naam: "Materialen en financiën", uitleg: "Materialen en financieel plan. Alleen invullen als je materiaal of budget nodig hebt." },
-  { code: "G", naam: "Thema en organisatie", uitleg: "Bijdrage aan het thema, rolverdeling, vervoer, catering en corvee." },
+  { code: "G", naam: "Thema en organisatie", uitleg: "Bijdrage aan het thema, afstemming, vervoer, catering en corvee." },
   { code: "H", naam: "Communicatie", uitleg: "Wat deelnemers vooraf, tijdens en na de belevenis horen." },
 ];
 
@@ -101,6 +101,7 @@ function veld(o: V): AvfVeld {
 
 export const AVF_VELDEN: AvfVeld[] = [
   // A Basisgegevens
+  veld({ sleutel: "projectgroep_rol", sectie: "A", label: "Rolverdeling (alle zes rollen ingevuld)", veldtype: "later", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K" }),
   veld({ sleutel: "titel", sectie: "A", label: "Titel van de belevenis", veldtype: "tekst", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K", maxLengte: 80,
     hulp: "Andere groepen zien deze titel." }),
   veld({ sleutel: "verschijningsvorm", sectie: "A", label: "Verschijningsvorm", hulp: "Kies één of meer vormen die bij jullie belevenis passen.", veldtype: "meerkeuze", v: "ja", pg: "programma_beleving", sg: "programma_kwaliteit", pack: "A", wezenlijk: true, opties: VERSCHIJNINGSVORMEN, maxLengte: 60 }),
@@ -163,7 +164,6 @@ export const AVF_VELDEN: AvfVeld[] = [
   // G Thema en organisatie
   veld({ sleutel: "organisatie.bijdrage_thema", sectie: "G", label: "Bijdrage aan het meerdaagsethema", veldtype: "lang", v: "ja", pg: "programma_beleving", sg: "beleving_thema", pack: "A", maxLengte: 1000 }),
   veld({ sleutel: "organisatie.samenhang", sectie: "G", label: "Samenhang met het programma", veldtype: "lang", v: "nee", pg: "programma_beleving", sg: "programma_kwaliteit", pack: "A", maxLengte: 1000 }),
-  veld({ sleutel: "projectgroep_rol", sectie: "G", label: "Rolverdeling (alle zes rollen ingevuld)", veldtype: "later", v: "ja", pg: "projectleider", sg: "projectleiding", pack: "K" }),
   veld({ sleutel: "organisatie.afstemming", sectie: "G", label: "Afstemming met anderen", veldtype: "lang", v: "nee", pg: "projectleider", sg: "projectleiding", pack: "K", maxLengte: 1000 }),
   veld({ sleutel: "organisatie.vervoer", sectie: "G", label: "Vervoer", veldtype: "lang", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", maxLengte: 1000 }),
   veld({ sleutel: "organisatie.opbouw_afbouw", sectie: "G", label: "Opbouw en afbouw", veldtype: "lang", v: "nee", pg: "logistiek_materialen", sg: "logistiek_facilitair", pack: "P", maxLengte: 1000 }),

@@ -14,6 +14,7 @@ Afkortingen SG-rol: PRL Projectleiding · P&K Programma & Kwaliteit · B&T Belev
 ## A Basisgegevens
 | Sleutel | Label | Verplicht | PG-rol | SG-rol | PACK | W |
 |---|---|---|---|---|---|---|
+| `projectgroep_rol` | Rolverdeling (zes rollen), bovenaan sectie A: het eerste dat een projectgroep invult | ✔ alle zes ingevuld | PL | PRL | K | |
 | `titel` | Titel van de belevenis | ✔ | PL | PRL | K | |
 | `verschijningsvorm` | Verschijningsvorm (één of meer van: Spel, Wedstrijd, Avontuur, Gezondheid, Recreatie, Show) | ✔ | PB | P&K | A | ✔ |
 | `publieke_samenvatting` | Publieke samenvatting (zonder spoilers) | ✔ | PB | B&T | A | |
@@ -84,7 +85,6 @@ Bij "nee" toont de app: "Voor deze belevenis geldt het algemene EHBO-plan" met e
 |---|---|---|---|---|---|---|
 | `organisatie.bijdrage_thema` | Bijdrage aan het meerdaagsethema | ✔ | PB | B&T | A | |
 | `organisatie.samenhang` | Samenhang met het programma | – | PB | P&K | A | |
-| `projectgroep_rol` | Rolverdeling (zes rollen) | ✔ alle zes ingevuld | PL | PRL | K | |
 | `organisatie.afstemming` | Afstemming met anderen | – | PL | PRL | K | |
 | `organisatie.vervoer` | Vervoer | – | LM | L&F | P | |
 | `organisatie.opbouw_afbouw` | Opbouw en afbouw | – | LM | L&F | P | |
@@ -108,7 +108,7 @@ Bij "nee" toont de app: "Voor deze belevenis geldt het algemene EHBO-plan" met e
 | A · Aansteker | Beleving & Thema | A publieke samenvatting; G bijdrage aan het meerdaagsethema |
 | A · Aansteker | Programma & Kwaliteit | A verschijningsvorm, doelgroep, tijdvak (programma en toewijzing); B; C; D organisatie, onderdelen, differentiatie, USV; G samenhang |
 | C · Camera | Communicatie & Financiën | F financieel plan; H communicatie voor, tijdens en na |
-| K · Kompas | Projectleiding | A titel, organiserende studenten, aantal, contactpersoon; G rolverdeling en afstemming; plus de status van alle AVF's |
+| K · Kompas | Projectleiding | A rolverdeling, titel, organiserende studenten, aantal, contactpersoon; G afstemming; plus de status van alle AVF's |
 
 Per rol toont het dashboard voor elk van de zes AVF's: welke van zijn velden leeg of ingevuld zijn, de laatste wijziging en open verbeterverzoeken. Klik op een veld → leesweergave van het AVF op die plek → "Verbeterverzoek" (automatisch gericht aan de PG-rol van dat veld).
 

@@ -1,5 +1,5 @@
 /**
- * AVF invullen (opdracht 3): het voorbeeld-AVF van vd-groep-1 bekijken en aanpassen op een telefoon,
+ * AVF invullen (opdracht 3): het voorbeeld-AVF van test-groep-1 (cluster TEST) bekijken en aanpassen op een telefoon,
  * twee browsers op hetzelfde account, andere groepen zien alleen de publieke kaart, programma en toewijzing.
  * Draait tegen het echte Supabase-project en zet alles daarna terug.
  */
@@ -11,7 +11,7 @@ import { nieuweSessie } from "./helpers";
 
 test.describe.configure({ mode: "serial" });
 
-let VD: string;
+let CLUSTER: string;
 const avf: Record<number, string> = {};
 const regel: Record<number, string | null> = {};
 let oorspronkelijk: { doelgroep: string | null; contactpersoon: string | null; titel: string | null; veiligheid: unknown; locatie: string | null };
@@ -20,8 +20,8 @@ let onderdeelIds: string[] = [];
 const voorbeeld = JSON.parse(readFileSync("seed/avf-voorbeeld.json", "utf8"));
 
 test.beforeAll(async () => {
-  VD = await clusterId("VD");
-  const { data } = await admin.from("avf").select("id, programma_regel_id, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
+  CLUSTER = await clusterId("TEST");
+  const { data } = await admin.from("avf").select("id, programma_regel_id, projectgroep:projectgroep_id(nummer)").eq("cluster_id", CLUSTER);
   for (const r of data ?? []) {
     const nr = (r.projectgroep as unknown as { nummer: number }).nummer;
     avf[nr] = r.id;
@@ -49,19 +49,19 @@ test.afterAll(async () => {
   const extra = (o ?? []).map((x) => x.id).filter((id) => !onderdeelIds.includes(id));
   if (extra.length) await admin.from("avf_onderdeel").delete().in("id", extra);
   await admin.from("avf_fase").update({ overzichtstekening_pad: null, overzichtstekening_bijschrift: null }).eq("avf_id", avf[1]);
-  const { data: bestanden } = await admin.storage.from("avf").list(`cluster/${VD}/avf/${avf[1]}`);
-  const weg = (bestanden ?? []).filter((f) => f.name.startsWith("tekening-")).map((f) => `cluster/${VD}/avf/${avf[1]}/${f.name}`);
+  const { data: bestanden } = await admin.storage.from("avf").list(`cluster/${CLUSTER}/avf/${avf[1]}`);
+  const weg = (bestanden ?? []).filter((f) => f.name.startsWith("tekening-")).map((f) => `cluster/${CLUSTER}/avf/${avf[1]}/${f.name}`);
   if (weg.length) await admin.storage.from("avf").remove(weg);
   // tijdvakken terugzetten
-  for (const nr of [1, 2, 3, 4, 5, 6]) await admin.from("avf").update({ programma_regel_id: null }).eq("id", avf[nr]);
-  for (const nr of [1, 2, 3, 4, 5, 6]) await admin.from("avf").update({ programma_regel_id: regel[nr] }).eq("id", avf[nr]);
+  for (const nr of [1, 2]) await admin.from("avf").update({ programma_regel_id: null }).eq("id", avf[nr]);
+  for (const nr of [1, 2]) await admin.from("avf").update({ programma_regel_id: regel[nr] }).eq("id", avf[nr]);
   const { data: r } = await admin.from("programma_regel").select("id, titel, starttijd").eq("id", regel[1]!).single();
   if (r?.starttijd !== "19:30:00") await admin.from("programma_regel").update({ starttijd: "19:30:00", eindtijd: "21:00:00" }).eq("id", regel[1]!);
   await admin.from("programma_regel").update({ oorspronkelijke_starttijd: null, oorspronkelijke_eindtijd: null }).eq("id", regel[1]!);
 });
 
 test("het voorbeeld-AVF is compleet en staat in het juiste tijdvak", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   await s.page.goto("/avf");
   await expect(s.page.getByRole("heading", { name: "Oer-Olympische Spelen" })).toBeVisible();
   await expect(s.page.getByText(/(7 van 7|8 van 8) secties ingepakt/)).toBeVisible();
@@ -74,7 +74,7 @@ test("het voorbeeld-AVF is compleet en staat in het juiste tijdvak", async ({ br
 });
 
 test("een veld wijzigen blijft bewaard na verversen; tijdvak en locatie zijn alleen-lezen", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   await s.page.goto("/avf/A");
   await s.page.getByLabel("Wie werkt hier?").fill("Testgebruiker");
   const doelgroep = s.page.getByLabel("Doelgroep");
@@ -106,8 +106,8 @@ test("een veld wijzigen blijft bewaard na verversen; tijdvak en locatie zijn all
 });
 
 test("twee browsers met hetzelfde account: verschillende velden blijven allebei bewaard, hetzelfde veld geeft een waarschuwing", async ({ browser }) => {
-  const a = await nieuweSessie(browser, "vd-groep-1");
-  const b = await nieuweSessie(browser, "vd-groep-1");
+  const a = await nieuweSessie(browser, "test-groep-1");
+  const b = await nieuweSessie(browser, "test-groep-1");
   for (const [s, naam] of [[a, "Persoon A"], [b, "Persoon B"]] as const) {
     await s.page.goto("/avf/A");
     await s.page.getByLabel("Wie werkt hier?").fill(naam);
@@ -142,8 +142,8 @@ test("twee browsers met hetzelfde account: verschillende velden blijven allebei 
 });
 
 test("twee browsers werken aan verschillende velden van hetzelfde onderdeel van de romp", async ({ browser }) => {
-  const a = await nieuweSessie(browser, "vd-groep-1");
-  const b = await nieuweSessie(browser, "vd-groep-1");
+  const a = await nieuweSessie(browser, "test-groep-1");
+  const b = await nieuweSessie(browser, "test-groep-1");
   const { data: o } = await admin.from("avf_onderdeel").select("id, beschrijving, fysieke_veiligheid").eq("avf_id", avf[1]).eq("fase", "romp").order("volgorde").limit(1).single();
   for (const [s, naam] of [[a, "Persoon A"], [b, "Persoon B"]] as const) {
     await s.page.goto(`/avf/onderdeel/${o!.id}`);
@@ -162,7 +162,7 @@ test("twee browsers werken aan verschillende velden van hetzelfde onderdeel van 
 });
 
 test("een onderdeel toevoegen, uitwerken, verschuiven en verwijderen", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/D?fase=staart");
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
@@ -194,7 +194,7 @@ test("een onderdeel toevoegen, uitwerken, verschuiven en verwijderen", async ({ 
 });
 
 test("een weerscenario afwegen en de EHBO-vraag", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/E");
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
@@ -224,7 +224,7 @@ async function geenToegang(res: { status(): number; text(): Promise<string> }) {
 }
 
 test("andere groepen, studenten en andere clusters zien alleen de publieke kaart", async ({ browser }) => {
-  const groep2 = await nieuweSessie(browser, "vd-groep-2");
+  const groep2 = await nieuweSessie(browser, "test-groep-2");
   await groep2.page.goto("/belevenissen");
   await expect(groep2.page.getByText("Oer-Olympische Spelen")).toBeVisible();
   await expect(groep2.page.getByText("Stammen nemen het tegen elkaar op")).toBeVisible();
@@ -236,7 +236,7 @@ test("andere groepen, studenten en andere clusters zien alleen de publieke kaart
   expect((await groep2.page.request.get(`/avf/A`)).url()).not.toContain(avf[1]); // eigen AVF, niet dat van groep 1
   await groep2.ctx.close();
 
-  const student = await nieuweSessie(browser, "vd-student");
+  const student = await nieuweSessie(browser, "test-student");
   await student.page.goto("/belevenissen");
   await expect(student.page.getByText("Oer-Olympische Spelen")).toBeVisible();
   await geenToegang(await student.page.request.get(`/belevenissen/${avf[1]}`));
@@ -252,7 +252,7 @@ test("andere groepen, studenten en andere clusters zien alleen de publieke kaart
 });
 
 test("de stuurgroep leest het hele AVF en de afdrukweergave verbergt het menu", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-stuur-programma");
+  const s = await nieuweSessie(browser, "test-stuur");
   const p = s.page;
   await p.goto("/belevenissen");
   await p.locator(`a[href="/belevenissen/${avf[1]}"]`).click();
@@ -275,7 +275,7 @@ test("de stuurgroep leest het hele AVF en de afdrukweergave verbergt het menu", 
 });
 
 test("een afbeelding bij een fase uploaden is alleen voor de eigen groep en de stuurgroep zichtbaar", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/D?fase=kop");
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
@@ -284,20 +284,20 @@ test("een afbeelding bij een fase uploaden is alleen voor de eigen groep en de s
   await expect(p.getByText("Opgeslagen", { exact: true }).first()).toBeVisible({ timeout: 20000 });
   const { data } = await admin.from("avf_fase").select("overzichtstekening_pad").eq("avf_id", avf[1]).eq("fase", "kop").single();
   const pad = data!.overzichtstekening_pad as string;
-  expect(pad).toMatch(new RegExp(`^cluster/${VD}/avf/${avf[1]}/tekening-kop-\\d+\\.webp$`));
+  expect(pad).toMatch(new RegExp(`^cluster/${CLUSTER}/avf/${avf[1]}/tekening-kop-\\d+\\.webp$`));
 
   expect((await p.request.get(`/api/avf/${pad}`)).status()).toBe(200);
-  const stuur = await nieuweSessie(browser, "vd-stuur-programma");
+  const stuur = await nieuweSessie(browser, "test-stuur");
   expect((await stuur.page.request.get(`/api/avf/${pad}`)).status()).toBe(200);
-  const groep2 = await nieuweSessie(browser, "vd-groep-2");
+  const groep2 = await nieuweSessie(browser, "test-groep-2");
   expect((await groep2.page.request.get(`/api/avf/${pad}`)).status()).toBe(404);
-  const student = await nieuweSessie(browser, "vd-student");
+  const student = await nieuweSessie(browser, "test-student");
   expect((await student.page.request.get(`/api/avf/${pad}`)).status()).toBe(404);
   await Promise.all([s.ctx.close(), stuur.ctx.close(), groep2.ctx.close(), student.ctx.close()]);
 });
 
 test("het programma is voor iedereen te lezen en markeert wat voor de eigen groep geldt", async ({ browser }) => {
-  const groep = await nieuweSessie(browser, "vd-groep-1");
+  const groep = await nieuweSessie(browser, "test-groep-1");
   await groep.page.goto("/programma");
   await expect(groep.page.getByRole("heading", { name: "Maandag 28 juni" })).toBeVisible();
   await expect(groep.page.getByText("Verzamelen bij Gymnasion")).toBeVisible();
@@ -307,7 +307,7 @@ test("het programma is voor iedereen te lezen en markeert wat voor de eigen groe
   await expect(groep.page.getByRole("link", { name: /Programma beheren/ })).toHaveCount(0);
   await groep.ctx.close();
 
-  const student = await nieuweSessie(browser, "vd-student");
+  const student = await nieuweSessie(browser, "test-student");
   await student.page.goto("/programma");
   await expect(student.page.getByText("Busreis terug naar Nijmegen")).toBeVisible();
   await student.page.goto("/stuurgroep/programma");
@@ -316,7 +316,7 @@ test("het programma is voor iedereen te lezen en markeert wat voor de eigen groe
 });
 
 test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de projectgroep ziet het direct", async ({ browser }) => {
-  const stuur = await nieuweSessie(browser, "vd-stuur-programma");
+  const stuur = await nieuweSessie(browser, "test-stuur");
   const p = stuur.page;
   await p.goto("/stuurgroep/programma");
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");
@@ -324,14 +324,14 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
   // Wisselen: projectgroep 2 in het tijdvak van projectgroep 1
   const kiezer = p.locator(`#toewijzen-${regel[1]}`);
   await kiezer.selectOption(avf[2]);
-  await expect(p.getByText(/Dit tijdvak is al van Projectgroep 1/).first()).toBeVisible();
+  await expect(p.getByText(/Dit tijdvak is al van Testgroep 1/).first()).toBeVisible();
   await p.getByRole("button", { name: "Wisselen" }).click();
   await expect.poll(async () => (await admin.from("avf").select("programma_regel_id").eq("id", avf[1]).single()).data?.programma_regel_id).toBe(regel[2]);
   const { data: twee } = await admin.from("avf").select("programma_regel_id").eq("id", avf[2]).single();
   expect(twee?.programma_regel_id).toBe(regel[1]);
 
-  // Projectgroep 1 ziet nu het dinsdagochtendtijdvak
-  const groep = await nieuweSessie(browser, "vd-groep-1");
+  // Testgroep 1 ziet nu het dinsdagochtendtijdvak
+  const groep = await nieuweSessie(browser, "test-groep-1");
   await groep.page.goto("/avf");
   await expect(groep.page.getByText("dinsdag 29 juni · 09:00–12:00").first()).toBeVisible();
 
@@ -374,7 +374,7 @@ test("de stuurgroep wisselt twee groepen van tijdvak en past een tijd aan: de pr
 });
 
 test("de verschijningsvorm heeft meerdere keuzes", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/A");
   await p.waitForLoadState("networkidle"); // wachten tot de pagina klaar is voor aanraken
@@ -397,7 +397,7 @@ test("de verschijningsvorm heeft meerdere keuzes", async ({ browser }) => {
   await expect(p.getByText(/Iemand anders heeft dit net gewijzigd/)).toHaveCount(0);
 
   // Andere groepen zien de gekozen vormen op de publieke kaart
-  const groep2 = await nieuweSessie(browser, "vd-groep-2");
+  const groep2 = await nieuweSessie(browser, "test-groep-2");
   await groep2.page.goto("/belevenissen");
   await expect(groep2.page.getByText("Avontuur, Show")).toBeVisible();
 

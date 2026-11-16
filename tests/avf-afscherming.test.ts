@@ -595,29 +595,37 @@ describe("Storage avf", () => {
 });
 
 describe("Opruimen en niet van toepassing", () => {
+  // Deze tests gebruiken het voorbeeld-AVF van test-groep-1 in het cluster TEST. VD en VC blijven leeg (zie de livegang).
+  let avfT1: string;
+  beforeAll(async () => {
+    const TEST = await clusterId("TEST");
+    const { data } = await admin.from("avf").select("id, projectgroep:projectgroep_id!inner(nummer)").eq("cluster_id", TEST).eq("projectgroep.nummer", 1).single();
+    avfT1 = data!.id as string;
+  });
+
   it("één W-veld van opruimen opslaan zonder de andere te overschrijven, met controle op eigenaar", async () => {
-    const a = await inloggenAls("vd-groep-1");
-    const { data: voor } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avf[1]).eq("fase", "romp").single();
+    const a = await inloggenAls("test-groep-1");
+    const { data: voor } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avfT1).eq("fase", "romp").single();
     const oudWie = (voor!.opruimen as Record<string, string>).wie;
-    const rpc = (client: typeof a, oud: string | null, nieuw: string, id = avf[1], sleutel = "wie") =>
+    const rpc = (client: typeof a, oud: string | null, nieuw: string, id = avfT1, sleutel = "wie") =>
       client.rpc("avf_fase_opruimen_opslaan", { p_avf_id: id, p_fase: "romp", p_sleutel: sleutel, p_oud: oud, p_nieuw: nieuw });
 
     expect(((await rpc(a, oudWie, "Test-wie")).data as Resultaat).ok).toBe(true);
     const verouderd = (await rpc(a, oudWie, "Overschreven")).data as Resultaat;
     expect(verouderd.ok).toBe(false);
     expect(verouderd.reden).toBe("gewijzigd");
-    const { data: na } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avf[1]).eq("fase", "romp").single();
+    const { data: na } = await admin.from("avf_fase").select("opruimen").eq("avf_id", avfT1).eq("fase", "romp").single();
     expect(na!.opruimen).toMatchObject({ wie: "Test-wie", wat: (voor!.opruimen as Record<string, string>).wat });
 
-    expect(((await rpc(await inloggenAls("vd-groep-2"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
-    expect(((await rpc(await inloggenAls("vd-stuur-programma"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
-    expect((await rpc(a, null, "x", avf[1], "onbekend")).error).not.toBeNull();
-    await admin.from("avf_fase").update({ opruimen: voor!.opruimen }).eq("avf_id", avf[1]).eq("fase", "romp");
+    expect(((await rpc(await inloggenAls("test-groep-2"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
+    expect(((await rpc(await inloggenAls("test-stuur"), "Test-wie", "x")).data as Resultaat).ok).toBe(false);
+    expect((await rpc(a, null, "x", avfT1, "onbekend")).error).not.toBeNull();
+    await admin.from("avf_fase").update({ opruimen: voor!.opruimen }).eq("avf_id", avfT1).eq("fase", "romp");
   });
 
   it("een veld als niet van toepassing markeren en weer vrijgeven; de fysieke veiligheid kan dat niet", async () => {
-    const a = await inloggenAls("vd-groep-1");
-    const { data: o } = await admin.from("avf_onderdeel").select("id").eq("avf_id", avf[1]).eq("fase", "romp").limit(1).single();
+    const a = await inloggenAls("test-groep-1");
+    const { data: o } = await admin.from("avf_onderdeel").select("id").eq("avf_id", avfT1).eq("fase", "romp").limit(1).single();
     const zet = (client: typeof a, veld: string, aan: boolean) => client.rpc("avf_onderdeel_nvt_zetten", { p_onderdeel_id: o!.id, p_veld: veld, p_aan: aan });
 
     expect((await zet(a, "usv_uitdagend", true)).data).toBe(true);
@@ -629,8 +637,8 @@ describe("Opruimen en niet van toepassing", () => {
     expect(uit!.niet_van_toepassing).toEqual([]);
 
     expect((await zet(a, "fysieke_veiligheid", true)).error).not.toBeNull();
-    expect((await zet(await inloggenAls("vd-groep-2"), "usv_uitdagend", true)).data).toBe(false);
-    expect((await zet(await inloggenAls("vd-stuur-programma"), "usv_uitdagend", true)).data).toBe(false);
+    expect((await zet(await inloggenAls("test-groep-2"), "usv_uitdagend", true)).data).toBe(false);
+    expect((await zet(await inloggenAls("test-stuur"), "usv_uitdagend", true)).data).toBe(false);
   });
 });
 

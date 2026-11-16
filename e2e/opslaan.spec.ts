@@ -1,6 +1,6 @@
 /**
  * Opslaan terwijl je typt: tekst mag niet verloren gaan als je direct na het typen doorklikt of de pagina sluit.
- * Gebruikt het AVF van vd-groep-6 (geen andere test gebruikt dat) en zet de waarde daarna terug.
+ * Gebruikt het AVF van test-groep-2 (cluster TEST) en zet de waarde daarna terug.
  * Draait tegen het echte Supabase-project.
  */
 import { expect, test } from "@playwright/test";
@@ -14,9 +14,9 @@ let oorspronkelijk: string | null;
 let oorspronkelijkOrganisatie: unknown;
 
 test.beforeAll(async () => {
-  const VD = await clusterId("VD");
-  const { data } = await admin.from("avf").select("id, contactpersoon, organisatie, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
-  const eerste = (data ?? []).find((r) => (r.projectgroep as unknown as { nummer: number }).nummer === 6)!;
+  const TEST = await clusterId("TEST");
+  const { data } = await admin.from("avf").select("id, contactpersoon, organisatie, projectgroep:projectgroep_id(nummer)").eq("cluster_id", TEST);
+  const eerste = (data ?? []).find((r) => (r.projectgroep as unknown as { nummer: number }).nummer === 2)!;
   avfId = eerste.id;
   oorspronkelijk = eerste.contactpersoon;
   oorspronkelijkOrganisatie = eerste.organisatie;
@@ -32,7 +32,7 @@ async function contactpersoonInDatabase() {
 }
 
 test("tekst wordt na een korte stilte opgeslagen, zonder het veld te verlaten", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-6");
+  const s = await nieuweSessie(browser, "test-groep-2");
   await s.page.goto("/avf/A");
   await s.page.getByLabel("Wie werkt hier?").fill("Testgebruiker");
   const veld = s.page.getByLabel("Contactpersoon");
@@ -43,7 +43,7 @@ test("tekst wordt na een korte stilte opgeslagen, zonder het veld te verlaten", 
 });
 
 test("tekst blijft bewaard als je direct na het typen op een knop in het menu tikt", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-6");
+  const s = await nieuweSessie(browser, "test-groep-2");
   await s.page.goto("/avf/A");
   await s.page.getByLabel("Wie werkt hier?").fill("Testgebruiker");
   await s.page.getByLabel("Contactpersoon").fill("Direct-doorklikken");
@@ -55,7 +55,7 @@ test("tekst blijft bewaard als je direct na het typen op een knop in het menu ti
 });
 
 test("tekst blijft bewaard als je de pagina direct na het typen opnieuw laadt", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-6");
+  const s = await nieuweSessie(browser, "test-groep-2");
   await s.page.goto("/avf/A");
   await s.page.getByLabel("Wie werkt hier?").fill("Testgebruiker");
   await s.page.getByLabel("Contactpersoon").fill("Pagina-herladen");
@@ -65,7 +65,7 @@ test("tekst blijft bewaard als je de pagina direct na het typen opnieuw laadt", 
 });
 
 test("bij allergieën kiezen voor Nee geeft een zachte waarschuwing, Ja haalt hem weg", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-6");
+  const s = await nieuweSessie(browser, "test-groep-2");
   const p = s.page;
   await p.goto("/avf/G");
   await p.getByLabel("Wie werkt hier?").fill("Testgebruiker");

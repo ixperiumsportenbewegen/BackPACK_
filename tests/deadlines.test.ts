@@ -32,17 +32,27 @@ const rij = async (cluster: string, onderdeel: string) =>
 const logboek = async (actie: string) =>
   (await admin.from("wijziging").select("naam, details, cluster_id").eq("tabel", "deadline").eq("actie", actie).eq("naam", NAAM)).data ?? [];
 
+// Er kunnen al deadlines staan (bijvoorbeeld van een collega die test): die zetten we eerst opzij en daarna terug,
+// zodat deze test ze nooit overschrijft of verwijdert.
+let bewaard: Record<string, unknown>[] = [];
+
 async function opschonen() {
-  await admin.from("deadline").delete().in("cluster_id", [TEST, VD]).eq("gezet_door_naam", NAAM);
+  await admin.from("deadline").delete().in("cluster_id", [TEST, VD]);
   await admin.from("wijziging").delete().eq("tabel", "deadline").eq("naam", NAAM);
+}
+
+async function terugzetten() {
+  await opschonen();
+  if (bewaard.length) await admin.from("deadline").insert(bewaard);
 }
 
 beforeAll(async () => {
   TEST = await clusterId("TEST");
   VD = await clusterId("VD");
+  bewaard = (await admin.from("deadline").select("*").in("cluster_id", [TEST, VD])).data ?? [];
   await opschonen();
 });
-afterAll(opschonen);
+afterAll(terugzetten);
 
 describe("instellen: alleen de stuurgroep van het cluster en de docent", () => {
   it("de stuurgroep van het cluster stelt een deadline in; die staat in de database en in het logboek", async () => {

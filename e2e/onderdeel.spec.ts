@@ -1,12 +1,12 @@
 /**
  * Onderdeelscherm (sectie D): naam, duur, beschrijving en veiligheid staan direct zichtbaar;
- * Differentiatie en USV zijn niet verplicht en beginnen dichtgeklapt. Leest alleen (voorbeeld-AVF van vd-groep-1).
+ * Differentiatie en USV zijn niet verplicht en beginnen dichtgeklapt. Leest alleen (voorbeeld-AVF van test-groep-1 (cluster TEST)).
  */
 import { expect, test } from "@playwright/test";
 import { nieuweSessie } from "./helpers";
 
 test("differentiatie en USV klappen in, de verplichte velden niet", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/D?fase=kop");
   await p.getByRole("link", { name: /^1\./ }).first().click();
@@ -35,7 +35,7 @@ test("differentiatie en USV klappen in, de verplichte velden niet", async ({ bro
 });
 
 test("de eigenaar van een veld staat per sectie in een uitklapblok en niet bij elk veld", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/A");
   await expect(p.getByRole("heading", { name: "Basisgegevens", level: 1 })).toBeVisible();
@@ -54,7 +54,7 @@ test("de eigenaar van een veld staat per sectie in een uitklapblok en niet bij e
 });
 
 test("sectie A vraagt eerst naar de locatie en legt uit wat het aantal deelnemers is", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/A");
   const locatie = p.getByRole("radiogroup", { name: /Op welke locatie vindt de belevenis plaats/ });

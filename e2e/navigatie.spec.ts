@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
 import { nieuweSessie } from "./helpers";
 
 test("door alle secties van het AVF met vorige en volgende, in de juiste volgorde", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/A");
 
@@ -46,7 +46,7 @@ test("door alle secties van het AVF met vorige en volgende, in de juiste volgord
 });
 
 test("de sectiebalk toont waar je bent en brengt je met één tik naar elke sectie", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/B");
   const balk = p.getByRole("navigation", { name: "Secties van het AVF" });
@@ -75,7 +75,7 @@ test("de sectiebalk toont waar je bent en brengt je met één tik naar elke sect
 });
 
 test("van onderdeel naar onderdeel binnen een fase, en terug naar de fase", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   await p.goto("/avf/D?fase=romp");
   await p.locator('a[href^="/avf/onderdeel/"]').first().click();
@@ -98,7 +98,7 @@ test("van onderdeel naar onderdeel binnen een fase, en terug naar de fase", asyn
 });
 
 test("het hoofdmenu markeert bij onderliggende schermen de juiste knop", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
   const menu = p.getByRole("navigation", { name: "Hoofdmenu" });
   const huidig = async (pad: string) => {
@@ -115,7 +115,7 @@ test("het hoofdmenu markeert bij onderliggende schermen de juiste knop", async (
   expect(await huidig("/meer/rolverdeling")).toContain("Meer");
   await s.ctx.close();
 
-  const stuur = await nieuweSessie(browser, "vd-stuur-programma");
+  const stuur = await nieuweSessie(browser, "test-stuur");
   const sm = stuur.page.getByRole("navigation", { name: "Hoofdmenu" });
   await stuur.page.goto("/stuurgroep/programma");
   await expect(sm.locator('a[aria-current="page"]')).toContainText("Stuurgroep");
@@ -123,7 +123,7 @@ test("het hoofdmenu markeert bij onderliggende schermen de juiste knop", async (
 });
 
 test("terugknoppen en doorverwijzingen op de overzichtsschermen", async ({ browser }) => {
-  const s = await nieuweSessie(browser, "vd-groep-1");
+  const s = await nieuweSessie(browser, "test-groep-1");
   const p = s.page;
 
   await p.goto("/avf");
@@ -156,21 +156,21 @@ test("terugknoppen en doorverwijzingen op de overzichtsschermen", async ({ brows
 });
 
 test("de stuurgroep bladert van belevenis naar belevenis; de projectgroep leest alleen het eigen AVF", async ({ browser }) => {
-  const stuur = await nieuweSessie(browser, "vd-stuur-programma");
+  const stuur = await nieuweSessie(browser, "test-stuur");
   const p = stuur.page;
   await p.goto("/belevenissen");
   await p.getByRole("link", { name: "Het hele AVF lezen" }).first().click();
   await expect(p.getByRole("heading", { level: 1 })).toContainText("Oer-Olympische Spelen");
   const nav = p.getByRole("navigation", { name: "Vorige en volgende" });
-  await expect(nav.getByRole("link", { name: /Volgende/ })).toContainText("Projectgroep 2");
+  await expect(nav.getByRole("link", { name: /Volgende/ })).toContainText("Testgroep 2");
   await nav.getByRole("link", { name: /Volgende/ }).click();
   await expect(p.getByText("Ardennen-meerdaagse · 28–30 juni 2027").first()).toBeVisible();
-  await expect(nav.getByRole("link", { name: /Vorige/ })).toContainText("Projectgroep 1");
+  await expect(nav.getByRole("link", { name: /Vorige/ })).toContainText("Testgroep 1");
   await nav.getByRole("link", { name: /Terug naar alle belevenissen/ }).click();
   await expect(p).toHaveURL(/\/belevenissen$/);
   await stuur.ctx.close();
 
-  const groep = await nieuweSessie(browser, "vd-groep-1");
+  const groep = await nieuweSessie(browser, "test-groep-1");
   await groep.page.goto("/avf");
   await groep.page.getByRole("link", { name: /Het hele AVF lezen of afdrukken/ }).click();
   const gnav = groep.page.getByRole("navigation", { name: "Vorige en volgende" });

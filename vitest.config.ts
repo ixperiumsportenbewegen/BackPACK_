@@ -10,5 +10,7 @@ export default defineConfig({
     fileParallelism: false,
     hookTimeout: 60000,
     setupFiles: ["tests/setup-env.ts"],
+    // Legt vast hoe VD en VC erbij staan en zet dat na alle tests terug (zie het bestand zelf).
+    globalSetup: ["tests/global-setup.ts"],
   },
 });

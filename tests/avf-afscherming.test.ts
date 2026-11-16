@@ -12,16 +12,23 @@ let VD: string, VC: string, TEST: string;
 const avf: Record<number, string> = {}; // VD-projectgroep 1..6 -> avf-id
 const groep: Record<number, string> = {}; // VD-projectgroep 1..6 -> projectgroep-id
 const origineleRegel: Record<number, string | null> = {};
+/** De stand van de VD-AVF's voor de tests: wat een test wijzigt, zetten we hierop terug (nooit blind op in_ontwikkeling). */
+const origineleStand: Record<number, { status: string; versie: number; tussentijds: boolean }> = {};
+
+async function herstelStand(nr: number) {
+  await admin.from("avf").update(origineleStand[nr]).eq("id", avf[nr]);
+}
 
 beforeAll(async () => {
   VD = await clusterId("VD");
   VC = await clusterId("VC");
   TEST = await clusterId("TEST");
-  const { data } = await admin.from("avf").select("id, projectgroep_id, programma_regel_id, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
+  const { data } = await admin.from("avf").select("id, projectgroep_id, programma_regel_id, status, versie, tussentijds, projectgroep:projectgroep_id(nummer)").eq("cluster_id", VD);
   for (const r of data ?? []) {
     const nr = (r.projectgroep as unknown as { nummer: number }).nummer;
     avf[nr] = r.id;
     groep[nr] = r.projectgroep_id;
+    origineleStand[nr] = { status: r.status, versie: r.versie, tussentijds: Boolean(r.tussentijds) };
     origineleRegel[nr] = r.programma_regel_id;
   }
   expect(Object.keys(avf)).toHaveLength(6);
@@ -31,7 +38,7 @@ afterAll(async () => {
   // zet tijdvakken terug zoals ze waren
   for (const nr of [1, 2, 3, 4, 5, 6]) await admin.from("avf").update({ programma_regel_id: null }).eq("id", avf[nr]);
   for (const nr of [1, 2, 3, 4, 5, 6]) await admin.from("avf").update({ programma_regel_id: origineleRegel[nr] }).eq("id", avf[nr]);
-  await admin.from("avf").update({ status: "in_ontwikkeling" }).eq("cluster_id", VD);
+  for (const nr of [1, 2, 3, 4, 5, 6]) await herstelStand(nr);
 });
 
 const PUBLIEKE_KOLOMMEN = [
@@ -173,8 +180,8 @@ describe("Test 4: eigen AVF wijzigen, maar nooit tijdvak, locatie of status", ()
       expect(res.error, JSON.stringify(w)).not.toBeNull();
     }
     const { data: na } = await admin.from("avf").select("status, versie, locatie_tekst, programma_regel_id, projectgroep_id").eq("id", avf[1]).single();
-    expect(na?.status).toBe("in_ontwikkeling");
-    expect(na?.versie).toBe(0);
+    expect(na?.status).toBe(origineleStand[1].status); // ongewijzigd, wat het ook was
+    expect(na?.versie).toBe(origineleStand[1].versie);
     expect(na?.projectgroep_id).toBe(groep[1]);
     expect(na?.programma_regel_id).toBe(origineleRegel[1]);
   });
@@ -204,7 +211,7 @@ describe("Test 4: eigen AVF wijzigen, maar nooit tijdvak, locatie of status", ()
       const lees = await client.from("avf").select("status").eq("id", avf[1]).single();
       expect(lees.data?.status).toBe("ingediend"); // lezen blijft kunnen
     } finally {
-      await admin.from("avf").update({ status: "in_ontwikkeling" }).eq("id", avf[1]);
+      await herstelStand(1);
     }
   });
 });
@@ -574,7 +581,7 @@ describe("Storage avf", () => {
       expect((await admin.storage.from("avf").download(pad)).error).toBeNull(); // bestand staat er nog
       expect((await a.storage.from("avf").download(pad)).error).toBeNull(); // lezen mag nog
     } finally {
-      await admin.from("avf").update({ status: "in_ontwikkeling" }).eq("id", avf[1]);
+      await herstelStand(1);
     }
   });
 

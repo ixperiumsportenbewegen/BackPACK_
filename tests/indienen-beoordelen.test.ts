@@ -13,7 +13,6 @@ type R = { ok: boolean; reden?: string; ontbrekend?: string[]; verzoeken?: { id:
 let VD: string, TEST: string;
 let avfTest1: string; // test-groep-1: voorbeeld-AVF
 let avfTest2: string; // test-groep-2: leeg AVF
-let avfVd1: string;
 let origineel: Record<string, unknown>;
 let onderdeelId: string;
 let origineleFysiek: string | null;
@@ -48,7 +47,6 @@ beforeAll(async () => {
   TEST = await clusterId("TEST");
   avfTest1 = await avfId(TEST, 1);
   avfTest2 = await avfId(TEST, 2);
-  avfVd1 = await avfId(VD, 1);
   const { data } = await admin.from("avf").select("*").eq("id", avfTest1).single();
   origineel = data!;
   const { data: o } = await admin.from("avf_onderdeel").select("id, fysieke_veiligheid").eq("avf_id", avfTest1).eq("fase", "romp").order("volgorde").limit(1).single();
@@ -93,45 +91,49 @@ describe("Controle van verplichte velden: database en schermen zijn het eens", (
 });
 
 describe("Test 5 en 10: status en beoordeling lopen alleen via functies", () => {
+  // Deze afschermingstests gebruiken het lege AVF van test-groep-2 op TEST (niet VD): zo zijn ze onafhankelijk van wat er
+  // op VD en VC staat en raken ze geen echte gegevens. VD en VC doen alleen mee als ander cluster.
   it("niemand kan de nieuwe tabellen rechtstreeks beschrijven", async () => {
-    for (const gebruiker of ["vd-groep-1", "vd-stuur-programma", "docent", "vd-student"]) {
+    for (const gebruiker of ["test-groep-2", "test-groep-1", "test-stuur", "docent", "test-student", "vd-groep-1"]) {
       const c = await inloggenAls(gebruiker);
-      const v = await c.from("verbeterverzoek").insert({ avf_id: avfVd1, sectie: "A", projectgroeprol: "projectleider", tekst: "x", door_naam: "x" });
-      const t = await c.from("themacheck").insert({ avf_id: avfVd1, stuurgroeprol_code: "projectleiding", oordeel: "akkoord", door_naam: "x" });
-      const ver = await c.from("avf_versie").insert({ avf_id: avfVd1, versie: 9, inhoud: {}, ingediend_door_naam: "x" });
+      const v = await c.from("verbeterverzoek").insert({ avf_id: avfTest2, sectie: "A", projectgroeprol: "projectleider", tekst: "x", door_naam: "x" });
+      const t = await c.from("themacheck").insert({ avf_id: avfTest2, stuurgroeprol_code: "projectleiding", oordeel: "akkoord", door_naam: "x" });
+      const ver = await c.from("avf_versie").insert({ avf_id: avfTest2, versie: 9, inhoud: {}, ingediend_door_naam: "x" });
       expect(v.error, `${gebruiker} verbeterverzoek`).not.toBeNull();
       expect(t.error, `${gebruiker} themacheck`).not.toBeNull();
       expect(ver.error, `${gebruiker} avf_versie`).not.toBeNull();
     }
-    const { data } = await admin.from("verbeterverzoek").select("id").eq("avf_id", avfVd1);
+    const { data } = await admin.from("verbeterverzoek").select("id").eq("avf_id", avfTest2);
     expect(data).toHaveLength(0);
   });
 
   it("de projectgroep kan niet goedkeuren, geen aanpassing vragen en geen verzoek plaatsen", async () => {
-    const goed = await rpc("vd-groep-1", "avf_goedkeuren", { p_avf_id: avfVd1, p_naam: naam });
-    const vraag = await rpc("vd-groep-1", "avf_aanpassing_vragen", { p_avf_id: avfVd1, p_naam: naam });
-    const plaats = await rpc("vd-groep-1", "verbeterverzoek_plaatsen", { p_avf_id: avfVd1, p_sectie: "A", p_onderdeel_id: null, p_veld_sleutel: null, p_rol: "projectleider", p_tekst: "x", p_naam: naam });
-    const check = await rpc("vd-groep-1", "themacheck_zetten", { p_avf_id: avfVd1, p_rol: "projectleiding", p_oordeel: "akkoord", p_toelichting: null, p_naam: naam });
+    const goed = await rpc("test-groep-2", "avf_goedkeuren", { p_avf_id: avfTest2, p_naam: naam });
+    const vraag = await rpc("test-groep-2", "avf_aanpassing_vragen", { p_avf_id: avfTest2, p_naam: naam });
+    const plaats = await rpc("test-groep-2", "verbeterverzoek_plaatsen", { p_avf_id: avfTest2, p_sectie: "A", p_onderdeel_id: null, p_veld_sleutel: null, p_rol: "projectleider", p_tekst: "x", p_naam: naam });
+    const check = await rpc("test-groep-2", "themacheck_zetten", { p_avf_id: avfTest2, p_rol: "projectleiding", p_oordeel: "akkoord", p_toelichting: null, p_naam: naam });
     for (const res of [goed, vraag, plaats, check]) expect(res.error).not.toBeNull();
-    const { data } = await admin.from("avf").select("status").eq("id", avfVd1).single();
+    const { data } = await admin.from("avf").select("status").eq("id", avfTest2).single();
     expect(data?.status).toBe("in_ontwikkeling");
   });
 
   it("alleen de eigen projectgroep kan indienen", async () => {
-    for (const gebruiker of ["vd-groep-2", "vd-stuur-programma", "docent", "vd-student", "vc-groep-1", "test-groep-1"]) {
-      const res = await rpc(gebruiker, "avf_indienen", { p_avf_id: avfVd1, p_naam: naam, p_samenvatting: null });
+    for (const gebruiker of ["test-groep-1", "test-stuur", "docent", "test-student", "vd-groep-1", "vc-groep-1"]) {
+      const res = await rpc(gebruiker, "avf_indienen", { p_avf_id: avfTest2, p_naam: naam, p_samenvatting: null });
       expect(res.error, gebruiker).not.toBeNull();
+      const feedback = await rpc(gebruiker, "avf_ter_feedback_indienen", { p_avf_id: avfTest2, p_naam: naam, p_samenvatting: "x" });
+      expect(feedback.error, gebruiker + " ter feedback").not.toBeNull();
     }
-    expect((await anoniem().rpc("avf_indienen", { p_avf_id: avfVd1, p_naam: naam, p_samenvatting: null })).error).not.toBeNull();
-    const { data } = await admin.from("avf").select("status, versie").eq("id", avfVd1).single();
+    expect((await anoniem().rpc("avf_indienen", { p_avf_id: avfTest2, p_naam: naam, p_samenvatting: null })).error).not.toBeNull();
+    const { data } = await admin.from("avf").select("status, versie").eq("id", avfTest2).single();
     expect(data).toEqual({ status: "in_ontwikkeling", versie: 0 });
   });
 
   it("stuurgroep van een ander cluster, student en projectgroep kunnen niets beoordelen", async () => {
-    for (const gebruiker of ["vc-stuur-programma", "test-stuur", "vd-student", "vd-groep-2"]) {
-      const res = await rpc(gebruiker, "verbeterverzoek_plaatsen", { p_avf_id: avfVd1, p_sectie: "A", p_onderdeel_id: null, p_veld_sleutel: null, p_rol: "projectleider", p_tekst: "x", p_naam: naam });
+    for (const gebruiker of ["vc-stuur-programma", "vd-stuur-programma", "test-student", "test-groep-1", "vd-groep-2"]) {
+      const res = await rpc(gebruiker, "verbeterverzoek_plaatsen", { p_avf_id: avfTest2, p_sectie: "A", p_onderdeel_id: null, p_veld_sleutel: null, p_rol: "projectleider", p_tekst: "x", p_naam: naam });
       expect(res.error, gebruiker).not.toBeNull();
-      const goed = await rpc(gebruiker, "avf_goedkeuren", { p_avf_id: avfVd1, p_naam: naam });
+      const goed = await rpc(gebruiker, "avf_goedkeuren", { p_avf_id: avfTest2, p_naam: naam });
       expect(goed.error, gebruiker).not.toBeNull();
     }
   });

@@ -32,7 +32,7 @@ export default async function PaklijstBewerken() {
       </Link>
       <PaginaKop titel="Paklijst bewerken" foto="wandeling-schemer-staand" />
       <p className="text-zacht">
-        Je bewerkt de persoonlijke paklijst van {cluster.naam}. De categorieën staan er al; voeg zelf spullen en aantallen toe, of plak een hele lijst
+        Je bewerkt de persoonlijke paklijst van {cluster.naam}. De categorieën staan er al; voeg zelf items en aantallen toe, of plak een hele lijst
         in een categorie. Iedereen in het cluster leest wat je hier invult en kan het afvinken op de eigen telefoon.
       </p>
       <BewerkerKader opslagSleutel="backpack_paklijstnaam">

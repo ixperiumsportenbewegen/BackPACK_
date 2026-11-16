@@ -1,7 +1,7 @@
 /**
- * Persoonlijke paklijst op telefoonformaat tegen het cluster TEST: de stuurgroep vult spullen in (ook door een lijst te
+ * Persoonlijke paklijst op telefoonformaat tegen het cluster TEST: de stuurgroep vult items in (ook door een lijst te
  * plakken), iedereen in het cluster leest de lijst en vinkt af op de eigen telefoon, en een ander cluster ziet niets.
- * Na afloop staat TEST weer op de vaste categorieën zonder spullen.
+ * Na afloop staat TEST weer op de vaste categorieën zonder items.
  */
 import { expect, test, type Page } from "@playwright/test";
 import { admin, clusterId } from "../tests/helpers";
@@ -60,29 +60,29 @@ test("de stuurgroep vult spullen in, plakt een lijst en voegt een categorie toe"
   const p = s.page;
   await p.goto("/meer/paklijst/bewerken");
   await expect(p.getByRole("heading", { name: "Paklijst bewerken", level: 1 })).toBeVisible();
-  // de vaste categorieën staan er al, zonder spullen
-  await expect(p.getByText("Nog geen spullen").first()).toBeVisible();
+  // de vaste categorieën staan er al, zonder items
+  await expect(p.getByText("Nog geen items").first()).toBeVisible();
   await p.getByLabel("Wie werkt hier? (jouw naam)").fill(NAAM);
 
   await open(p, "Kleding");
-  await p.getByRole("button", { name: "Spul toevoegen aan Kleding" }).click();
-  await expect(p.getByLabel("Kleding, spul 1, naam")).toBeVisible();
-  await p.getByLabel("Kleding, spul 1, naam").fill("Broek");
-  await p.getByLabel("Kleding, spul 1, aantal").fill("2");
-  await p.getByLabel("Kleding, spul 1, aantal").blur();
+  await p.getByRole("button", { name: "Item toevoegen aan Kleding" }).click();
+  await expect(p.getByLabel("Kleding, item 1, naam")).toBeVisible();
+  await p.getByLabel("Kleding, item 1, naam").fill("Broek");
+  await p.getByLabel("Kleding, item 1, aantal").fill("2");
+  await p.getByLabel("Kleding, item 1, aantal").blur();
   await expect.poll(async () => (await admin.from("paklijst_item").select("naam, aantal").eq("cluster_id", TEST)).data).toEqual([{ naam: "Broek", aantal: "2" }]);
 
-  await p.getByRole("button", { name: "Spul toevoegen aan Kleding" }).click();
-  await expect(p.getByLabel("Kleding, spul 2, naam")).toBeVisible();
-  await p.getByLabel("Kleding, spul 2, naam").fill("Muts");
-  await p.getByLabel("Kleding, spul 2, toelichting").fill("Voor de koude ochtenden");
-  await p.getByLabel("Kleding, spul 2, toelichting").blur();
-  await p.locator("li", { has: p.getByLabel("Kleding, spul 2, naam") }).getByLabel("Optioneel").first().check();
+  await p.getByRole("button", { name: "Item toevoegen aan Kleding" }).click();
+  await expect(p.getByLabel("Kleding, item 2, naam")).toBeVisible();
+  await p.getByLabel("Kleding, item 2, naam").fill("Muts");
+  await p.getByLabel("Kleding, item 2, toelichting").fill("Voor de koude ochtenden");
+  await p.getByLabel("Kleding, item 2, toelichting").blur();
+  await p.locator("li", { has: p.getByLabel("Kleding, item 2, naam") }).getByLabel("Optioneel").first().check();
   await expect.poll(async () => (await admin.from("paklijst_item").select("optioneel").eq("cluster_id", TEST).eq("naam", "Muts").single()).data?.optioneel).toBe(true);
 
-  // een spul verplaatsen: Muts boven Broek
-  await p.getByRole("button", { name: "Kleding, spul 2 omhoog" }).click();
-  await expect(p.getByLabel("Kleding, spul 1, naam")).toHaveValue("Muts");
+  // een item verplaatsen: Muts boven Broek
+  await p.getByRole("button", { name: "Kleding, item 2 omhoog" }).click();
+  await expect(p.getByLabel("Kleding, item 1, naam")).toHaveValue("Muts");
 
   // een lijst plakken in een andere categorie
   await open(p, "Toilettas en verzorging");
@@ -98,20 +98,20 @@ test("de stuurgroep vult spullen in, plakt een lijst en voegt een categorie toe"
   await expect.poll(async () => (await admin.from("paklijst_categorie").select("naam").eq("cluster_id", TEST).eq("naam", "Fietsspullen")).data).toHaveLength(1);
   await expect(p.getByText("Fietsspullen", { exact: true }).first()).toBeVisible();
 
-  // een spul verwijderen vraagt een bevestiging
-  await p.getByRole("button", { name: "Kleding, spul 1 verwijderen" }).click();
+  // een item verwijderen vraagt een bevestiging
+  await p.getByRole("button", { name: "Kleding, item 1 verwijderen" }).click();
   await p.getByRole("button", { name: "Annuleren" }).click();
   expect(await spullenNamen()).toContain("Muts");
-  await p.getByRole("button", { name: "Kleding, spul 1 verwijderen" }).click();
+  await p.getByRole("button", { name: "Kleding, item 1 verwijderen" }).click();
   await p.getByRole("button", { name: "Ja, verwijderen" }).click();
   await expect.poll(spullenNamen).not.toContain("Muts");
-  await expect(p.getByLabel("Kleding, spul 2, naam")).toHaveCount(0); // wacht tot het scherm de verwijdering toont
-  // en weer een optioneel spul toevoegen voor de leesweergave
-  await p.getByRole("button", { name: "Spul toevoegen aan Kleding" }).click();
-  await expect(p.getByLabel("Kleding, spul 2, naam")).toBeVisible();
-  await p.getByLabel("Kleding, spul 2, naam").fill("Muts");
-  await p.getByLabel("Kleding, spul 2, naam").blur();
-  await p.locator("li", { has: p.getByLabel("Kleding, spul 2, naam") }).getByLabel("Optioneel").first().check();
+  await expect(p.getByLabel("Kleding, item 2, naam")).toHaveCount(0); // wacht tot het scherm de verwijdering toont
+  // en weer een optioneel item toevoegen voor de leesweergave
+  await p.getByRole("button", { name: "Item toevoegen aan Kleding" }).click();
+  await expect(p.getByLabel("Kleding, item 2, naam")).toBeVisible();
+  await p.getByLabel("Kleding, item 2, naam").fill("Muts");
+  await p.getByLabel("Kleding, item 2, naam").blur();
+  await p.locator("li", { has: p.getByLabel("Kleding, item 2, naam") }).getByLabel("Optioneel").first().check();
   await expect.poll(async () => (await admin.from("paklijst_item").select("optioneel").eq("cluster_id", TEST).eq("naam", "Muts").single()).data?.optioneel).toBe(true);
   await s.ctx.close();
 });
@@ -127,7 +127,7 @@ test("iedereen in het cluster leest de lijst en vinkt af op de eigen telefoon", 
     await expect(p.getByText("· 2")).toBeVisible();
     await expect(p.getByText("Optioneel", { exact: true })).toBeVisible();
     await expect(p.getByText("in een zakje")).toBeVisible();
-    // categorieën zonder spullen staan er niet
+    // categorieën zonder items staan er niet
     await expect(p.getByRole("heading", { name: "Schoenen" })).toHaveCount(0);
     await expect(p.getByRole("heading", { name: "Fietsspullen" })).toHaveCount(0);
 
@@ -146,6 +146,29 @@ test("iedereen in het cluster leest de lijst en vinkt af op de eigen telefoon", 
     await expect(p.getByRole("button", { name: /Afdrukken of opslaan als PDF/ })).toBeVisible();
     await s.ctx.close();
   }
+});
+
+test("de werkpagina van Logistiek & Facilitair linkt naar de paklijst met een uitroepteken zolang hij niet af is", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "test-stuur");
+  const p = s.page;
+  const link = p.getByRole("link", { name: /Persoonlijke paklijst/ });
+  // per persoon staan er items, maar nog niets om te delen met een groepje
+  await p.goto("/stuurgroep/rol/logistiek_facilitair");
+  await expect(link).toHaveAttribute("href", "/meer/paklijst");
+  await expect(link.getByTestId("uitroepteken")).toBeVisible();
+  await expect(link).toContainText("Nog niet af: er staan nog geen items bij om met een groepje te delen.");
+
+  const { data: cat } = await admin.from("paklijst_categorie").select("id").eq("cluster_id", TEST).eq("blok", "groepje").order("volgorde").limit(1).single();
+  await admin.from("paklijst_item").insert({ cluster_id: TEST, categorie_id: cat!.id, naam: "Gasstel", volgorde: 1 });
+  await p.reload();
+  await expect(link).toHaveAttribute("href", "/meer/paklijst");
+  await expect(link.getByTestId("uitroepteken")).toHaveCount(0);
+  await expect(link).not.toContainText("Nog niet af");
+
+  // de rol Veiligheid & Welzijn heeft deze link niet
+  await p.goto("/stuurgroep/rol/veiligheid_welzijn");
+  await expect(p.getByRole("link", { name: /Persoonlijke paklijst/ })).toHaveCount(0);
+  await s.ctx.close();
 });
 
 test("een ander cluster ziet de paklijst van TEST niet", async ({ browser }) => {

@@ -139,6 +139,43 @@ test("het AVF verwijst naar het plan zodra er iets in staat", async ({ browser }
   await g.ctx.close();
 });
 
+test("de werkpagina van Veiligheid & Welzijn linkt naar het plan met een uitroepteken zolang het niet af is", async ({ browser }) => {
+  const s = await nieuweSessie(browser, "test-stuur");
+  const p = s.page;
+  const link = p.getByRole("link", { name: /Calamiteitenplan \(incl\. EHBO\)/ });
+  // er staan stappen, een noodnummer en een contactpersoon in: dat is nog niet volledig
+  await p.goto("/stuurgroep/rol/veiligheid_welzijn");
+  await expect(link).toHaveAttribute("href", "/meer/calamiteitenplan");
+  await expect(link.getByTestId("uitroepteken")).toBeVisible();
+  await expect(link).toContainText("Nog niet af: nog in te vullen:");
+  await expect(link).toContainText("Ziekenhuizen en hulp in de buurt");
+  await expect(link).toContainText("Situaties met verhoogd risico");
+  await expect(link).not.toContainText("Eerste stappen bij een ongeval"); // die staat er al in
+  await expect(link).not.toContainText("Overig"); // Overig mag leeg blijven
+
+  // pas als alles is ingevuld, is het plan af: het uitroepteken verdwijnt, de link blijft
+  await admin.from("calamiteit_veld").upsert([
+    { cluster_id: TEST, sleutel: "melden", tekst: "Melden in de groepsapp", bijgewerkt_door_naam: NAAM },
+    { cluster_id: TEST, sleutel: "ter_plaatse", tekst: "Organisatie ter plaatse", bijgewerkt_door_naam: NAAM },
+    { cluster_id: TEST, sleutel: "thuisfront", tekst: "Afspraken voor het thuisfront", bijgewerkt_door_naam: NAAM },
+    { cluster_id: TEST, sleutel: "extern", tekst: "Afspraken bij een externe aanbieder", bijgewerkt_door_naam: NAAM },
+  ]);
+  await admin.from("calamiteit_item").insert([
+    { cluster_id: TEST, lijst: "ziekenhuizen", volgorde: 1, velden: { naam: "Ziekenhuis voor de test" } },
+    { cluster_id: TEST, lijst: "situaties", volgorde: 1, velden: { titel: "Teek" } },
+    { cluster_id: TEST, lijst: "zorg", volgorde: 1, velden: { onderwerp: "Arts" } },
+  ]);
+  await p.reload();
+  await expect(link).toHaveAttribute("href", "/meer/calamiteitenplan");
+  await expect(link.getByTestId("uitroepteken")).toHaveCount(0);
+  await expect(link).not.toContainText("Nog niet af");
+
+  // andere rollen hebben deze link niet
+  await p.goto("/stuurgroep/rol/projectleiding");
+  await expect(p.getByRole("link", { name: /Calamiteitenplan \(incl\. EHBO\)/ })).toHaveCount(0);
+  await s.ctx.close();
+});
+
 test("een ander cluster ziet het plan van TEST niet", async ({ browser }) => {
   const s = await nieuweSessie(browser, "vd-student");
   await s.page.goto("/meer/calamiteitenplan");

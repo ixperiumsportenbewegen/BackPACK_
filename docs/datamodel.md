@@ -277,10 +277,10 @@ De link naar de groepsapp voor noodmeldingen (https, optioneel). Alleen een link
 Wat neemt een student mee? Per cluster, gemaakt door de stuurgroep. Niet te verwarren met de materiaalcontrole (`materiaal_telling`). Twee vaste blokken (`persoon` en `groepje`, zie `src/config/paklijst.ts`).
 
 ### paklijst_categorie
-`id`, `cluster_id`, `blok` (`persoon` of `groepje`), `naam` (1 tot 80 tekens), `volgorde`, `bijgewerkt_door_naam`, tijden. Elk cluster krijgt vooraf de vaste categorieën (zonder spullen) via `paklijst_standaard_categorieen`.
+`id`, `cluster_id`, `blok` (`persoon` of `groepje`), `naam` (1 tot 80 tekens), `volgorde`, `bijgewerkt_door_naam`, tijden. Elk cluster krijgt vooraf de vaste categorieën (zonder items) via `paklijst_standaard_categorieen`.
 
 ### paklijst_item
-`id`, `cluster_id`, `categorie_id`, `bovenliggend_id` (null bij een spul; verwijst bij een onderdeel naar het spul, één niveau diep), `naam` (maximaal 150), `aantal` (vrije tekst, maximaal 40), `toelichting` (maximaal 500), `optioneel`, `volgorde`, `bijgewerkt_door_naam`, tijden. Een spul zonder naam is nog niet ingevuld en staat niet op de leesweergave. Wat een student afvinkt staat niet in de database maar alleen op het eigen toestel.
+`id`, `cluster_id`, `categorie_id`, `bovenliggend_id` (null bij een item; verwijst bij een onderdeel naar het item, één niveau diep), `naam` (maximaal 150), `aantal` (vrije tekst, maximaal 40), `toelichting` (maximaal 500), `optioneel`, `volgorde`, `bijgewerkt_door_naam`, tijden. Een item zonder naam is nog niet ingevuld en staat niet op de leesweergave. Wat een student afvinkt staat niet in de database maar alleen op het eigen toestel.
 
 ## Logboek
 

@@ -10,6 +10,9 @@ import { laadAvf, laadKaarten } from "@/lib/avfData";
 import { sectieVoortgang } from "@/lib/avfVoortgang";
 import { veldStand, type VeldStand } from "@/lib/avfVeldStatus";
 import { laadVerzoekenCluster } from "@/lib/beoordeling";
+import { laadPlan } from "@/lib/calamiteitenplan";
+import { laadPaklijst } from "@/lib/paklijst";
+import { opsomming, paklijstOntbreekt, planOntbreekt } from "@/lib/planStatus";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { formatMoment } from "@/lib/tijd";
@@ -45,12 +48,17 @@ const ROLLEN: Record<StuurgroepRolCode, { naam: string; pack: "P" | "A" | "C" | 
   projectleiding: { naam: "Projectleiding", pack: "K" },
 };
 
-function LinkKaart({ href, titel, uitleg }: { href: string; titel: string; uitleg: string }) {
+/** Een zwart omlijnde knop naar een werkpagina. Met `aandacht` staat er een uitroepteken en de reden: er moet nog iets gebeuren. */
+function LinkKaart({ href, titel, uitleg, aandacht }: { href: string; titel: string; uitleg: string; aandacht?: string }) {
   return (
     <Link href={href} className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-3 py-2">
+      {aandacht && (
+        <span aria-hidden data-testid="uitroepteken" className="flex size-7 shrink-0 items-center justify-center rounded-full bg-kop font-heading text-lg font-bold text-white">!</span>
+      )}
       <span className="flex-1">
         <span className="block font-bold text-kop">{titel}</span>
         <span className="block text-sm text-zacht">{uitleg}</span>
+        {aandacht && <span className="mt-1 block text-sm font-bold text-kop"><span className="sr-only">Let op: </span>{aandacht}</span>}
       </span>
       <ChevronRight aria-hidden className="size-5 text-kop" />
     </Link>
@@ -77,6 +85,12 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
     supabase.from("stuurgroeprol").select("focus, studenten").eq("cluster_id", cluster.id).eq("code", rolCode).maybeSingle(),
   ]);
   const avfs = (await Promise.all(kaarten.map((k) => laadAvf(k.id)))).filter((a): a is NonNullable<typeof a> => a !== null);
+
+  // Het calamiteitenplan (Veiligheid & Welzijn) en de persoonlijke paklijst (Logistiek & Facilitair): een uitroepteken zolang er iets ontbreekt.
+  const planOntbrekend = rolCode === "veiligheid_welzijn" ? planOntbreekt(await laadPlan(cluster.id)) : [];
+  const paklijstOntbrekend = rolCode === "logistiek_facilitair" ? paklijstOntbreekt(await laadPaklijst(cluster.id)) : [];
+  const planAandacht = planOntbrekend.length > 0 ? `Nog niet af: nog in te vullen: ${opsomming(planOntbrekend)}.` : undefined;
+  const paklijstAandacht = paklijstOntbrekend.length > 0 ? `Nog niet af: er staan nog geen items bij ${opsomming(paklijstOntbrekend)}.` : undefined;
 
   const velden = AVF_VELDEN.filter((v) => v.sgRol === rolCode);
   const rol = ROLLEN[rolCode];
@@ -135,6 +149,11 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
       )}
       {rolCode === "logistiek_facilitair" && (
         <>
+          <LinkKaart
+            href="/meer/paklijst" titel="Persoonlijke paklijst"
+            uitleg="Wat neemt een student mee? Maak de lijst met categorieën, items en aantallen. Iedereen leest hem onder Meer."
+            aandacht={paklijstAandacht}
+          />
           <LinkKaart href="/stuurgroep/materialen" titel="Materialenlijst" uitleg="De gedeelde lijst met voorraad op de camping en het bivak. Bouwen, definitief maken en aanvullen." />
           <LinkKaart href="/stuurgroep/materialen/aanvragen" titel="Aanvragen van projectgroepen" uitleg="Materiaal dat groepen missen of waarvan er te weinig is." />
           <LinkKaart href="/stuurgroep/materialen/behoefte" titel="Behoefte en tekorten" uitleg="Wat de belevenissen nodig hebben per locatie en moment, en correcties." />
@@ -155,6 +174,13 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
       )}
       {rolCode === "communicatie_financien" && (
         <LinkKaart href="/stuurgroep/budget" titel="Budget en aanvragen" uitleg="Het budget van het cluster, aanvragen van projectgroepen beoordelen en wat er nog over is." />
+      )}
+      {rolCode === "veiligheid_welzijn" && (
+        <LinkKaart
+          href="/meer/calamiteitenplan" titel="Calamiteitenplan (incl. EHBO)"
+          uitleg="Het algemene plan voor jullie cluster: eerste stappen, noodnummer, contactpersonen en ziekenhuizen. Jullie vullen het in, iedereen leest het onder Meer."
+          aandacht={planAandacht}
+        />
       )}
       {rolCode === "veiligheid_welzijn" && (
         <section className="rounded-han border border-rand bg-vlak p-4">

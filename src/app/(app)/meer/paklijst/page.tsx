@@ -48,7 +48,7 @@ export default async function PersoonlijkePaklijst() {
 
       {leeg ? (
         <p className="rounded-han border border-rand bg-vlak p-4 text-tekst">
-          De paklijst van {cluster.naam} wordt gemaakt door de stuurgroep (Logistiek &amp; Facilitair). Zodra er spullen op staan, zie je ze hier.
+          De paklijst van {cluster.naam} wordt gemaakt door de stuurgroep (Logistiek &amp; Facilitair). Zodra er items op staan, zie je ze hier.
         </p>
       ) : (
         <nav aria-label="Onderdelen van de paklijst" className="print:hidden flex gap-2">

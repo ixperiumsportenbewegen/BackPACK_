@@ -73,7 +73,7 @@ async function main() {
   const planRegels = await telling("calamiteit_item", (q) => q.eq("cluster_id", cluster.id));
   if (planRegels) meld(`${planRegels} regel(s) in het calamiteitenplan`);
   const paklijst = await telling("paklijst_item", (q) => q.eq("cluster_id", cluster.id));
-  if (paklijst) meld(`${paklijst} spul(len) op de persoonlijke paklijst`);
+  if (paklijst) meld(`${paklijst} item(s) op de persoonlijke paklijst`);
   const log = await telling("wijziging", (q) => q.eq("cluster_id", cluster.id));
   if (log) meld(`${log} logregel(s)`);
 

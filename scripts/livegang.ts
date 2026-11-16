@@ -3,7 +3,7 @@
  *
  *  - maakt eerst een export (export/voor-livegang-<tijd>.json en .xlsx);
  *  - verwijdert alle AVF-gegevens van het cluster: inhoud, fasen, onderdelen, versies, verbeterverzoeken, themachecks,
- *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, het calamiteitenplan, de spullen op de persoonlijke paklijst (de categorieën blijven), logboek en de bestanden in Storage;
+ *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, het calamiteitenplan, de items op de persoonlijke paklijst (de categorieën blijven), logboek en de bestanden in Storage;
  *  - zet het meerdaagsethema, de rolverdeling en de namen van de stuurgroepleden terug naar leeg;
  *  - laadt de basisgegevens opnieuw (npm run seed) zonder voorbeeld-AVF: de groepen krijgen weer het standaardtijdvak;
  *  - maakt nieuwe wachtwoorden voor alle accounts van het cluster en trekt hun sessies in.
@@ -179,10 +179,10 @@ async function maakSchoon(c: Cluster, ids: string[]) {
   // het calamiteitenplan is testdata tot de livegang; de link naar de groepsapp blijft staan (net als de Teams- en Forms-link)
   await ok(admin.from("calamiteit_veld").delete().eq("cluster_id", c.id), "calamiteitenplan (velden)");
   await ok(admin.from("calamiteit_item").delete().eq("cluster_id", c.id), "calamiteitenplan (regels)");
-  // de persoonlijke paklijst: de spullen zijn testdata en gaan weg; de categorieën blijven staan (zoals de categorieën van de materialenlijst)
-  await ok(admin.from("paklijst_item").delete().eq("cluster_id", c.id), "paklijst (spullen)");
+  // de persoonlijke paklijst: de items zijn testdata en gaan weg; de categorieën blijven staan (zoals de categorieën van de materialenlijst)
+  await ok(admin.from("paklijst_item").delete().eq("cluster_id", c.id), "paklijst (items)");
   await ok(admin.from("wijziging").delete().eq("cluster_id", c.id), "logboek");
-  console.log("  thema, rolverdeling, namen, deadlines, calamiteitenplan, paklijst-spullen en logboek teruggezet");
+  console.log("  thema, rolverdeling, namen, deadlines, calamiteitenplan, paklijst-items en logboek teruggezet");
 }
 
 async function nieuweWachtwoorden(clusters: Cluster[]) {
@@ -230,7 +230,7 @@ async function main() {
     const o = await overzicht(c);
     per.set(c.code, o);
     console.log(`${c.naam} (${c.code}): ${o.avfs} AVF's (${o.onderdelen} onderdelen, ${o.versies} versies, ${o.verzoeken} verbeterverzoeken, ${o.themachecks} themachecks),`);
-    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.calamiteitenplan} regels in het calamiteitenplan, ${o.paklijst} spullen op de paklijst, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
+    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.calamiteitenplan} regels in het calamiteitenplan, ${o.paklijst} items op de paklijst, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
     console.log(zonderWachtwoorden ? `  ${o.accounts} accounts houden hun wachtwoord (--zonder-wachtwoorden).` : `  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
   }
   console.log("\nBlijft staan: de materialenlijst, het programma (tijden en activiteiten), de links, het clusterbudget, het docentaccount en cluster TEST.");

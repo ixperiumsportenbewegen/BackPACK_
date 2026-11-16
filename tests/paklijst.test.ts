@@ -1,6 +1,6 @@
 /**
  * Persoonlijke paklijst: lezen voor iedereen in het eigen cluster, schrijven alleen voor de stuurgroep van dat cluster en de
- * docent, via functies; categorieën en spullen met opslaan per veld, volgorde, plakken van een lijst en overnemen door de docent.
+ * docent, via functies; categorieën en items met opslaan per veld, volgorde, plakken van een lijst en overnemen door de docent.
  * Alles wordt op het cluster TEST aangemaakt (en op een tijdelijk bron-cluster voor het overnemen); VD en VC worden alleen
  * gelezen of krijgen verboden schrijfpogingen (die moeten mislukken). Na afloop staat TEST weer op de vaste categorieën.
  */

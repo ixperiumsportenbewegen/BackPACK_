@@ -30,7 +30,7 @@ function vertaal(res: Rpc, ok: () => PlanResultaat = () => { ververs(); return {
   if (res.ok) return ok();
   if (res.reden === "conflict") return { status: "conflict", huidig: res.huidig ?? null };
   if (res.reden === "naam") return { status: "fout", melding: NAAM_NODIG };
-  if (res.reden === "te_veel") return { status: "fout", melding: "Dat zijn er te veel. Een categorie heeft maximaal 100 spullen en een spul maximaal 30 onderdelen." };
+  if (res.reden === "te_veel") return { status: "fout", melding: "Dat zijn er te veel. Een categorie heeft maximaal 100 items en een item maximaal 30 onderdelen." };
   if (res.reden === "leeg") return { status: "fout", melding: "Er staat niets in de tekst om toe te voegen." };
   return { status: "fout", melding: FOUT };
 }
@@ -104,7 +104,7 @@ export async function paklijstSpulToevoegen(clusterId: string, categorieId: stri
   return { status: "fout", melding: v.status === "fout" ? v.melding : FOUT };
 }
 
-/** Eén veld van een spul: naam, aantal, toelichting of optioneel (ja of leeg). */
+/** Eén veld van een item: naam, aantal, toelichting of optioneel (ja of leeg). */
 export async function paklijstSpulVeldOpslaan(
   clusterId: string, id: string, veld: keyof typeof VELDEN, oud: string, nieuw: string, naam: string,
 ): Promise<PlanResultaat> {
@@ -140,7 +140,7 @@ export async function paklijstSpulVerwijderen(clusterId: string, id: string, naa
 
 export type PlakResultaat = { status: "ok"; aantal: number } | { status: "fout"; melding: string };
 
-/** Een geplakte lijst toevoegen aan een categorie: elke regel een spul, streepjes of inspringen geven onderdelen. */
+/** Een geplakte lijst toevoegen aan een categorie: elke regel een item, streepjes of inspringen geven onderdelen. */
 export async function paklijstLijstPlakken(clusterId: string, categorieId: string, tekst: string, naam: string): Promise<PlakResultaat> {
   const supabase = await schrijver(clusterId);
   if (!supabase) return { status: "fout", melding: GEEN_RECHT };
@@ -168,7 +168,7 @@ export async function paklijstOvernemen(vanClusterId: string, naarClusterId: str
   const res = data as Rpc;
   if (res.ok) {
     ververs();
-    return { status: "ok", tekst: `Overgenomen: ${res.categorieen ?? 0} categorieën en ${res.spullen ?? 0} spullen.` };
+    return { status: "ok", tekst: `Overgenomen: ${res.categorieen ?? 0} categorieën en ${res.spullen ?? 0} items.` };
   }
   if (res.reden === "ongeldig") return { status: "fout", melding: "Kies twee verschillende clusters." };
   return { status: "fout", melding: res.reden === "naam" ? NAAM_NODIG : FOUT };

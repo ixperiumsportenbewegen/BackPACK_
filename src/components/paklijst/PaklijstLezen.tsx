@@ -5,7 +5,7 @@ import { RotateCcw } from "lucide-react";
 import { PAKLIJST_BLOKKEN } from "@/config/paklijst";
 import type { PaklijstCategorie, PaklijstSpul } from "@/lib/paklijst";
 
-/** Spullen met een naam; een spul zonder naam is nog niet ingevuld en blijft verborgen. */
+/** Items met een naam; een item zonder naam is nog niet ingevuld en blijft verborgen. */
 const metNaam = (s: PaklijstSpul) => s.naam.trim() !== "";
 
 function bewaarSleutel(clusterId: string) {
@@ -13,7 +13,7 @@ function bewaarSleutel(clusterId: string) {
 }
 
 
-/** Eén spul met zijn onderdelen: een vinkje, de naam, het aantal en een eventuele toelichting. */
+/** Eén item met zijn onderdelen: een vinkje, de naam, het aantal en een eventuele toelichting. */
 function SpulRij({ s, onderdeel = false, afgevinkt, wissel }: { s: PaklijstSpul; onderdeel?: boolean; afgevinkt: Set<string>; wissel: (id: string) => void }) {
   const id = `spul-${s.id}`;
   const gedaan = afgevinkt.has(s.id);
@@ -39,7 +39,7 @@ function SpulRij({ s, onderdeel = false, afgevinkt, wissel }: { s: PaklijstSpul;
 
 /**
  * De paklijst om te lezen en af te vinken. Wat je afvinkt blijft alleen op deze telefoon bewaard (niet in de database), zodat
- * er niets van studenten wordt opgeslagen. Optionele spullen tellen niet mee in de voortgang.
+ * er niets van studenten wordt opgeslagen. Optionele items tellen niet mee in de voortgang.
  */
 export function PaklijstLezen({ clusterId, categorieen }: { clusterId: string; categorieen: PaklijstCategorie[] }) {
   const [afgevinkt, setAfgevinkt] = useState<Set<string>>(new Set());

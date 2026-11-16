@@ -39,7 +39,7 @@ function useBewerking() {
   return { naam, bezig, fout, setFout, uitvoeren };
 }
 
-/** Het vinkje "Optioneel" van een spul. Slaat direct op. */
+/** Het vinkje "Optioneel" van een item. Slaat direct op. */
 function OptioneelVeld({ clusterId, spul }: { clusterId: string; spul: PaklijstSpul }) {
   const { naam, bezig, fout, uitvoeren } = useBewerking();
   const [aan, setAan] = useState(spul.optioneel);
@@ -63,13 +63,13 @@ function OptioneelVeld({ clusterId, spul }: { clusterId: string; spul: PaklijstS
   );
 }
 
-/** Een spul (of een onderdeel van een spul) om te bewerken: naam, aantal, toelichting en optioneel. */
+/** Een item (of een onderdeel van een item) om te bewerken: naam, aantal, toelichting en optioneel. */
 function SpulEditor({
   clusterId, categorie, spul, nummer, aantalBroers, onderdeel = false,
 }: { clusterId: string; categorie: PaklijstCategorie; spul: PaklijstSpul; nummer: number; aantalBroers: number; onderdeel?: boolean }) {
   const { naam, bezig, fout, uitvoeren } = useBewerking();
   const [verwijderen, setVerwijderen] = useState(false);
-  const wat = onderdeel ? "onderdeel" : "spul";
+  const wat = onderdeel ? "onderdeel" : "item";
   const label = `${categorie.naam}, ${wat} ${nummer}`;
   const opslaan = (veld: "naam" | "aantal" | "toelichting") => (oud: string, nieuw: string, wie: string) =>
     paklijstSpulVeldOpslaan(clusterId, spul.id, veld, oud, nieuw, wie);
@@ -80,7 +80,7 @@ function SpulEditor({
         <div className="min-w-0 flex-1">
           <OpslaanVeld
             id={`spul-${spul.id}-naam`} label={`${label}, naam`} ariaLabel={`${label}, naam`} soort="kort" maxLengte={150}
-            begin={spul.naam} compact placeholder={onderdeel ? "Naam van het onderdeel" : "Naam van het spul"} opslaan={opslaan("naam")}
+            begin={spul.naam} compact placeholder={onderdeel ? "Naam van het onderdeel" : "Naam van het item"} opslaan={opslaan("naam")}
           />
         </div>
         <div className="flex shrink-0 gap-1">
@@ -113,7 +113,7 @@ function SpulEditor({
 
       {verwijderen && (
         <div role="alert" className="mt-2 rounded-han border-2 border-actie p-3">
-          <p className="font-bold text-kop">{onderdeel ? "Dit onderdeel verwijderen?" : "Dit spul met zijn onderdelen verwijderen?"}</p>
+          <p className="font-bold text-kop">{onderdeel ? "Dit onderdeel verwijderen?" : "Dit item met zijn onderdelen verwijderen?"}</p>
           <p className="text-sm text-zacht">De inhoud blijft bewaard in het logboek, maar verdwijnt van de lijst.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button type="button" disabled={bezig} className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60"
@@ -147,7 +147,7 @@ function SpulEditor({
   );
 }
 
-/** Een lijst plakken: elke regel wordt een spul; een streepje of inspringen maakt een onderdeel; | scheidt naam, aantal en toelichting. */
+/** Een lijst plakken: elke regel wordt een item; een streepje of inspringen maakt een onderdeel; | scheidt naam, aantal en toelichting. */
 function PlakPaneel({ clusterId, categorie }: { clusterId: string; categorie: PaklijstCategorie }) {
   const { naam, bezig, fout, uitvoeren } = useBewerking();
   const [tekst, setTekst] = useState("");
@@ -156,7 +156,7 @@ function PlakPaneel({ clusterId, categorie }: { clusterId: string; categorie: Pa
     <details className="rounded-han border border-rand p-3">
       <summary className="flex min-h-aanraak cursor-pointer items-center gap-2 font-bold text-kop"><ListPlus aria-hidden className="size-5" /> Plak een lijst in {categorie.naam}</summary>
       <p className="mt-1 text-sm text-zacht">
-        Elke regel wordt een spul. Begin een regel met een streepje (-) of spring in om er een onderdeel van het spul erboven van te maken.
+        Elke regel wordt een item. Begin een regel met een streepje (-) of spring in om er een onderdeel van het item erboven van te maken.
         Met een rechte streep scheid je naam, aantal en toelichting, bijvoorbeeld: Slaapzak | 1 | warm genoeg.
       </p>
       <label className="mt-2 block font-medium text-kop" htmlFor={`plak-${categorie.id}`}>Lijst voor {categorie.naam}</label>
@@ -195,7 +195,7 @@ function CategorieKaart({
     <details className="rounded-han border border-rand bg-vlak p-3" open={aantalInBlok === 1}>
       <summary className="flex min-h-aanraak cursor-pointer flex-col justify-center">
         <span className="text-xl font-bold text-kop">{categorie.naam}</span>
-        <span className="text-sm text-zacht">{aantal === 0 ? "Nog geen spullen" : `${aantal} ${aantal === 1 ? "regel" : "regels"}`}</span>
+        <span className="text-sm text-zacht">{aantal === 0 ? "Nog geen items" : `${aantal} ${aantal === 1 ? "regel" : "regels"}`}</span>
       </summary>
 
       <div className="mt-2 flex items-start gap-2">
@@ -245,7 +245,7 @@ function CategorieKaart({
       <div className="mt-3 flex flex-col gap-2">
         <button type="button" disabled={bezig} onClick={() => void uitvoeren(() => paklijstSpulToevoegen(clusterId, categorie.id, null, naam))}
           className="flex min-h-aanraak items-center justify-center gap-2 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop disabled:opacity-60">
-          <Plus aria-hidden className="size-5" /> Spul toevoegen aan {categorie.naam}
+          <Plus aria-hidden className="size-5" /> Item toevoegen aan {categorie.naam}
         </button>
         <PlakPaneel clusterId={clusterId} categorie={categorie} />
       </div>
@@ -279,7 +279,7 @@ function CategorieToevoegen({ clusterId, blok }: { clusterId: string; blok: Pakl
   );
 }
 
-/** Het bewerkscherm van de paklijst: per blok de categorieën met hun spullen. */
+/** Het bewerkscherm van de paklijst: per blok de categorieën met hun items. */
 export function PaklijstEditor({ clusterId, categorieen }: { clusterId: string; categorieen: PaklijstCategorie[] }) {
   return (
     <div className="flex flex-col gap-8">

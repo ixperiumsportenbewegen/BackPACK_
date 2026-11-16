@@ -20,14 +20,14 @@ export interface PaklijstCategorie {
 export interface Paklijst {
   clusterId: string;
   categorieen: PaklijstCategorie[];
-  /** Wanneer en door wie er voor het laatst iets is bijgewerkt (spullen en door de stuurgroep gemaakte of gewijzigde categorieën). */
+  /** Wanneer en door wie er voor het laatst iets is bijgewerkt (items en door de stuurgroep gemaakte of gewijzigde categorieën). */
   bijgewerkt: { moment: string; naam: string | null } | null;
 }
 
-/** Een spul telt mee op de lijst zodra het een naam heeft. */
+/** Een item telt mee op de lijst zodra het een naam heeft. */
 export const heeftNaam = (s: PaklijstSpul) => s.naam.trim() !== "";
 
-/** Alle spullen met een naam (ook onderdelen), voor de voortgang en om te weten of de lijst leeg is. */
+/** Alle items met een naam (ook onderdelen), voor de voortgang en om te weten of de lijst leeg is. */
 export function alleSpullen(p: Paklijst): PaklijstSpul[] {
   return p.categorieen.flatMap((c) => c.spullen.flatMap((s) => [s, ...s.onderdelen])).filter(heeftNaam);
 }

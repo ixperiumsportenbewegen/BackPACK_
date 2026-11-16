@@ -1,6 +1,6 @@
 /**
- * De persoonlijke paklijst: twee vaste blokken, zoals in de paklijst van eerdere jaren. De categorieën en spullen komen
- * uit de database (per cluster); de vaste categorieën worden bij het aanmaken van een cluster klaargezet zonder spullen.
+ * De persoonlijke paklijst: twee vaste blokken, zoals in de paklijst van eerdere jaren. De categorieën en items komen
+ * uit de database (per cluster); de vaste categorieën worden bij het aanmaken van een cluster klaargezet zonder items.
  */
 export type PaklijstBlokCode = "persoon" | "groepje";
 

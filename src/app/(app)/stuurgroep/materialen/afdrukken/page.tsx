@@ -36,7 +36,7 @@ export default async function MaterialenAfdrukken({ searchParams }: { searchPara
         <header className="break-inside-avoid border-b-4 border-thema pb-3">
           <p className="text-sm font-medium text-zacht">Ardennen-meerdaagse · 28–30 juni 2027</p>
           <h1 className="text-3xl">Paklijst {naam}</h1>
-          <p className="mt-1 text-tekst">Vul Mee, Kamp en Retour in. Zet bij een verschil een opmerking. Afgedrukt op {vandaag}.</p>
+          <p className="mt-1 text-tekst">Vul Mee, Aanwezig en Retour in. Zet bij een verschil een opmerking. Afgedrukt op {vandaag}.</p>
         </header>
         {groepen.map(({ c, items }) => (
           <section key={c.id} className="break-inside-avoid">
@@ -47,7 +47,7 @@ export default async function MaterialenAfdrukken({ searchParams }: { searchPara
                   <th scope="col" className="border border-rand p-1">Materiaal</th>
                   <th scope="col" className="w-14 border border-rand p-1 text-center">Plan</th>
                   <th scope="col" className="w-14 border border-rand p-1 text-center">Mee</th>
-                  <th scope="col" className="w-14 border border-rand p-1 text-center">Kamp</th>
+                  <th scope="col" className="w-16 border border-rand p-1 text-center">Aanwezig</th>
                   <th scope="col" className="w-14 border border-rand p-1 text-center">Retour</th>
                   <th scope="col" className="w-1/4 border border-rand p-1">Opmerking</th>
                 </tr>

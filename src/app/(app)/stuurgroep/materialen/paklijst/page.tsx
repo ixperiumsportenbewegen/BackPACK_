@@ -8,7 +8,7 @@ import { Paklijst } from "./Paklijst";
 
 export const metadata = { title: "Paklijst · BackPACK_" };
 
-/** De paklijst voor het kamp (inpakken, op kamp, retour). Alle stuurgroepen en de docent mogen hem invullen. */
+/** De paklijst voor de meerdaagse (inpakken, op locatie, retour). Alle stuurgroepen en de docent mogen hem invullen. */
 export default async function PaklijstPagina() {
   const profiel = (await getProfiel())!;
   if (profiel.soort !== "stuurgroep" && profiel.soort !== "docent") redirect("/");
@@ -22,7 +22,7 @@ export default async function PaklijstPagina() {
       </Link>
       <PaginaKop titel="Paklijst" foto="ochtend-tentterrein" />
       <p className="text-zacht">
-        Houd bij wat er echt meegaat, wat er op kamp is en wat er terugkomt, per locatie. Wat er echt is telt direct mee voor de projectgroepen:
+        Houd bij wat er echt meegaat, wat er op de locatie is en wat er terugkomt, per locatie. Wat er echt is telt direct mee voor de projectgroepen:
         als er minder is dan gepland, krijgen zij daar een melding van.
       </p>
       {status.status !== "definitief" && (

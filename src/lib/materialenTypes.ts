@@ -64,7 +64,7 @@ export interface Aanvraag {
   createdAt: string;
 }
 
-/** Eén regel van de paklijst: wat er is meegenomen, op kamp aanwezig is en teruggekomen. */
+/** Eén regel van de paklijst: wat er is meegenomen, op locatie aanwezig is en teruggekomen. */
 export interface Telling {
   materiaalId: string;
   locatie: Locatie;

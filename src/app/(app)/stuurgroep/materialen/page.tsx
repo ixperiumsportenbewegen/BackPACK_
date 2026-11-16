@@ -37,7 +37,7 @@ export default async function MaterialenPagina() {
         {[
           { href: "/stuurgroep/materialen/aanvragen", tekst: "Aanvragen van projectgroepen" },
           { href: "/stuurgroep/materialen/behoefte", tekst: "Behoefte en tekorten" },
-          { href: "/stuurgroep/materialen/paklijst", tekst: "Paklijst voor het kamp" },
+          { href: "/stuurgroep/materialen/paklijst", tekst: "Paklijst voor de meerdaagse" },
         ].map((l) => (
           <Link key={l.href} href={l.href} className="flex min-h-aanraak items-center justify-between rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
             {l.tekst} <ChevronRight aria-hidden className="size-5 shrink-0" />

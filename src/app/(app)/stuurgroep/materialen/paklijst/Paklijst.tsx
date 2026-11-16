@@ -12,7 +12,7 @@ type Veld = "meegenomen" | "op_kamp" | "retour";
 
 const STAPPEN: { code: Stap; naam: string; veld: Veld; refLabel: string; veldLabel: string; uitleg: string }[] = [
   { code: "inpakken", naam: "Inpakken", veld: "meegenomen", refLabel: "Plan", veldLabel: "Mee", uitleg: "Vink aan wat klopt met de planning of pas het aantal aan dat echt meegaat." },
-  { code: "op_kamp", naam: "Op kamp", veld: "op_kamp", refLabel: "Mee", veldLabel: "Kamp", uitleg: "Controleer bij aankomst of alles er is. Pas het aantal aan als er iets mist." },
+  { code: "op_kamp", naam: "Op locatie", veld: "op_kamp", refLabel: "Mee", veldLabel: "Aanwezig", uitleg: "Controleer bij aankomst of alles er is. Pas het aantal aan als er iets mist." },
   { code: "retour", naam: "Retour", veld: "retour", refLabel: "Mee", veldLabel: "Retour", uitleg: "Tel bij het opruimen wat er terugkomt. Het verschil laat zien wat er mist." },
 ];
 
@@ -133,7 +133,7 @@ function PakRij({
 }
 
 /**
- * De paklijst voor het kamp: per locatie en per stap (inpakken, op kamp, retour) wat er klopt en wat niet.
+ * De paklijst voor de meerdaagse: per locatie en per stap (inpakken, op locatie, retour) wat er klopt en wat niet.
  * Wat er echt is telt direct mee in de beschikbaarheid voor de projectgroepen.
  */
 export function Paklijst({ materialen, categorieen, tellingen }: { materialen: Materiaal[]; categorieen: Categorie[]; tellingen: Telling[] }) {

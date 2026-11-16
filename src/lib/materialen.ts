@@ -130,7 +130,7 @@ export async function laadTellingen(): Promise<Telling[]> {
 
 /**
  * Meldingen voor een projectgroep: een gekozen materiaal is niet meer beschikbaar of er is een tekort.
- * Zo kan de groep er op tijd op anticiperen, ook als de voorraad tijdens het inpakken of op kamp lager blijkt.
+ * Zo kan de groep er op tijd op anticiperen, ook als de voorraad tijdens het inpakken of op locatie lager blijkt.
  */
 export async function laadMateriaalMeldingen(avfId: string): Promise<MateriaalMelding[]> {
   const [regels, materialen, beschikbaar] = await Promise.all([laadAvfMaterialen(avfId), laadMaterialen(), laadBeschikbaarheid(avfId)]);

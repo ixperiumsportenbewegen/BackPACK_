@@ -321,7 +321,7 @@ export async function aanvraagAfhandelen(id: string, status: "afgehandeld" | "af
 
 // ------------------------------------------------------------------- paklijst
 
-/** Eén veld van de paklijst bijwerken (meegenomen, op kamp, retour of opmerking). Alle stuurgroepen mogen dat. */
+/** Eén veld van de paklijst bijwerken (meegenomen, op locatie, retour of opmerking). Alle stuurgroepen mogen dat. */
 export async function paklijstZetten(
   materiaalId: string, locatie: "camping" | "bivak", veld: "meegenomen" | "op_kamp" | "retour" | "opmerking",
   waarde: number | null, tekst: string, naam: string, verwacht: string | null,

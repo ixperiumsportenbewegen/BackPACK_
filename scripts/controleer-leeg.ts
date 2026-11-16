@@ -68,6 +68,10 @@ async function main() {
   if (regels) meld(`${regels} losse budgetaanvraag/aanvragen`);
   const dl = await telling("deadline", (q) => q.eq("cluster_id", cluster.id));
   if (dl) meld(`${dl} deadline(s)`);
+  const planVelden = await telling("calamiteit_veld", (q) => q.eq("cluster_id", cluster.id));
+  if (planVelden) meld(`${planVelden} tekstveld(en) in het calamiteitenplan`);
+  const planRegels = await telling("calamiteit_item", (q) => q.eq("cluster_id", cluster.id));
+  if (planRegels) meld(`${planRegels} regel(s) in het calamiteitenplan`);
   const log = await telling("wijziging", (q) => q.eq("cluster_id", cluster.id));
   if (log) meld(`${log} logregel(s)`);
 

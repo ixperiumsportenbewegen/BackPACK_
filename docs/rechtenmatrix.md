@@ -17,6 +17,8 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | cluster.budget_totaal | L S | L S | via `budget_resterend` | via `budget_resterend` | – |
 | cluster.teams_link | L S | L | L | L | L |
 | cluster.forms_link | L S | L, S voor Communicatie & Financiën van het eigen cluster (via `cluster_forms_link_zetten`) | L | L | L |
+| cluster.whatsapp_link (groepsapp voor noodmeldingen) | L S | L, S via `cluster_whatsapp_link_zetten` (hele stuurgroep van het eigen cluster) | L | L | L |
+| calamiteit_veld, calamiteit_item (calamiteitenplan) | L S | L, S (hele stuurgroep van het eigen cluster, via functies) | L | L | L (besluit 2026-11-16: iedereen in het eigen cluster leest het plan; een ander cluster niets) |
 | systeem_instelling (markering livegang) | – (alleen server) | – | – | – | – |
 | meerdaagsethema | L S | L S | L | L | L |
 | stuurgroeprol (namen studenten) | L S | L S (eigen rol) | L | L | L |
@@ -68,6 +70,10 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `budget_resterend(cluster_id)` | Iedereen in het cluster, docent | Budget min wat is toegekend; geeft alleen dat bedrag terug |
 | `account_wachtwoord_resetten(account_id)` | Docent | In de app: server-actie op de beheerpagina met de service role (controleert eerst of de gebruiker de docent is); het nieuwe wachtwoord wordt één keer getoond aan de docent en alle sessies van het account worden ingetrokken (`account_sessies_verwijderen`, alleen voor de service role). Staat in het logboek |
 | `cluster_forms_link_zetten(cluster_id, link, naam)` | Communicatie & Financiën van het cluster, docent | Stelt de Forms-link in (https, geen spaties; leeg haalt hem weg); staat in het logboek |
+| `calamiteit_veld_opslaan(cluster_id, sleutel, oud, nieuw, naam)` | Stuurgroep van het cluster, docent | Slaat één tekstveld van het calamiteitenplan op; alleen als het veld nog de waarde `oud` heeft (anders conflict met de huidige waarde); leeg wist het veld; legt oude en nieuwe tekst met naam vast in het logboek |
+| `calamiteit_item_toevoegen(cluster_id, lijst, naam)`, `calamiteit_item_veld_opslaan(id, veld, oud, nieuw, naam)`, `calamiteit_item_verplaatsen(id, omhoog, naam)`, `calamiteit_item_verwijderen(id, naam)` | Stuurgroep van het cluster, docent | Regels in de lijsten van het calamiteitenplan (maximaal 50 per lijst), met dezelfde regels voor opslaan per veld; verwijderen bewaart de inhoud in het logboek |
+| `cluster_whatsapp_link_zetten(cluster_id, link, naam)` | Stuurgroep van het cluster, docent | Stelt de link naar de groepsapp in (https, geen spaties; leeg haalt hem weg); staat in het logboek |
+| `calamiteitenplan_overnemen(van_cluster, naar_cluster, naam)` | Alleen docent | Kopieert het hele plan van het ene cluster naar het andere en vervangt wat daar stond; de groepsapp-link wordt niet meegekopieerd |
 | `blijf_actief()` | Iedereen, ook niet ingelogd | Geeft alleen het aantal edities terug (voor `/api/blijf-actief`) |
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.

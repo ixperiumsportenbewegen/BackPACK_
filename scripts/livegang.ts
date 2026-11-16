@@ -3,7 +3,7 @@
  *
  *  - maakt eerst een export (export/voor-livegang-<tijd>.json en .xlsx);
  *  - verwijdert alle AVF-gegevens van het cluster: inhoud, fasen, onderdelen, versies, verbeterverzoeken, themachecks,
- *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, logboek en de bestanden in Storage;
+ *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, het calamiteitenplan, logboek en de bestanden in Storage;
  *  - zet het meerdaagsethema, de rolverdeling en de namen van de stuurgroepleden terug naar leeg;
  *  - laadt de basisgegevens opnieuw (npm run seed) zonder voorbeeld-AVF: de groepen krijgen weer het standaardtijdvak;
  *  - maakt nieuwe wachtwoorden voor alle accounts van het cluster en trekt hun sessies in.
@@ -104,7 +104,8 @@ async function overzicht(c: Cluster) {
     avfs: ids.length, ids,
     onderdelen: await perAvf("avf_onderdeel"), versies: await perAvf("avf_versie"), verzoeken: await perAvf("verbeterverzoek"),
     themachecks: await perAvf("themacheck"), materialen: await perAvf("avf_materiaal"), materiaalaanvragen: await perAvf("materiaal_aanvraag"),
-    budgetaanvragen: await perAvf("budgetaanvraag"), deadlines: await tel("deadline", (q) => q.eq("cluster_id", c.id)), logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
+    budgetaanvragen: await perAvf("budgetaanvraag"), deadlines: await tel("deadline", (q) => q.eq("cluster_id", c.id)),
+    calamiteitenplan: (await tel("calamiteit_veld", (q) => q.eq("cluster_id", c.id))) + (await tel("calamiteit_item", (q) => q.eq("cluster_id", c.id))), logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
     accounts, bestanden,
   };
 }
@@ -174,8 +175,11 @@ async function maakSchoon(c: Cluster, ids: string[]) {
   // 4. deadlines (testdata: de stuurgroep stelt ze na de livegang zelf in) en het logboek van dit cluster (na alle wijzigingen
   //    hierboven, want die loggen zelf ook)
   await ok(admin.from("deadline").delete().eq("cluster_id", c.id), "deadlines");
+  // het calamiteitenplan is testdata tot de livegang; de link naar de groepsapp blijft staan (net als de Teams- en Forms-link)
+  await ok(admin.from("calamiteit_veld").delete().eq("cluster_id", c.id), "calamiteitenplan (velden)");
+  await ok(admin.from("calamiteit_item").delete().eq("cluster_id", c.id), "calamiteitenplan (regels)");
   await ok(admin.from("wijziging").delete().eq("cluster_id", c.id), "logboek");
-  console.log("  thema, rolverdeling, namen, deadlines en logboek teruggezet");
+  console.log("  thema, rolverdeling, namen, deadlines, calamiteitenplan en logboek teruggezet");
 }
 
 async function nieuweWachtwoorden(clusters: Cluster[]) {
@@ -223,7 +227,7 @@ async function main() {
     const o = await overzicht(c);
     per.set(c.code, o);
     console.log(`${c.naam} (${c.code}): ${o.avfs} AVF's (${o.onderdelen} onderdelen, ${o.versies} versies, ${o.verzoeken} verbeterverzoeken, ${o.themachecks} themachecks),`);
-    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
+    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.calamiteitenplan} regels in het calamiteitenplan, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
     console.log(zonderWachtwoorden ? `  ${o.accounts} accounts houden hun wachtwoord (--zonder-wachtwoorden).` : `  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
   }
   console.log("\nBlijft staan: de materialenlijst, het programma (tijden en activiteiten), de links, het clusterbudget, het docentaccount en cluster TEST.");

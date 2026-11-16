@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { JaNeeVeld, TekstVeld } from "@/components/avf/Velden";
 import { WEER_SCENARIOS, WEER_VELDEN } from "@/config/avf-velden";
@@ -49,7 +50,9 @@ export function WeerEditor({ begin, eigenaar }: { begin: Record<string, Scenario
 }
 
 /** De EHBO-vraag: ja geeft een veld voor de maatregelen, nee verwijst naar het algemene EHBO-plan. */
-export function EhboBlok({ aanvullend, maatregelen, eigenaar }: { aanvullend: boolean | null; maatregelen: string | null; eigenaar?: string | null }) {
+export function EhboBlok({
+  aanvullend, maatregelen, eigenaar, planKlaar = false,
+}: { aanvullend: boolean | null; maatregelen: string | null; eigenaar?: string | null; planKlaar?: boolean }) {
   const [ja, setJa] = useState<boolean | null>(aanvullend);
   return (
     <div className="flex flex-col gap-3">
@@ -71,7 +74,12 @@ export function EhboBlok({ aanvullend, maatregelen, eigenaar }: { aanvullend: bo
       )}
       {ja === false && (
         <p className="rounded-han bg-achtergrond p-3 text-kop">
-          Voor deze belevenis geldt het algemene EHBO-plan. Het algemene EHBO-plan volgt.
+          Voor deze belevenis geldt het algemene calamiteitenplan (inclusief EHBO).{" "}
+          {planKlaar ? (
+            <Link href="/meer/calamiteitenplan" className="font-bold underline">Open het calamiteitenplan</Link>
+          ) : (
+            "Het calamiteitenplan volgt."
+          )}
         </p>
       )}
     </div>

@@ -30,6 +30,8 @@ export const EXPORT_TABELLEN: { naam: string; sorteer: string }[] = [
   { naam: "materiaal_aanvraag", sorteer: "created_at" },
   { naam: "budgetaanvraag", sorteer: "created_at" },
   { naam: "deadline", sorteer: "created_at" },
+  { naam: "calamiteit_veld", sorteer: "created_at" },
+  { naam: "calamiteit_item", sorteer: "created_at" },
   { naam: "wijziging", sorteer: "created_at" },
 ];
 

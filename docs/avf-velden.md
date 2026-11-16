@@ -71,7 +71,7 @@ Per onderdeel (`avf_onderdeel`):
 | `veiligheid.ehbo.aanvullend` | Zijn aanvullende EHBO-maatregelen nodig? (ja/nee) | ✔ | VE | V&W | P | ✔ |
 | `veiligheid.ehbo.maatregelen` | Welke? (wie, waar, middelen) | ◐ als ja | VE | V&W | P | ✔ |
 
-Bij "nee" toont de app: "Voor deze belevenis geldt het algemene EHBO-plan" met een link naar de informatiepagina van Veiligheid & Welzijn (INF-03). Zolang die pagina er niet is: "Het algemene EHBO-plan volgt".
+Bij "nee" toont de app: "Voor deze belevenis geldt het algemene calamiteitenplan (inclusief EHBO)" met een link naar het calamiteitenplan onder Meer (INF-03). Zolang er niets in dat plan staat: "Het calamiteitenplan volgt".
 
 ## F Materialen en financiën
 | Sleutel | Label | Verplicht | PG-rol | SG-rol | PACK | W |

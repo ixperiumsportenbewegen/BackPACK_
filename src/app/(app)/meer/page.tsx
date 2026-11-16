@@ -1,7 +1,7 @@
 import { SubmitKnop } from "@/components/SubmitKnop";
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
-import { CalendarClock, CalendarDays, FileText, Package, Palette, Settings, Users, UsersRound } from "lucide-react";
+import { CalendarClock, CalendarDays, FileText, Package, Palette, Settings, Siren, Users, UsersRound } from "lucide-react";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -19,6 +19,14 @@ export default async function Meer() {
         <p className="text-sm font-medium text-zacht">Ingelogd als</p>
         <p className="font-heading text-2xl font-bold text-kop">{profiel.label}</p>
       </section>
+
+      <Link
+        href="/meer/calamiteitenplan"
+        className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-merk bg-vlak px-4 font-bold text-kop"
+      >
+        <Siren aria-hidden className="size-5 text-merk" strokeWidth={1.75} />
+        Calamiteitenplan (incl. EHBO)
+      </Link>
 
       <Link
         href="/programma"

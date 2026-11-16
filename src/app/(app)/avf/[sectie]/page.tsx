@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AvfEditor } from "@/components/avf/AvfEditor";
 import { FaseEditor } from "@/components/avf/FaseEditor";
@@ -20,6 +21,7 @@ import { laadAanvragen, laadAvfMaterialen, laadBeschikbaarheid, laadCategorieen,
 import { AVF_VELDEN, SECTIES, veldenVanSectie, type AvfVeld, type SectieCode } from "@/config/avf-velden";
 import { laadEigenAvf, type AvfGegevens } from "@/lib/avfData";
 import { laadDeadlines } from "@/lib/deadlineData";
+import { laadPlan, planHeeftInhoud } from "@/lib/calamiteitenplan";
 import { leesWaarde, sectieVoortgang } from "@/lib/avfVoortgang";
 import { buren } from "@/lib/avfNavigatie";
 import { getProfiel } from "@/lib/profiel";
@@ -112,6 +114,9 @@ export default async function SectiePagina({
   const kop = <SectieKop sectie={code} status={voortgang.status} ontbrekend={voortgang.ontbrekend.map((o) => o.melding)} deadline={deadline} />;
   const inhoud = avf.inhoud;
 
+  // Het algemene calamiteitenplan (incl. EHBO) staat onder Meer; sectie E en H verwijzen ernaar zodra er iets in staat.
+  const planKlaar = code === "E" || code === "H" ? planHeeftInhoud(await laadPlan(avf.clusterId)) : false;
+
   let inhoudBlok: React.ReactNode = null;
 
   if (code === "A") {
@@ -175,7 +180,17 @@ export default async function SectiePagina({
       </>
     );
   } else if (code === "B" || code === "H") {
-    inhoudBlok = <Velden velden={veldenVanSectie(code, "avf").filter((v) => EENVOUDIG.has(v.veldtype))} avf={avf} />;
+    inhoudBlok = (
+      <>
+        <Velden velden={veldenVanSectie(code, "avf").filter((v) => EENVOUDIG.has(v.veldtype))} avf={avf} />
+        {code === "H" && (
+          <p className="rounded-han bg-achtergrond p-3 text-kop">
+            Wie communiceert bij een calamiteit? Het algemene calamiteitenplan geldt voor iedereen.{" "}
+            {planKlaar ? <Link href="/meer/calamiteitenplan" className="font-bold underline">Open het calamiteitenplan</Link> : "Het calamiteitenplan volgt."}
+          </p>
+        )}
+      </>
+    );
   } else if (code === "C") {
     const doelen = (inhoud.doelen.persoonlijk as LijstItem[] | undefined) ?? [];
     inhoudBlok = (
@@ -223,7 +238,7 @@ export default async function SectiePagina({
         </section>
         <section className="flex flex-col gap-2">
           <h2 className="text-xl">EHBO</h2>
-          <EhboBlok aanvullend={typeof ehbo.aanvullend === "boolean" ? ehbo.aanvullend : null} maatregelen={(ehbo.maatregelen as string | null) ?? null} />
+          <EhboBlok aanvullend={typeof ehbo.aanvullend === "boolean" ? ehbo.aanvullend : null} maatregelen={(ehbo.maatregelen as string | null) ?? null} planKlaar={planKlaar} />
         </section>
       </>
     );

@@ -259,6 +259,19 @@ Elk AVF heeft automatisch één (aanvankelijk lege) aanvraag van soort `avf`: he
 
 Functie `budget_resterend(cluster_id)` (`security definer`): budget_totaal minus toegekend. Projectgroepen gebruiken deze functie; zij kunnen de aanvragen van anderen niet lezen.
 
+## Calamiteitenplan
+
+Een algemeen calamiteitenplan (incl. EHBO) per cluster, als sectie in de app. De opzet (onderdelen en velden) staat in `src/config/calamiteitenplan.ts`; de inhoud komt van de stuurgroep.
+
+### calamiteit_veld
+Losse tekstvelden. Sleutel: (`cluster_id`, `sleutel`). `tekst` (maximaal 4000 tekens), `bijgewerkt_door_naam`, `created_at`, `updated_at`.
+
+### calamiteit_item
+Regels in lijsten (contactpersonen, ziekenhuizen, situaties met verhoogd risico, zorgsysteem, overig): `id`, `cluster_id`, `lijst` (sleutel van de lijst), `volgorde`, `velden` (jsonb met tekstwaarden per veld), `bijgewerkt_door_naam`, tijden. Maximaal 50 regels per lijst.
+
+### cluster.whatsapp_link
+De link naar de groepsapp voor noodmeldingen (https, optioneel). Alleen een link: er is geen chat in de app.
+
 ## Logboek
 
 ### wijziging

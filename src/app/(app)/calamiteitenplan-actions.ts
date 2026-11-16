@@ -117,7 +117,7 @@ export async function groepsappLinkOpslaan(clusterId: string, link: string, naam
   return vertaal(res);
 }
 
-export type OvernemenResultaat = { status: "ok"; velden: number; regels: number } | { status: "fout"; melding: string };
+export type OvernemenResultaat = { status: "ok"; velden: number; regels: number; tekst: string } | { status: "fout"; melding: string };
 
 /** De docent kopieert het plan van het ene cluster naar het andere; het plan in het doelcluster wordt vervangen. */
 export async function planOvernemen(vanClusterId: string, naarClusterId: string, naam: string): Promise<OvernemenResultaat> {
@@ -128,7 +128,12 @@ export async function planOvernemen(vanClusterId: string, naarClusterId: string,
   const { data, error } = await supabase.rpc("calamiteitenplan_overnemen", { p_van: vanClusterId, p_naar: naarClusterId, p_naam: naam.trim().slice(0, 60) });
   if (error) return { status: "fout", melding: FOUT };
   const res = data as Rpc;
-  if (res.ok) { ververs(); return { status: "ok", velden: res.velden ?? 0, regels: res.regels ?? 0 }; }
+  if (res.ok) {
+    ververs();
+    const velden = res.velden ?? 0;
+    const regels = res.regels ?? 0;
+    return { status: "ok", velden, regels, tekst: `Overgenomen: ${velden} tekstvelden en ${regels} regels.` };
+  }
   if (res.reden === "ongeldig") return { status: "fout", melding: "Kies twee verschillende clusters." };
   return { status: "fout", melding: res.reden === "naam" ? NAAM_NODIG : FOUT };
 }

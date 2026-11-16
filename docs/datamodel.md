@@ -215,7 +215,7 @@ Eén lijst voor beide clusters, met de voorraad per locatie (op basis van ervari
 ### materiaal_categorie
 Vaste lijst van categorieën (`naam`, `volgorde`), beheerd door de docent en Logistiek & Facilitair van VD; VC kiest alleen. Startlijst: Afbakening en markering, Teamherkenning, Ballen, Sport- en spelmateriaal, Touwen en stokken, Archery tag, Veiligheid en communicatie, Organisatie en schrijfmateriaal, Opslag en Overig. Een categorie hernoemen werkt door bij alle materialen; verwijderen kan alleen als er geen materialen in zitten.
 
-### materiaal_telling (paklijst)
+### materiaal_telling (materiaalcontrole)
 PK (`materiaal_id`, `locatie`). `meegenomen`, `op_kamp`, `retour` (alle optioneel), `opmerking`, `bijgewerkt_door_naam`. Verschil = retour min meegenomen (of plan). Wat er echt is (`op_kamp`, anders `meegenomen`, anders de voorraad uit de lijst) telt mee in `materiaal_beschikbaar` en `materiaal_context`, zodat projectgroepen een tekort direct zien.
 
 ### materiaal_aanvraag
@@ -271,6 +271,16 @@ Regels in lijsten (contactpersonen, ziekenhuizen, situaties met verhoogd risico,
 
 ### cluster.whatsapp_link
 De link naar de groepsapp voor noodmeldingen (https, optioneel). Alleen een link: er is geen chat in de app.
+
+## Persoonlijke paklijst
+
+Wat neemt een student mee? Per cluster, gemaakt door de stuurgroep. Niet te verwarren met de materiaalcontrole (`materiaal_telling`). Twee vaste blokken (`persoon` en `groepje`, zie `src/config/paklijst.ts`).
+
+### paklijst_categorie
+`id`, `cluster_id`, `blok` (`persoon` of `groepje`), `naam` (1 tot 80 tekens), `volgorde`, `bijgewerkt_door_naam`, tijden. Elk cluster krijgt vooraf de vaste categorieën (zonder spullen) via `paklijst_standaard_categorieen`.
+
+### paklijst_item
+`id`, `cluster_id`, `categorie_id`, `bovenliggend_id` (null bij een spul; verwijst bij een onderdeel naar het spul, één niveau diep), `naam` (maximaal 150), `aantal` (vrije tekst, maximaal 40), `toelichting` (maximaal 500), `optioneel`, `volgorde`, `bijgewerkt_door_naam`, tijden. Een spul zonder naam is nog niet ingevuld en staat niet op de leesweergave. Wat een student afvinkt staat niet in de database maar alleen op het eigen toestel.
 
 ## Logboek
 

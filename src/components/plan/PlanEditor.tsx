@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Check, Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
-  groepsappLinkOpslaan, planItemToevoegen, planItemVeldOpslaan, planItemVerplaatsen, planItemVerwijderen, planOvernemen, planVeldOpslaan,
+  groepsappLinkOpslaan, planItemToevoegen, planItemVeldOpslaan, planItemVerplaatsen, planItemVerwijderen, planVeldOpslaan,
   type PlanResultaat,
 } from "@/app/(app)/calamiteitenplan-actions";
 import { NaamVeld, useNaam } from "@/components/NaamVeld";
@@ -15,11 +15,11 @@ import type { PlanItem } from "@/lib/calamiteitenplan";
 const NAAM_SLEUTEL = "backpack_plannaam";
 
 const NaamContext = createContext<{ naam: string }>({ naam: "" });
-const usePlanNaam = () => useContext(NaamContext);
+export const usePlanNaam = () => useContext(NaamContext);
 
-/** Omhult het bewerkscherm: vraagt één keer per telefoon om de naam van wie invult (komt in het logboek). */
-export function PlanBewerker({ children }: { children: React.ReactNode }) {
-  const [naam, setNaam] = useNaam(NAAM_SLEUTEL);
+/** Omhult een bewerkscherm: vraagt één keer per telefoon om de naam van wie invult (komt in het logboek). */
+export function BewerkerKader({ opslagSleutel, children }: { opslagSleutel: string; children: React.ReactNode }) {
+  const [naam, setNaam] = useNaam(opslagSleutel);
   return (
     <NaamContext.Provider value={{ naam }}>
       <div className="flex flex-col gap-4">
@@ -36,6 +36,11 @@ export function PlanBewerker({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Het bewerkscherm van het calamiteitenplan. */
+export function PlanBewerker({ children }: { children: React.ReactNode }) {
+  return <BewerkerKader opslagSleutel={NAAM_SLEUTEL}>{children}</BewerkerKader>;
+}
+
 type Melding = { soort: "bezig" | "ok" | "fout" | "waarschuwing"; tekst: string };
 
 const schoon = (t: string | null | undefined) => (t ?? "").trim();
@@ -44,8 +49,8 @@ const schoon = (t: string | null | undefined) => (t ?? "").trim();
  * Eén veld dat opslaat terwijl je typt en bij het verlaten. Heeft iemand anders het veld net gewijzigd, dan komt er een
  * waarschuwing met de huidige tekst in plaats van een overschrijving.
  */
-function OpslaanVeld({
-  id, label, ariaLabel, hulp, soort, maxLengte, begin, opslaan,
+export function OpslaanVeld({
+  id, label, ariaLabel, hulp, soort, maxLengte, begin, opslaan, compact = false, placeholder,
 }: {
   id: string;
   label: string;
@@ -55,6 +60,9 @@ function OpslaanVeld({
   maxLengte: number;
   begin: string | null;
   opslaan: (oud: string, nieuw: string, naam: string) => Promise<PlanResultaat>;
+  /** Compact: het label is alleen voor schermlezers en er is geen ruimte voor een melding tot er een melding is. */
+  compact?: boolean;
+  placeholder?: string;
 }) {
   const { naam } = usePlanNaam();
   const naamRef = useRef(naam);
@@ -95,7 +103,7 @@ function OpslaanVeld({
 
   const auto = useAutoBewaar(tekst, bewaar, { actief: !conflict });
   const gedeeld = {
-    id, "aria-label": ariaLabel, value: tekst, maxLength: maxLengte, autoComplete: "off",
+    id, "aria-label": ariaLabel, value: tekst, maxLength: maxLengte, autoComplete: "off", placeholder,
     onBlur: () => void auto.bewaarNu(),
     className: "w-full rounded-han border-2 border-zacht bg-vlak px-3 text-base text-tekst",
   };
@@ -106,8 +114,8 @@ function OpslaanVeld({
 
   return (
     <div>
-      <label htmlFor={id} className="block font-medium text-kop">{label}</label>
-      {hulp && <p className="text-sm text-zacht">{hulp}</p>}
+      <label htmlFor={id} className={compact ? "sr-only" : "block font-medium text-kop"}>{label}</label>
+      {hulp && !compact && <p className="text-sm text-zacht">{hulp}</p>}
       {soort === "lang" ? (
         <textarea {...gedeeld} rows={4} onChange={(e) => wijzig(e.target.value)} className={`${gedeeld.className} mt-1 py-2`} />
       ) : (
@@ -150,7 +158,7 @@ function OpslaanVeld({
       <p
         aria-live="polite"
         role={melding?.soort === "fout" ? "alert" : undefined}
-        className={`mt-1 min-h-5 text-sm font-medium ${melding?.soort === "fout" ? "text-fout" : "text-kop"}`}
+        className={`mt-1 text-sm font-medium ${compact && !melding ? "" : "min-h-5"} ${melding?.soort === "fout" ? "text-fout" : "text-kop"}`}
       >
         {melding?.soort === "ok" && <Check aria-hidden className="mr-1 inline size-4" />}
         {melding?.soort === "waarschuwing" && <TriangleAlert aria-hidden className="mr-1 inline size-4" />}
@@ -265,8 +273,21 @@ export function PlanLijstEditor({ clusterId, lijst, items }: { clusterId: string
   );
 }
 
-/** Alleen voor de docent: het plan van een ander cluster overnemen (het plan van dit cluster wordt vervangen). */
-export function OvernemenPaneel({ naarClusterId, naarNaam, bronnen }: { naarClusterId: string; naarNaam: string; bronnen: { id: string; naam: string }[] }) {
+/**
+ * Alleen voor de docent: het plan of de lijst van een ander cluster overnemen (wat er in dit cluster staat, wordt vervangen).
+ * `actie` is de server-actie die het overnemen doet.
+ */
+export function OvernemenPaneel({
+  naarClusterId, naarNaam, bronnen, onderwerp, uitleg, actie,
+}: {
+  naarClusterId: string;
+  naarNaam: string;
+  bronnen: { id: string; naam: string }[];
+  /** Bijvoorbeeld "plan" of "paklijst". */
+  onderwerp: string;
+  uitleg?: string;
+  actie: (vanClusterId: string, naarClusterId: string, naam: string) => Promise<{ status: "ok"; tekst: string } | { status: "fout"; melding: string }>;
+}) {
   const router = useRouter();
   const { naam } = usePlanNaam();
   const [bron, setBron] = useState(bronnen[0]?.id ?? "");
@@ -278,19 +299,19 @@ export function OvernemenPaneel({ naarClusterId, naarNaam, bronnen }: { naarClus
     setBericht(null);
     if (!naam.trim()) return setBericht({ fout: true, tekst: "Vul bovenaan eerst je naam in." });
     setBezig(true);
-    const res = await planOvernemen(bron, naarClusterId, naam);
+    const res = await actie(bron, naarClusterId, naam);
     setBezig(false);
     if (res.status === "ok") {
       setBevestigd(false);
-      setBericht({ fout: false, tekst: `Overgenomen: ${res.velden} tekstvelden en ${res.regels} regels.` });
+      setBericht({ fout: false, tekst: res.tekst });
       router.refresh();
     } else setBericht({ fout: true, tekst: res.melding });
   }
 
   return (
-    <section aria-label="Plan overnemen" className="flex flex-col gap-3 rounded-han border-2 border-kop bg-vlak p-4">
-      <h2 className="text-xl">Plan overnemen van een ander cluster</h2>
-      <p className="text-tekst">Kopieert het hele calamiteitenplan van een ander cluster naar {naarNaam}. De groepsapp-link wordt niet meegekopieerd.</p>
+    <section aria-label={`${onderwerp[0].toUpperCase()}${onderwerp.slice(1)} overnemen`} className="flex flex-col gap-3 rounded-han border-2 border-kop bg-vlak p-4">
+      <h2 className="text-xl">{onderwerp[0].toUpperCase()}{onderwerp.slice(1)} overnemen van een ander cluster</h2>
+      <p className="text-tekst">Kopieert het hele {onderwerp} van een ander cluster naar {naarNaam}. {uitleg}</p>
       <label className="flex flex-col gap-1 font-medium text-kop">
         Overnemen van
         <select value={bron} onChange={(e) => setBron(e.target.value)} className="min-h-aanraak rounded-han border-2 border-zacht bg-vlak px-3 text-base font-normal text-tekst">
@@ -299,14 +320,14 @@ export function OvernemenPaneel({ naarClusterId, naarNaam, bronnen }: { naarClus
       </label>
       <label className="flex min-h-aanraak items-start gap-3 font-medium text-kop">
         <input type="checkbox" checked={bevestigd} onChange={(e) => setBevestigd(e.target.checked)} className="mt-1 size-6 shrink-0" />
-        Ik weet dat het plan van {naarNaam} wordt vervangen. Wat er nu staat gaat verloren.
+        Ik weet dat het {onderwerp} van {naarNaam} wordt vervangen. Wat er nu staat gaat verloren.
       </label>
       {bericht && <p role={bericht.fout ? "alert" : "status"} className={`font-bold ${bericht.fout ? "text-fout" : "text-kop"}`}>{bericht.tekst}</p>}
       <button
         type="button" disabled={bezig || !bevestigd || !bron} onClick={() => void neemOver()}
         className="min-h-aanraak rounded-han bg-merk px-4 font-bold text-op-merk disabled:opacity-60"
       >
-        {bezig ? "Bezig met overnemen…" : "Plan overnemen"}
+        {bezig ? "Bezig met overnemen…" : `${onderwerp[0].toUpperCase()}${onderwerp.slice(1)} overnemen`}
       </button>
     </section>
   );

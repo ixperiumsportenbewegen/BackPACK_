@@ -144,7 +144,7 @@ test("de lijst bouwen, publiceren, kiezen, aanvragen, tekort zien, corrigeren en
   await expect(g.getByText("De stuurgroep heeft dit aantal aangepast naar 5.")).toBeVisible();
   await stuur.ctx.close();
 
-  // 9. Paklijst: bij het inpakken blijkt dat er minder is; de groep krijgt direct een melding
+  // 9. Materiaalcontrole: bij het inpakken blijkt dat er minder is; de groep krijgt direct een melding
   await l.goto("/stuurgroep/materialen/paklijst");
   await l.getByLabel("Wie telt er? (jouw naam)").fill(NAAM);
   await expect(l.getByRole("button", { name: "Inpakken", exact: true })).toHaveAttribute("aria-pressed", "true");
@@ -160,9 +160,9 @@ test("de lijst bouwen, publiceren, kiezen, aanvragen, tekort zien, corrigeren en
   await g.goto("/avf");
   await expect(g.getByRole("heading", { name: "Let op bij jullie materialen" })).toBeVisible();
 
-  // de papieren paklijst voor op de camping
+  // de papieren materiaalcontrole voor op de camping
   await l.getByRole("link", { name: /Papieren lijst camping/ }).click();
-  await expect(l.getByRole("heading", { name: "Paklijst camping" })).toBeVisible();
+  await expect(l.getByRole("heading", { name: "Materiaalcontrole camping" })).toBeVisible();
 
   // 10. VC past de lijst aan na publicatie, maar kan een gekozen materiaal niet verwijderen
   const vc = await nieuweSessie(browser, "vc-stuur-logistiek");

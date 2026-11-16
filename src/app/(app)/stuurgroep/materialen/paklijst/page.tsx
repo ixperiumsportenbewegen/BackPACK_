@@ -6,9 +6,9 @@ import { getProfiel } from "@/lib/profiel";
 import { laadCategorieen, laadLijstStatus, laadMaterialen, laadTellingen } from "@/lib/materialen";
 import { Paklijst } from "./Paklijst";
 
-export const metadata = { title: "Paklijst · BackPACK_" };
+export const metadata = { title: "Materiaalcontrole · BackPACK_" };
 
-/** De paklijst voor de meerdaagse (inpakken, op locatie, retour). Alle stuurgroepen en de docent mogen hem invullen. */
+/** De materiaalcontrole (inpakken, op locatie, retour). Alle stuurgroepen en de docent mogen hem invullen. */
 export default async function PaklijstPagina() {
   const profiel = (await getProfiel())!;
   if (profiel.soort !== "stuurgroep" && profiel.soort !== "docent") redirect("/");
@@ -20,7 +20,7 @@ export default async function PaklijstPagina() {
       <Link href="/stuurgroep/materialen" className="flex min-h-aanraak items-center gap-1 font-medium text-kop">
         <ChevronLeft aria-hidden className="size-5" /> Materialenlijst
       </Link>
-      <PaginaKop titel="Paklijst" foto="ochtend-tentterrein" />
+      <PaginaKop titel="Materiaalcontrole" foto="ochtend-tentterrein" />
       <p className="text-zacht">
         Houd bij wat er echt meegaat, wat er op de locatie is en wat er terugkomt, per locatie. Wat er echt is telt direct mee voor de projectgroepen:
         als er minder is dan gepland, krijgen zij daar een melding van.

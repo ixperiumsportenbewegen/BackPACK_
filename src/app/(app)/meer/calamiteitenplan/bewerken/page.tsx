@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { PaginaKop } from "@/components/PaginaKop";
 import { GroepsappLinkVeld, OvernemenPaneel, PlanBewerker, PlanLijstEditor, PlanTekstVeld } from "@/components/plan/PlanEditor";
 import { PLAN_SECTIES } from "@/config/calamiteitenplan";
+import { planOvernemen } from "../../../calamiteitenplan-actions";
 import { laadPlan } from "@/lib/calamiteitenplan";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
@@ -46,7 +47,7 @@ export default async function CalamiteitenplanBewerken() {
             {sectie.lijst && <PlanLijstEditor clusterId={cluster.id} lijst={sectie.lijst} items={plan.lijsten[sectie.lijst.sleutel] ?? []} />}
           </section>
         ))}
-        {profiel.soort === "docent" && bronnen.length > 0 && <OvernemenPaneel naarClusterId={cluster.id} naarNaam={cluster.naam} bronnen={bronnen} />}
+        {profiel.soort === "docent" && bronnen.length > 0 && <OvernemenPaneel naarClusterId={cluster.id} naarNaam={cluster.naam} bronnen={bronnen} onderwerp="plan" uitleg="De groepsapp-link wordt niet meegekopieerd." actie={planOvernemen} />}
       </PlanBewerker>
     </div>
   );

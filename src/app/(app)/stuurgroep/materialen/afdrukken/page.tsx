@@ -25,17 +25,17 @@ export default async function MaterialenAfdrukken({ searchParams }: { searchPara
   const vandaag = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Amsterdam" }).format(new Date());
 
   if (papierLocatie) {
-    // Paklijst om met pen in te vullen: plan uit de lijst, de rest leeg
+    // Materiaalcontrole om met pen in te vullen: plan uit de lijst, de rest leeg
     const naam = papierLocatie === "camping" ? "camping" : "bivak";
     return (
       <article className="flex flex-col gap-5">
         <Link href="/stuurgroep/materialen/paklijst" className="print:hidden flex min-h-aanraak items-center gap-1 font-medium text-kop">
-          <ChevronLeft aria-hidden className="size-5" /> Paklijst
+          <ChevronLeft aria-hidden className="size-5" /> Materiaalcontrole
         </Link>
         <AfdrukKnop />
         <header className="break-inside-avoid border-b-4 border-thema pb-3">
           <p className="text-sm font-medium text-zacht">Ardennen-meerdaagse · 28–30 juni 2027</p>
-          <h1 className="text-3xl">Paklijst {naam}</h1>
+          <h1 className="text-3xl">Materiaalcontrole {naam}</h1>
           <p className="mt-1 text-tekst">Vul Mee, Aanwezig en Retour in. Zet bij een verschil een opmerking. Afgedrukt op {vandaag}.</p>
         </header>
         {groepen.map(({ c, items }) => (

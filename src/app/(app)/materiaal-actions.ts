@@ -319,15 +319,15 @@ export async function aanvraagAfhandelen(id: string, status: "afgehandeld" | "af
   return { status: "fout", melding: FOUT };
 }
 
-// ------------------------------------------------------------------- paklijst
+// ------------------------------------------------------------------- materiaalcontrole
 
-/** Eén veld van de paklijst bijwerken (meegenomen, op locatie, retour of opmerking). Alle stuurgroepen mogen dat. */
+/** Eén veld van de materiaalcontrole bijwerken (meegenomen, op locatie, retour of opmerking). Alle stuurgroepen mogen dat. */
 export async function paklijstZetten(
   materiaalId: string, locatie: "camping" | "bivak", veld: "meegenomen" | "op_kamp" | "retour" | "opmerking",
   waarde: number | null, tekst: string, naam: string, verwacht: string | null,
 ): Promise<{ status: "ok"; updatedAt: string } | { status: "conflict"; huidigUpdatedAt: string | null } | { status: "fout"; melding: string }> {
   const supabase = await stuurgroepOfDocent();
-  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan de paklijst bijwerken." };
+  if (!supabase) return { status: "fout", melding: "Alleen de stuurgroep kan de materiaalcontrole bijwerken." };
   if (!naam.trim()) return { status: "fout", melding: NAAM_NODIG };
   if (veld !== "opmerking" && waarde !== null && (!Number.isInteger(waarde) || waarde < 0 || waarde > 99999)) return { status: "fout", melding: "Vul een heel getal van 0 of meer in." };
   const { data, error } = await supabase.rpc("materiaal_telling_zetten", {

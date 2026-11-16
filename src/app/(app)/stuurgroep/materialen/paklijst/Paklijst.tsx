@@ -133,7 +133,7 @@ function PakRij({
 }
 
 /**
- * De paklijst voor de meerdaagse: per locatie en per stap (inpakken, op locatie, retour) wat er klopt en wat niet.
+ * De materiaalcontrole: per locatie en per stap (inpakken, op locatie, retour) wat er klopt en wat niet.
  * Wat er echt is telt direct mee in de beschikbaarheid voor de projectgroepen.
  */
 export function Paklijst({ materialen, categorieen, tellingen }: { materialen: Materiaal[]; categorieen: Categorie[]; tellingen: Telling[] }) {

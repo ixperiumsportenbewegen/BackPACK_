@@ -11,7 +11,7 @@ Onderste balk met vier knoppen, voor elk account gelijk van vorm:
 | **Onze meerdaagse** | startscherm | startscherm | startscherm (met clusterkeuze VD, VC of TEST) | startscherm |
 | **Belevenissen** | eigen AVF bovenaan, daaronder de andere vijf (publiek) | alle zes AVF's met status | alle zes van het gekozen cluster | alle zes (publiek) |
 | **Stuurgroep** / **Budget** | Budget (eigen aanvragen) | Werkpagina's | Werkpagina's | – (knop verborgen) |
-| **Meer** | rolverdeling, Teams-knop, uitloggen | materialenlijst, thema instellen, Teams-knop, uitloggen | beheer, materialenlijst, thema, uitloggen | Teams-knop, uitloggen |
+| **Meer** | rolverdeling, Stuurgroep: onderwerpen en leden, Teams-knop, uitloggen | Stuurgroep: onderwerpen en leden, materialenlijst, thema instellen, Teams-knop, uitloggen | Stuurgroep: onderwerpen en leden, beheer, materialenlijst, thema, uitloggen | Stuurgroep: onderwerpen en leden, Teams-knop, uitloggen |
 
 Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descriptor`), daarnaast naam en logo van het meerdaagsethema (of het woordmerk "BackPACK_" zolang er geen thema is), het accountlabel (bijv. "VD · Projectgroep 3") en later de zoekknop. Bij de docent staat in het label het gekozen cluster ("Docent · TEST") en brengt een tik erop je naar de clusterkeuze op het startscherm.
 
@@ -29,6 +29,9 @@ Bovenaan elk scherm: witte kopbalk met links het HAN-logo (`han-woordmerk-descri
 
 ## Schermen opdracht 1–5
 
+### Stuurgroep: onderwerpen en leden (`/meer/stuurgroep`, onder Meer voor alle accounts)
+De zes stuurgroeprollen met hun onderwerp (focus) en de namen van de studenten, met het aantal personen. Voor iedereen in het cluster zichtbaar; de eigen rol is gemarkeerd. De namen worden door de stuurgroep zelf ingevuld op de pagina Stuurgroep (één naam per veld, zoals bij de rolverdeling).
+
 ### Inloggen
 Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit het logo `han-sport-en-bewegen`; daaronder sfeerfoto `wandeling-schemer-staand`. Geen "wachtwoord vergeten" (de docent reset).
 
@@ -38,6 +41,7 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 2. Aftellen tot 28 juni 2027, in kalenderdagen in Nederlandse tijd (het getal springt dus om middernacht, ook in de winter).
 2a. Kaart "Deadlines" (onder de aftelling): wat moet wanneer af en hoe lang het nog duurt, op volgorde van datum, met kleur, icoon en tekst (ruim, binnenkort, vandaag of morgen, verstreken). Een projectgroep ziet de eigen stand per onderdeel ("2 punten open", met een link naar de plek), wat klaar is staat onder "klaar". Stuurgroep en docent zien "4 van 6 groepen klaar", wie nog open staat, een knop "Kopieer herinnering voor Teams" en "Deadlines beheren"; is er nog niets ingesteld, dan staat daar de knop "Deadlines instellen". Een student ziet de deadlines zonder stand. Zonder deadlines ziet een projectgroep of student de kaart niet.
 3. Zes belevenissen als kaarten: titel, publieke samenvatting, statuslabel.
+   Elke kaart toont ook de groepsleden: "9 personen: Anna, Bram, …" (elke naam één keer, ook als iemand bij twee rollen staat), of "Nog geen namen ingevuld". Dit zien alle accounts van het cluster, zodat studenten elkaar kunnen vinden.
 4. Alleen projectgroep: blok "Jullie AVF" met voortgang per sectie en open verbeterverzoeken.
 5. Alleen stuurgroep en docent: per stuurgroeprol één regel stand van zaken (bijv. "Budget: € 180 van € 250 vrij", "2 materiaaltekorten", "3 AVF's wachten op beoordeling").
 
@@ -50,7 +54,7 @@ Gebruikersnaam en wachtwoord, "ingelogd blijven" standaard aan. Bovenaan op wit 
 - Sectie H: drie blokken Voor, Tijdens en Na.
 - Sectie A vraagt de locatie (camping of bivak) vooraan, direct onder het tijdvak. Bij allergieën (sectie G) geeft het antwoord Nee een zachte waarschuwing; die blokkeert niets.
 - Sectie F (niet verplicht: alleen invullen bij materiaal of budget): eerst de locatie (anders een melding met link naar sectie A) en de lijst (anders de melding dat de materialenlijst nog niet klaar is). Daarna materiaal kiezen uit de lijst met aantal en fase (kop, romp, staart of hele belevenis) en de beschikbare voorraad op de locatie en op dit moment; een tekort is een waarschuwing en blokkeert niets. Eigen materiaal (zonder voorraad). Het financieel plan volgt in deel B.
-- Rolverdeling (onder "Meer" en als controle bij indienen).
+- Rolverdeling (onder "Meer" en als controle bij indienen): per rol één veld per naam, met steeds een leeg veld erbij; een kruisje verwijdert een naam. Een komma werkt niet als scheiding. Opslaan zoals bij de andere velden (tijdens het typen, waarschuwing bij gelijktijdig wijzigen). De namen zijn voor het hele cluster zichtbaar (zie hieronder).
 - Velden worden opgeslagen terwijl je typt (na ongeveer een seconde stilte) en bij het verlaten van het veld of de pagina, zodat er niets verloren gaat als je direct doorklikt. Is er nog iets niet opgeslagen terwijl de pagina sluit, dan waarschuwt de browser.
 - Een onderdeel (sectie D): naam, duur, beschrijving en veiligheid staan direct zichtbaar. Differentiatie en USV zijn niet verplicht en klappen in (met het label "Ingevuld" of "Niet verplicht").
 - Knop **Indienen**: toont eerst een controlelijst van ontbrekende verplichte velden, vraagt om een naam en vanaf versie 2 om een wijzigingssamenvatting. De controlelijst begint met een samenvatting ("Nog 12 punten open in 5 secties"). Elke sectie klapt in als er meer dan drie punten openstaan, en elk punt linkt naar de plek waar je het invult (sectie D opent de juiste fase, de rolverdeling staat onder Meer).

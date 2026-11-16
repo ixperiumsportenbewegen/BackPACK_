@@ -4,17 +4,16 @@ import { revalidatePath } from "next/cache";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
 import { PROJECTGROEPROLLEN } from "@/config/projectgroeprollen";
+import { splitNamen, voegNamenSamen } from "@/lib/namen";
 
 export type NamenResultaat =
   | { status: "ok"; namen: string | null; updatedAt: string }
   | { status: "conflict"; namen: string | null; updatedAt: string }
   | { status: "fout"; melding: string };
 
-const MAX = 200;
-
+/** De namen komen als tekst met komma's binnen (één naam per veld in de app) en worden opgeschoond opgeslagen. */
 function schoon(namen: string): string | null {
-  const t = namen.trim().replace(/\s+/g, " ");
-  return t === "" ? null : t.slice(0, MAX);
+  return voegNamenSamen(splitNamen(namen));
 }
 
 /** Naam van de verantwoordelijke student(en) bij een rol van de eigen projectgroep. */

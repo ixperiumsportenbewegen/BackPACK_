@@ -1,4 +1,5 @@
-import { CheckCircle2, CircleDashed, Clock, RotateCw, Send, TriangleAlert } from "lucide-react";
+import { CheckCircle2, CircleDashed, Clock, RotateCw, Send, TriangleAlert, Users } from "lucide-react";
+import { aantalPersonen } from "@/lib/namen";
 import { formatTijdvak } from "@/lib/tijd";
 
 export type AvfStatus = "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
@@ -36,6 +37,8 @@ export interface KaartGegevens {
   samenvatting: string | null;
   tijdvak: { dag: string; starttijd: string; eindtijd: string } | null;
   status: AvfStatus;
+  /** De namen van de groepsleden; alleen tonen als dit is meegegeven. */
+  leden?: string[];
 }
 
 /** De publieke kaart van een belevenis: alleen wat andere groepen en studenten mogen zien. */
@@ -56,6 +59,19 @@ export function BelevenisKaart({ k, kop = "h3" }: { k: KaartGegevens; kop?: "h2"
           {k.tijdvak ? formatTijdvak(k.tijdvak) : "Nog niet ingepland"}
         </span>
       </div>
+      {k.leden && (
+        <p className="mt-3 flex items-start gap-2 text-sm text-tekst">
+          <Users aria-hidden className="mt-0.5 size-4 shrink-0 text-kop" />
+          {k.leden.length > 0 ? (
+            <span>
+              <span className="font-bold text-kop">{aantalPersonen(k.leden.length)}: </span>
+              {k.leden.join(", ")}
+            </span>
+          ) : (
+            <span className="text-zacht">Nog geen namen ingevuld</span>
+          )}
+        </p>
+      )}
     </article>
   );
 }

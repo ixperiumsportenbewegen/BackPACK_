@@ -42,7 +42,7 @@ Zes per cluster.
 | code | enum `stuurgroeprol_code` | `projectleiding`, `programma_kwaliteit`, `beleving_thema`, `veiligheid_welzijn`, `logistiek_facilitair`, `communicatie_financien` |
 | naam | text | weergavenaam, bijv. "Programma & Kwaliteit" |
 | focus | text | bijv. "Planning, samenhang en overdracht" |
-| studenten | text | namen van de twee studenten (vrije tekst) |
+| studenten | text | namen van de studenten bij deze rol, gescheiden door een komma ("Anna, Bram"); in de app één naam per veld, zie `src/lib/namen.ts`; oude vrije tekst blijft leesbaar |
 | pack | enum `pack_vak` | `P`, `A`, `C` of `K` (zie PRD 4.1) |
 
 Uniek: (`cluster_id`, `code`).
@@ -64,7 +64,7 @@ Zes vaste rollen per projectgroep. PK (`projectgroep_id`, `rol`).
 |---|---|---|
 | projectgroep_id | uuid → projectgroep | |
 | rol | enum `projectgroeprol` | `projectleider`, `programma_beleving`, `veiligheid_ehbo`, `logistiek_materialen`, `catering`, `corvee_communicatie` |
-| namen | text | verantwoordelijke student(en), vrije tekst |
+| namen | text | verantwoordelijke student(en), gescheiden door een komma ("Anna, Bram"); in de app één naam per veld; leesbaar voor het hele cluster |
 
 ### account
 Koppelt een Supabase Auth-gebruiker aan een rol. PK = `auth.users.id`.

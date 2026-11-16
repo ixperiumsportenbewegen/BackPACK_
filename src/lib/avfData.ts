@@ -2,6 +2,7 @@ import { cache } from "react";
 import { maakServerClient } from "@/lib/supabase/server";
 import type { AvfInhoud, FaseInhoud, Json, OnderdeelInhoud } from "@/lib/avfVoortgang";
 import { isGevuld } from "@/lib/avfVoortgang";
+import { uniekeNamen } from "@/lib/namen";
 
 export interface Tijdvak {
   id: string;
@@ -158,6 +159,8 @@ export interface PubliekeKaart {
   samenvatting: string | null;
   tijdvak: { dag: string; starttijd: string; eindtijd: string } | null;
   status: "in_ontwikkeling" | "ingediend" | "aanpassing_gevraagd" | "goedgekeurd";
+  /** De namen van de groepsleden, zoals de groep ze zelf invulde (elke naam één keer). */
+  leden: string[];
 }
 
 /** De publieke kaarten van alle belevenissen in een cluster (alleen wat avf_publiek toont). */
@@ -165,9 +168,16 @@ export async function laadKaarten(clusterId: string): Promise<PubliekeKaart[]> {
   const supabase = await maakServerClient();
   const { data } = await supabase
     .from("avf_publiek")
-    .select("id, projectgroep_nummer, projectgroep_naam, titel, verschijningsvorm, publieke_samenvatting, status, dag, starttijd, eindtijd")
+    .select("id, projectgroep_id, projectgroep_nummer, projectgroep_naam, titel, verschijningsvorm, publieke_samenvatting, status, dag, starttijd, eindtijd")
     .eq("cluster_id", clusterId)
     .order("projectgroep_nummer");
+  // De namen van de groepsleden: iedereen in het cluster mag ze lezen (besluit 2026-11-16).
+  const groepIds = (data ?? []).map((r) => r.projectgroep_id as string);
+  const { data: rollen } = groepIds.length
+    ? await supabase.from("projectgroep_rol").select("projectgroep_id, namen").in("projectgroep_id", groepIds)
+    : { data: [] as { projectgroep_id: string; namen: string | null }[] };
+  const ledenPerGroep = new Map<string, (string | null)[]>();
+  for (const r of rollen ?? []) ledenPerGroep.set(r.projectgroep_id, [...(ledenPerGroep.get(r.projectgroep_id) ?? []), r.namen]);
   return (data ?? []).map((r) => ({
     id: r.id,
     projectgroepNummer: r.projectgroep_nummer,
@@ -177,5 +187,6 @@ export async function laadKaarten(clusterId: string): Promise<PubliekeKaart[]> {
     samenvatting: r.publieke_samenvatting,
     tijdvak: r.dag ? { dag: r.dag, starttijd: r.starttijd, eindtijd: r.eindtijd } : null,
     status: r.status,
+    leden: uniekeNamen(ledenPerGroep.get(r.projectgroep_id) ?? []),
   }));
 }

@@ -109,12 +109,26 @@ describe("Rechten binnen het eigen cluster", () => {
     expect(data).toHaveLength(1);
   });
 
-  it("studenten zien projectgroep_rol niet; projectgroepen en stuurgroep wel", async () => {
-    const student = await (await inloggenAls("vd-student")).from("projectgroep_rol").select("*");
+  it("de rolverdeling met namen is voor iedereen in het eigen cluster leesbaar en voor niemand in het andere", async () => {
+    // Studenten organiseren voor elkaar en moeten elkaar kunnen vinden (besluit 2026-11-16).
+    for (const naam of ["vd-student", "vd-groep-2", "vd-stuur-programma"]) {
+      const { data } = await (await inloggenAls(naam)).from("projectgroep_rol").select("projectgroep_id");
+      expect(data?.length, naam).toBe(36); // 6 groepen x 6 rollen, alleen van VD
+    }
+    for (const naam of ["vc-student", "vc-groep-1", "vc-stuur-programma"]) {
+      const { data } = await (await inloggenAls(naam)).from("projectgroep_rol").select("projectgroep_id");
+      expect(data?.length, naam).toBe(36); // alleen van VC
+    }
+    // En niet te schrijven door een student of een andere groep (zie ook de tests hieronder).
+    const student = await (await inloggenAls("vd-student")).from("projectgroep_rol").update({ namen: "Gehackt" }).neq("rol", "x").select();
     expect(student.data ?? []).toHaveLength(0);
-    for (const naam of ["vd-groep-2", "vd-stuur-programma"]) {
-      const { data } = await (await inloggenAls(naam)).from("projectgroep_rol").select("*");
-      expect(data?.length, naam).toBe(36); // 6 groepen x 6 rollen
+  });
+
+  it("de namen van de stuurgroepleden zijn voor het hele eigen cluster leesbaar en niet voor het andere", async () => {
+    for (const naam of ["vd-student", "vd-groep-3"]) {
+      const { data } = await (await inloggenAls(naam)).from("stuurgroeprol").select("cluster_id, studenten");
+      expect(data?.length, naam).toBe(6);
+      expect(new Set(data?.map((r) => r.cluster_id)), naam).toEqual(new Set([VD]));
     }
   });
 

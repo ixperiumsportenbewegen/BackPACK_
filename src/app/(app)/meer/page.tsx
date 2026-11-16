@@ -1,7 +1,7 @@
 import { SubmitKnop } from "@/components/SubmitKnop";
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
-import { CalendarClock, CalendarDays, FileText, Package, Palette, Settings, Users } from "lucide-react";
+import { CalendarClock, CalendarDays, FileText, Package, Palette, Settings, Users, UsersRound } from "lucide-react";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -26,6 +26,14 @@ export default async function Meer() {
       >
         <CalendarDays aria-hidden className="size-5" strokeWidth={1.75} />
         Programma van de meerdaagse
+      </Link>
+
+      <Link
+        href="/meer/stuurgroep"
+        className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop"
+      >
+        <UsersRound aria-hidden className="size-5" strokeWidth={1.75} />
+        Stuurgroep: onderwerpen en leden
       </Link>
 
       {profiel.soort === "docent" && (

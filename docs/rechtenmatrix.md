@@ -21,7 +21,7 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | meerdaagsethema | L S | L S | L | L | L |
 | stuurgroeprol (namen studenten) | L S | L S (eigen rol) | L | L | L |
 | projectgroep | L S | L | L | L | L |
-| projectgroep_rol (rolverdeling) | L S | L | L S | L | – |
+| projectgroep_rol (rolverdeling met namen) | L S | L | L S | L | L (besluit 2026-11-16: iedereen in het eigen cluster ziet de namen van de groepsleden; schrijven alleen de eigen groep en de docent) |
 | account | L S (via beheerfunctie) | L eigen | L eigen | – | L eigen |
 | avf – volledige inhoud | L S | L (wijzigen alleen via verbeterverzoek) | L, S zolang status niet `ingediend` is | – | – |
 | avf.programma_regel_id (tijdvak) | L, wijzigen via F | F (`avf_planning_toewijzen`, `avf_planning_wisselen`) | L (nooit wijzigen) | tijdvak via `avf_publiek` | tijdvak via `avf_publiek` |

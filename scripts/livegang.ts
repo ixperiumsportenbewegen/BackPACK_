@@ -3,7 +3,7 @@
  *
  *  - maakt eerst een export (export/voor-livegang-<tijd>.json en .xlsx);
  *  - verwijdert alle AVF-gegevens van het cluster: inhoud, fasen, onderdelen, versies, verbeterverzoeken, themachecks,
- *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, het calamiteitenplan, de items op de persoonlijke paklijst (de categorieën blijven), logboek en de bestanden in Storage;
+ *    gekozen materialen, materiaalaanvragen, budgetaanvragen, deadlines, het calamiteitenplan, de items op de persoonlijke paklijst (de categorieën blijven), de 10 bergtoppen, logboek en de bestanden in Storage;
  *  - zet het meerdaagsethema, de rolverdeling en de namen van de stuurgroepleden terug naar leeg;
  *  - laadt de basisgegevens opnieuw (npm run seed) zonder voorbeeld-AVF: de groepen krijgen weer het standaardtijdvak;
  *  - maakt nieuwe wachtwoorden voor alle accounts van het cluster en trekt hun sessies in.
@@ -106,7 +106,9 @@ async function overzicht(c: Cluster) {
     themachecks: await perAvf("themacheck"), materialen: await perAvf("avf_materiaal"), materiaalaanvragen: await perAvf("materiaal_aanvraag"),
     budgetaanvragen: await perAvf("budgetaanvraag"), deadlines: await tel("deadline", (q) => q.eq("cluster_id", c.id)),
     calamiteitenplan: (await tel("calamiteit_veld", (q) => q.eq("cluster_id", c.id))) + (await tel("calamiteit_item", (q) => q.eq("cluster_id", c.id))),
-    paklijst: await tel("paklijst_item", (q) => q.eq("cluster_id", c.id)), logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
+    paklijst: await tel("paklijst_item", (q) => q.eq("cluster_id", c.id)),
+    bergtoppen: (await tel("bergtop_veld", (q) => q.eq("cluster_id", c.id))) + (await tel("bergtop_publicatie", (q) => q.eq("cluster_id", c.id))),
+    logboek: await tel("wijziging", (q) => q.eq("cluster_id", c.id)),
     accounts, bestanden,
   };
 }
@@ -181,8 +183,11 @@ async function maakSchoon(c: Cluster, ids: string[]) {
   await ok(admin.from("calamiteit_item").delete().eq("cluster_id", c.id), "calamiteitenplan (regels)");
   // de persoonlijke paklijst: de items zijn testdata en gaan weg; de categorieën blijven staan (zoals de categorieën van de materialenlijst)
   await ok(admin.from("paklijst_item").delete().eq("cluster_id", c.id), "paklijst (items)");
+  // de 10 bergtoppen (concept en gepubliceerde versie) zijn testdata; de link naar het inschrijfformulier blijft staan
+  await ok(admin.from("bergtop_veld").delete().eq("cluster_id", c.id), "bergtoppen (concept)");
+  await ok(admin.from("bergtop_publicatie").delete().eq("cluster_id", c.id), "bergtoppen (gepubliceerd)");
   await ok(admin.from("wijziging").delete().eq("cluster_id", c.id), "logboek");
-  console.log("  thema, rolverdeling, namen, deadlines, calamiteitenplan, paklijst-items en logboek teruggezet");
+  console.log("  thema, rolverdeling, namen, deadlines, calamiteitenplan, paklijst-items, bergtoppen en logboek teruggezet");
 }
 
 async function nieuweWachtwoorden(clusters: Cluster[]) {
@@ -230,7 +235,7 @@ async function main() {
     const o = await overzicht(c);
     per.set(c.code, o);
     console.log(`${c.naam} (${c.code}): ${o.avfs} AVF's (${o.onderdelen} onderdelen, ${o.versies} versies, ${o.verzoeken} verbeterverzoeken, ${o.themachecks} themachecks),`);
-    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.calamiteitenplan} regels in het calamiteitenplan, ${o.paklijst} items op de paklijst, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
+    console.log(`  ${o.materialen} gekozen materialen, ${o.materiaalaanvragen} materiaalaanvragen, ${o.budgetaanvragen} budgetaanvragen, ${o.deadlines} deadlines, ${o.calamiteitenplan} regels in het calamiteitenplan, ${o.paklijst} items op de paklijst, ${o.bergtoppen} onderdelen van de bergtoppen, ${o.logboek} logregels, ${o.bestanden} bestanden in Storage,`);
     console.log(zonderWachtwoorden ? `  ${o.accounts} accounts houden hun wachtwoord (--zonder-wachtwoorden).` : `  ${o.accounts} accounts krijgen een nieuw wachtwoord.`);
   }
   console.log("\nBlijft staan: de materialenlijst, het programma (tijden en activiteiten), de links, het clusterbudget, het docentaccount en cluster TEST.");

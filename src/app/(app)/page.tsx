@@ -1,13 +1,14 @@
 import { SubmitKnop } from "@/components/SubmitKnop";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { CalendarDays, ChevronRight } from "lucide-react";
+import { CalendarDays, ChevronRight, Mountain } from "lucide-react";
 import { BelevenisKaart } from "@/components/BelevenisKaart";
 import { DeadlinesKaart } from "@/components/DeadlinesKaart";
 import { JullieAvfBlok } from "@/components/JullieAvfBlok";
 import { STUURGROEPROL_VOLGORDE } from "@/config/projectgroeprollen";
 import { laadEigenAvf, laadKaarten } from "@/lib/avfData";
 import { laadStanden } from "@/lib/beoordeling";
+import { zichtbareBergtoppen } from "@/lib/bergtoppen";
 import { euro, laadClusterBudget, laadResterend } from "@/lib/budget";
 import { getProfiel } from "@/lib/profiel";
 import { dagenTot } from "@/lib/tijd";
@@ -25,6 +26,7 @@ export default async function OnzeMeerdaagse() {
   const supabase = await maakServerClient();
   const kaarten = profiel.cluster ? await laadKaarten(profiel.cluster.id) : [];
   const eigenAvf = profiel.soort === "projectgroep" ? await laadEigenAvf() : null;
+  const bergtoppen = profiel.cluster ? await zichtbareBergtoppen(profiel.cluster.id) : null;
   const toonStand = profiel.soort === "stuurgroep" || profiel.soort === "docent";
   const { data: rollen } = toonStand
     ? await supabase.from("stuurgroeprol").select("code, naam").eq("cluster_id", profiel.cluster?.id ?? "")
@@ -119,6 +121,16 @@ export default async function OnzeMeerdaagse() {
 
       {/* Het eigen AVF van een projectgroep staat direct onder het themablok, dat als titelbanner dient. */}
       {eigenAvf && <JullieAvfBlok avf={eigenAvf} />}
+
+      {bergtoppen && (
+        <Link
+          href="/bergtoppen" data-testid="bergtoppen-kaart"
+          className="flex min-h-aanraak items-center justify-between gap-3 rounded-han border-2 border-merk bg-vlak px-4 py-3 font-bold text-kop"
+        >
+          <span className="flex items-center gap-3 text-lg"><Mountain aria-hidden className="size-6 shrink-0 text-merk" /> De 10 bergtoppen: onze afspraken</span>
+          <ChevronRight aria-hidden className="size-5 shrink-0" />
+        </Link>
+      )}
 
       <section className="rounded-han border border-rand bg-vlak p-4">
         <p className="text-sm font-medium text-zacht">Ardennen-meerdaagse · 28–30 juni 2027</p>

@@ -74,6 +74,10 @@ async function main() {
   if (planRegels) meld(`${planRegels} regel(s) in het calamiteitenplan`);
   const paklijst = await telling("paklijst_item", (q) => q.eq("cluster_id", cluster.id));
   if (paklijst) meld(`${paklijst} item(s) op de persoonlijke paklijst`);
+  const bergtoppen = await telling("bergtop_veld", (q) => q.eq("cluster_id", cluster.id));
+  if (bergtoppen) meld(`${bergtoppen} veld(en) van de 10 bergtoppen`);
+  const bergtopPublicatie = await telling("bergtop_publicatie", (q) => q.eq("cluster_id", cluster.id));
+  if (bergtopPublicatie) meld(`een gepubliceerde versie van de 10 bergtoppen`);
   const log = await telling("wijziging", (q) => q.eq("cluster_id", cluster.id));
   if (log) meld(`${log} logregel(s)`);
 

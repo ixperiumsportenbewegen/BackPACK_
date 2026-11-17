@@ -10,6 +10,8 @@ import { laadAvf, laadKaarten } from "@/lib/avfData";
 import { sectieVoortgang } from "@/lib/avfVoortgang";
 import { veldStand, type VeldStand } from "@/lib/avfVeldStatus";
 import { laadVerzoekenCluster } from "@/lib/beoordeling";
+import { laadBergtoppen } from "@/lib/bergtoppen";
+import { bergtoppenOntbreekt, conceptVerschilt, toppenIngevuld } from "@/lib/bergtoppenStatus";
 import { laadPlan } from "@/lib/calamiteitenplan";
 import { laadPaklijst } from "@/lib/paklijst";
 import { opsomming, paklijstOntbreekt, planOntbreekt } from "@/lib/planStatus";
@@ -91,6 +93,22 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
   const paklijstOntbrekend = rolCode === "logistiek_facilitair" ? paklijstOntbreekt(await laadPaklijst(cluster.id)) : [];
   const planAandacht = planOntbrekend.length > 0 ? `Nog niet af: nog in te vullen: ${opsomming(planOntbrekend)}.` : undefined;
   const paklijstAandacht = paklijstOntbrekend.length > 0 ? `Nog niet af: er staan nog geen items bij ${opsomming(paklijstOntbrekend)}.` : undefined;
+
+  // De 10 bergtoppen (Veiligheid & Welzijn): een uitroepteken tot ze volledig zijn én gepubliceerd; daarna alleen een notitie bij wijzigingen.
+  let bergtoppenAandacht: string | undefined;
+  let bergtoppenNotitie: string | undefined;
+  if (rolCode === "veiligheid_welzijn") {
+    const b = await laadBergtoppen(cluster.id);
+    const ontbreekt = bergtoppenOntbreekt(b.velden);
+    const gepubliceerd = b.publicatie?.zichtbaar === true;
+    if (!gepubliceerd) {
+      bergtoppenAandacht = ontbreekt.length > 0
+        ? `Nog niet af: ${toppenIngevuld(b.velden)} van de 10 toppen ingevuld${ontbreekt.includes("toelichting") ? " en de toelichting ontbreekt" : ""}.`
+        : b.publicatie ? "Ingetrokken: studenten zien de bergtoppen niet. Publiceer ze opnieuw." : "Klaar, maar nog niet gepubliceerd: studenten zien ze nog niet.";
+    } else if (conceptVerschilt(b.velden, b.publicatie!.inhoud)) {
+      bergtoppenNotitie = "Let op: er zijn wijzigingen die nog niet zijn gepubliceerd.";
+    }
+  }
 
   const velden = AVF_VELDEN.filter((v) => v.sgRol === rolCode);
   const rol = ROLLEN[rolCode];
@@ -180,6 +198,13 @@ export default async function RolPagina({ params }: { params: Promise<{ code: st
           href="/meer/calamiteitenplan" titel="Calamiteitenplan (incl. EHBO)"
           uitleg="Het algemene plan voor jullie cluster: eerste stappen, noodnummer, contactpersonen en ziekenhuizen. Jullie vullen het in, iedereen leest het onder Meer."
           aandacht={planAandacht}
+        />
+      )}
+      {rolCode === "veiligheid_welzijn" && (
+        <LinkKaart
+          href="/bergtoppen/bewerken" titel="De 10 bergtoppen (gedragsafspraken)"
+          uitleg={`Tien afspraken voor de meerdaagse, met een toelichting en de link naar het inschrijfformulier. Jullie vullen ze in en publiceren ze; daarna lezen studenten ze op Onze meerdaagse.${bergtoppenNotitie ? ` ${bergtoppenNotitie}` : ""}`}
+          aandacht={bergtoppenAandacht}
         />
       )}
       {rolCode === "veiligheid_welzijn" && (

@@ -272,6 +272,19 @@ Regels in lijsten (contactpersonen, ziekenhuizen, situaties met verhoogd risico,
 ### cluster.whatsapp_link
 De link naar de groepsapp voor noodmeldingen (https, optioneel). Alleen een link: er is geen chat in de app.
 
+## De 10 bergtoppen (gedragsafspraken)
+
+Per cluster precies 10 vaste toppen met een titel en een afspraak, plus een toelichting onder de toppen (zie `src/config/bergtoppen.ts`). Eerst een concept, daarna bewust publiceren.
+
+### bergtop_veld (het concept)
+`cluster_id`, `sleutel` (`top_1_titel` t/m `top_10_afspraak`, `toelichting_titel`, `toelichting`), `tekst` (titel maximaal 80 tekens, afspraak 300, toelichting 3000), `bijgewerkt_door_naam`, tijden. Alleen de stuurgroep van het cluster en de docent lezen dit.
+
+### bergtop_publicatie (wat studenten zien)
+`cluster_id` (één rij per cluster), `versie` (telt op bij elke publicatie), `inhoud` (json: de 10 toppen en de toelichting op het moment van publiceren), `zichtbaar` (intrekken zet dit uit), `gepubliceerd_op`, `gepubliceerd_door_naam`. Iedereen in het cluster leest dit zolang `zichtbaar` aanstaat.
+
+### cluster.inschrijf_link
+De https-link naar het inschrijfformulier waar studenten de afspraken ondertekenen. De app bewaart zelf geen handtekeningen of namen van studenten.
+
 ## Persoonlijke paklijst
 
 Wat neemt een student mee? Per cluster, gemaakt door de stuurgroep. Niet te verwarren met de materiaalcontrole (`materiaal_telling`). Twee vaste blokken (`persoon` en `groepje`, zie `src/config/paklijst.ts`).

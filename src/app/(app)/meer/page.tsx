@@ -1,7 +1,8 @@
 import { SubmitKnop } from "@/components/SubmitKnop";
 import { PaginaKop } from "@/components/PaginaKop";
 import Link from "next/link";
-import { Backpack, CalendarClock, CalendarDays, FileText, MessageSquare, Package, Palette, Settings, Siren, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { Backpack, CalendarClock, CalendarDays, FileText, MessageSquare, Mountain, Package, Palette, Settings, Siren, Users, UsersRound, type LucideIcon } from "lucide-react";
+import { zichtbareBergtoppen } from "@/lib/bergtoppen";
 import { getProfiel } from "@/lib/profiel";
 import { uitloggen } from "../actions";
 
@@ -31,6 +32,7 @@ function Groep({ titel, children }: { titel: string; children: React.ReactNode }
 export default async function Meer() {
   const profiel = (await getProfiel())!;
   const teams = profiel.cluster?.teams_link;
+  const bergtoppen = profiel.cluster ? await zichtbareBergtoppen(profiel.cluster.id) : null;
   const stuurgroep = profiel.soort === "stuurgroep" || profiel.soort === "docent";
 
   return (
@@ -45,6 +47,7 @@ export default async function Meer() {
       <Groep titel="Praktisch voor iedereen">
         <MeerLink href="/meer/calamiteitenplan" icoon={Siren} opvallend>Calamiteitenplan (incl. EHBO)</MeerLink>
         <MeerLink href="/meer/paklijst" icoon={Backpack}>Persoonlijke paklijst</MeerLink>
+        {bergtoppen && <MeerLink href="/bergtoppen" icoon={Mountain}>De 10 bergtoppen (afspraken)</MeerLink>}
         <MeerLink href="/programma" icoon={CalendarDays}>Programma van de meerdaagse</MeerLink>
         <MeerLink href="/meer/stuurgroep" icoon={UsersRound}>Stuurgroep: onderwerpen en leden</MeerLink>
         {teams && (

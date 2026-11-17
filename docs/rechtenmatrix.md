@@ -20,6 +20,8 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | cluster.whatsapp_link (groepsapp voor noodmeldingen) | L S | L, S via `cluster_whatsapp_link_zetten` (hele stuurgroep van het eigen cluster) | L | L | L |
 | calamiteit_veld, calamiteit_item (calamiteitenplan) | L S | L, S (hele stuurgroep van het eigen cluster, via functies) | L | L | L (besluit 2026-11-16: iedereen in het eigen cluster leest het plan; een ander cluster niets) |
 | paklijst_categorie, paklijst_item (persoonlijke paklijst) | L S | L, S (hele stuurgroep van het eigen cluster, via functies) | L | L | L (besluit 2026-11-16: iedereen in het eigen cluster leest de lijst; een ander cluster niets) |
+| bergtop_veld (concept van de 10 bergtoppen) | L, S (alleen de stuurgroep van het eigen cluster en de docent lezen het concept) | L, S (via functies) | - | - | - (studenten en projectgroepen zien het concept niet; besluit 2026-11-17) |
+| bergtop_publicatie (gepubliceerde versie van de 10 bergtoppen) | L S | L, S (alleen via functies) | L (alleen zolang hij zichtbaar is) | L (alleen zolang hij zichtbaar is) | L (alleen zolang hij zichtbaar is) |
 | systeem_instelling (markering livegang) | – (alleen server) | – | – | – | – |
 | meerdaagsethema | L S | L S | L | L | L |
 | stuurgroeprol (namen studenten) | L S | L S (eigen rol) | L | L | L |
@@ -79,6 +81,11 @@ Afgedwongen met Row Level Security en Postgres-functies. Elke regel krijgt een t
 | `paklijst_item_toevoegen(categorie_id, bovenliggend_id, naam)`, `paklijst_item_veld_opslaan(id, veld, oud, nieuw, naam)`, `paklijst_item_verplaatsen(id, omhoog, naam)`, `paklijst_item_verwijderen(id, naam)` | Stuurgroep van het cluster, docent | Items (maximaal 100 per categorie) en onderdelen van een item (één niveau, maximaal 30); velden naam, aantal, toelichting en optioneel met opslaan per veld en een waarschuwing bij gelijktijdig wijzigen |
 | `paklijst_items_plakken(categorie_id, tekst, naam)` | Stuurgroep van het cluster, docent | Voegt een geplakte lijst toe aan een categorie: elke regel een item, een streepje of inspringen een onderdeel, | scheidt naam, aantal en toelichting; alles of niets |
 | `paklijst_overnemen(van_cluster, naar_cluster, naam)` | Alleen docent | Kopieert de hele paklijst (categorieën, items en onderdelen) van het ene cluster naar het andere en vervangt wat daar stond |
+| `bergtop_veld_opslaan(cluster_id, sleutel, oud, nieuw, naam)` | Stuurgroep van het cluster, docent | Eén veld van het concept van de 10 bergtoppen (titel of afspraak van top 1 t/m 10, titel of tekst van de toelichting); opslaan per veld met waarschuwing bij gelijktijdig wijzigen; alleen de vaste sleutels |
+| `bergtop_publiceren(cluster_id, naam)` | Stuurgroep van het cluster, docent | Legt het concept vast als nieuwe versie die studenten zien; alleen als alle 10 toppen (titel én afspraak) en de toelichting zijn ingevuld |
+| `bergtop_intrekken(cluster_id, naam)` | Stuurgroep van het cluster, docent | Verbergt de gepubliceerde versie voor studenten; het concept blijft |
+| `cluster_inschrijf_link_zetten(cluster_id, link, naam)` | Stuurgroep van het cluster, docent | De https-link naar het inschrijfformulier waar studenten de afspraken ondertekenen; leeg haalt hem weg |
+| `bergtoppen_overnemen(van_cluster, naar_cluster, naam)` | Alleen docent | Kopieert het concept van het ene cluster naar het andere (vervangt het concept daar); de gepubliceerde versie en de link blijven ongemoeid |
 | `blijf_actief()` | Iedereen, ook niet ingelogd | Geeft alleen het aantal edities terug (voor `/api/blijf-actief`) |
 
 Een goedgekeurd AVF blijft voor de projectgroep bewerkbaar. Een wezenlijke wijziging (verschijningsvorm, sectie D-onderdelen toevoegen of verwijderen, fysieke veiligheid van een onderdeel, sectie E of materialen) zet via een trigger `opnieuw_te_controleren = true`. De status blijft `goedgekeurd`, maar het AVF verschijnt bij de stuurgroep met het label "Opnieuw te controleren" tot een stuurgroeplid opnieuw goedkeurt. De stuurgroep wijzigt AVF-inhoud nooit zelf; zij plaatst verbeterverzoeken.

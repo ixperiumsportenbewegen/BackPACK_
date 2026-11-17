@@ -307,6 +307,9 @@ Wat neemt een student mee? Per cluster, gemaakt door de stuurgroep. Niet te verw
 
 ## Beheer
 
+### account_activiteit() (functie)
+Alleen voor de docent (anderen krijgen een fout). Geeft per account (zonder docent) `account_id`, `gebruikersnaam`, `soort`, `cluster_code`, `label`, `laatst_ingelogd` (uit `auth.users`), `laatst_gewerkt`, `avf_status` en `tussentijds`. Geen tabel en geen persoonsgegevens.
+
 ### systeem_instelling
 `sleutel`, `waarde`: alleen voor de server. Nu alleen `livegang_op` (tijdstip van de livegang): zolang die er is, laadt `npm run seed` geen voorbeeld-AVF meer in VD.
 

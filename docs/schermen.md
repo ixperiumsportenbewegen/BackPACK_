@@ -152,6 +152,9 @@ Wanneer een groep "klaar" is: sectie A t/m H: de bestaande voortgang is compleet
 ### Beheer (docent, `/beheer`, onder Meer)
 Alles exporteren als JSON of Excel (zonder afbeeldingen). Per cluster (VD, VC en TEST): de Teams-link en de Forms-link, en de lijst met accounts met de knop "Wachtwoord resetten". Een reset toont het nieuwe wachtwoord één keer, met een knop "Kopieer voor Teams" die een korte tekst met website, gebruikersnaam en wachtwoord kopieert om per groep te delen. Alle sessies van dat account worden uitgelogd. Het docentaccount reset je hier niet. De Forms-link kan ook de stuurgroep Communicatie & Financiën van het eigen cluster instellen, op de pagina Budget.
 
+### Activiteit (docent, `/beheer/activiteit`, knop op de pagina Beheer)
+Per cluster (VD, VC of TEST) een lijst van alle accounts: label (groep of stuurgroeprol), gebruikersnaam, laatst ingelogd, laatst gewerkt en de AVF-status. Elk account heeft één stand met kleur, icoon en tekst: **Gewerkt**, **Alleen ingelogd** of **Nog niet ingelogd**. Bovenaan een samenvatting per soort account ("4 van 6 hebben gewerkt, 6 van 6 ooit ingelogd") en een knop "Kopieer herinnering voor Teams" met de groepen en rollen die nog niet hebben gewerkt (alleen labels, geen personen). Gewerkt betekent bij een projectgroep: een opgeslagen sectie, een indiening, of een fase of onderdeel waar iets in staat; bij stuurgroep en docent: een actie in het logboek. Het is per gedeeld account en bevat geen persoonsgegevens. De gegevens komen uit de database-functie `account_activiteit()`, die alleen de docent mag aanroepen. Dezelfde gegevens staan in het script `npm run activiteit`.
+
 ## Stijl
 
 Zie `docs/huisstijl.md`. Kort: HAN rood, wit en zwart als basis; secundaire HAN-kleuren (oranje, groen, blauw) als outdoorlaag met zwarte tekst; Roboto en Roboto Condensed; foto's uit `assets/fotos`; Lucide-lijniconen tot de HAN-iconenset er is; statuskleuren altijd met tekst of icoon.

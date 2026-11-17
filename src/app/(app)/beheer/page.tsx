@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronLeft, Download, FileSpreadsheet } from "lucide-react";
+import { Activity, ChevronLeft, Download, FileSpreadsheet } from "lucide-react";
 import { PaginaKop } from "@/components/PaginaKop";
 import { getProfiel } from "@/lib/profiel";
 import { maakServerClient } from "@/lib/supabase/server";
@@ -56,6 +56,10 @@ export default async function Beheer() {
           </a>
         </div>
       </section>
+
+      <Link href="/beheer/activiteit" className="flex min-h-aanraak items-center gap-3 rounded-han border-2 border-kop bg-vlak px-4 font-bold text-kop">
+        <Activity aria-hidden className="size-5" strokeWidth={1.75} /> Activiteit: wie heeft ingelogd en gewerkt
+      </Link>
 
       <BeheerPaneel clusters={perCluster} />
     </div>

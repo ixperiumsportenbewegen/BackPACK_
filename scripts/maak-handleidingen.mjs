@@ -8,7 +8,7 @@
 // Resultaat: export/handleidingen/BackPACK_handleiding_VD_<rol>.pdf
 // De map export/ staat in .gitignore (met wachtwoorden erin nooit committen).
 import { chromium } from "playwright";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");

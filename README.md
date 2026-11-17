@@ -25,6 +25,7 @@ npx supabase link --project-ref aryntrmhpgowvzxyobfr
 | `npm run export` | Volledige export van de gegevens naar `export/` (JSON; met `-- --excel` ook Excel). Dit doet ook de wekelijkse GitHub Actions-taak |
 | `npm run livegang -- --droog` | Laat zien wat de livegang zou verwijderen, zonder iets te wijzigen |
 | `npm run controleer-leeg` | Alleen lezen: controleert of een cluster leeg is (standaard VD; `-- --cluster=VC` of `TEST`). Gebruik dit na het testen en voor de livegang |
+| `npm run activiteit` | Alleen lezen: per account het laatste inlogmoment en de laatste echte wijziging (standaard VD; `-- --cluster=VC` of `TEST`), met een samenvatting per soort account. Let op: een inlog door je eigen test telt ook mee |
 | `npm run livegang` | De livegang voor VD en VC: export vooraf, testdata weg, nieuwe wachtwoorden. Vraagt om het intypen van LIVEGANG. `-- --cluster=TEST` oefent op het fictieve cluster (daarna `npm run seed`). `-- --cluster=VD --zonder-wachtwoorden` maakt alleen de gegevens van VD leeg en laat wachtwoorden en links staan |
 
 Geheime instellingen (`CRON_SECRET`, de service role key in Vercel en GitHub), de dagelijkse blijf-actief-aanroep en de wekelijkse export: zie `docs/beheer-instellen.md`. De docent beheert wachtwoorden, links en de export in de app onder Meer, dan Beheer.

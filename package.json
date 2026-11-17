@@ -13,7 +13,8 @@
     "seed": "tsx scripts/seed.ts",
     "export": "tsx scripts/export.ts",
     "livegang": "tsx scripts/livegang.ts",
-    "controleer-leeg": "tsx scripts/controleer-leeg.ts"
+    "controleer-leeg": "tsx scripts/controleer-leeg.ts",
+    "activiteit": "tsx scripts/activiteit.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

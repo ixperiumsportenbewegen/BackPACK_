@@ -36,7 +36,7 @@ describe("account_activiteit", () => {
     const { data } = await docent.rpc("account_activiteit");
     const sleutels = new Set(Object.keys((data as Rij[])[0]));
     expect([...sleutels].sort()).toEqual(
-      ["account_id", "avf_status", "cluster_code", "gebruikersnaam", "label", "laatst_gewerkt", "laatst_ingelogd", "soort", "tussentijds"],
+      ["account_id", "avf_status", "cluster_code", "gebruikersnaam", "laatst_gewerkt", "laatst_ingelogd", "label", "soort", "tussentijds"],
     );
   });
 
